@@ -2,7 +2,6 @@ package com.isw2;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.api.errors.NoHeadException;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
@@ -10,6 +9,7 @@ import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class GitFilter {
 	private ArrayList<String> logMessages;
@@ -30,12 +30,10 @@ public class GitFilter {
         git = new Git(repo);
 	}
 
-	public ArrayList<String> filterLog(String filter) {
+	public List<String> filterLog(String filter) {
 		Iterable<RevCommit> log = null;
 		try {
 			log = this.git.log().call();
-		} catch (NoHeadException e) {
-			e.printStackTrace();
 		} catch (GitAPIException e) {
 			e.printStackTrace();
 		}
