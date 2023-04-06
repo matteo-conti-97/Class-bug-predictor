@@ -25,7 +25,6 @@ public class GitFilter {
 		try {
 			repo = builder.setGitDir(new File(repoPath+"\\.git")).setMustExist(true).build();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
         git = new Git(repo);
@@ -36,10 +35,8 @@ public class GitFilter {
 		try {
 			log = this.git.log().call();
 		} catch (NoHeadException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (GitAPIException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
         for (RevCommit rev : log) {
