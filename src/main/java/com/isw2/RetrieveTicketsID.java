@@ -25,10 +25,9 @@ public class RetrieveTicketsID {
 
    public static JSONArray readJsonArrayFromUrl(String url) throws IOException, JSONException {
        try (InputStream is = new URL(url).openStream()) {
-           BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+           BufferedReader rd = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
            String jsonText = readAll(rd);
-           JSONArray json = new JSONArray(jsonText);
-           return json;
+           return new JSONArray(jsonText);
        }
    }
 
