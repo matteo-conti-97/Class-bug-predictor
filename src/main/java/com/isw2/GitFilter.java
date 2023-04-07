@@ -12,39 +12,48 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GitFilter {
-	private ArrayList<String> logMessages;
-	private ArrayList<String> filteredLogMessages;
-	private FileRepositoryBuilder builder;
-	private Repository repo;
 	private Git git;
 
-	GitFilter(String repoPath){
-		logMessages=new ArrayList<>();
-		filteredLogMessages=new ArrayList<>();
-		builder = new FileRepositoryBuilder();
+	//Constructor in which is specified the path of the local repo
+	GitFilter(String repoPath) {
+		FileRepositoryBuilder builder = new FileRepositoryBuilder();
 		try {
-			repo = builder.setGitDir(new File(repoPath+"\\.git")).setMustExist(true).build();
+			Repository repo = builder.setGitDir(new File(repoPath + "\\.git")).setMustExist(true).build();
+			this.git = new Git(repo);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-        git = new Git(repo);
 	}
 
-	public List<String> filterLog(String filter) {
+
+	//Retrieve all repo commits
+	public List<String> getCommits() {
 		Iterable<RevCommit> log = null;
+		List<String> commitLog = new ArrayList<>();
 		try {
 			log = this.git.log().call();
 		} catch (GitAPIException e) {
 			e.printStackTrace();
 		}
         for (RevCommit rev : log) {
-          //Populate with filtered log
-          if (rev.getFullMessage().contains(filter)){
-        	 filteredLogMessages.add(rev.getFullMessage());
-          }
           //Populate with full log
-          logMessages.add(rev.getFullMessage());
+          commitLog.add(rev.getFullMessage());
         }
-		return filteredLogMessages;
+		return commitLog;
 	}
+
+	//Drop all commits until specified release TODO
+	public List<String> dropUntilRel(List<String> commitLog, String rel){
+		return commitLog;
+	}
+
+	//Drop all the commits not associated with specified ticket TODO
+	public List<String> filterByTicket(List<String> commitLog, String lbTicket){
+		return commitLog;
+	}
+
+
+	/*Bisogna prima di tutto capire quante versioni ci sono, poi bisogna associare i file java in git alla versione
+	Successivamente vanno prelevate tutte le metriche necessarie, è utile sicuramente calcolare qualche indice
+	come il linkage*/
 }

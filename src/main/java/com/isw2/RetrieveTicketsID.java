@@ -6,13 +6,9 @@ import org.json.JSONObject;
 
 import java.io.*;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 public class RetrieveTicketsID {
-
-
-
 
    private static String readAll(Reader rd) throws IOException {
 	      StringBuilder sb = new StringBuilder();
@@ -40,10 +36,10 @@ public class RetrieveTicketsID {
    }
 
 
-  
-  	   public static void main(String[] args) throws IOException, JSONException {
+  //In jira the affected version is the field "name" of the version
+   public static void main(String[] args) throws IOException, JSONException {
 		   
-		   String projName ="BOOKKEPER";
+       String projName ="BOOKKEPER";
 	   int j = 0;
        int i = 0;
        int total = 1;
