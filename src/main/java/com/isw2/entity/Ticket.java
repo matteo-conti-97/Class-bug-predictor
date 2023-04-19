@@ -1,5 +1,7 @@
 package com.isw2.entity;
 
+import java.util.List;
+
 public class Ticket {
 
     private String ticketId;
@@ -10,16 +12,21 @@ public class Ticket {
     private String creationDate;
     private String versionUrl;
     private String ticketUrl;
+    private List<Commit> gitCommits;
+
+    public Ticket() {
+
+    }
 
     public Ticket(String... args) {
         this.ticketId = args[0];
-        this.description = args[0];
-        this.type = args[0];
-        this.affectedVersion = args[0];
-        this.fixDate = args[0];
-        this.creationDate = args[0];
-        this.versionUrl = args[0];
-        this.ticketUrl = args[0];
+        this.description = args[1];
+        this.type = args[2];
+        this.affectedVersion = args[3];
+        this.fixDate = args[4];
+        this.creationDate = args[5];
+        this.versionUrl = args[6];
+        this.ticketUrl = args[7];
     }
 
     public String getTicketId() {
@@ -86,4 +93,7 @@ public class Ticket {
         this.ticketUrl = ticketUrl;
     }
 
+    public List<Commit> getGitCommits() { return gitCommits; }
+
+    public void setGitCommits(List<Commit> gitCommits) { this.gitCommits = gitCommits; }
 }

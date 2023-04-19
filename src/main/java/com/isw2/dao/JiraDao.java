@@ -1,5 +1,6 @@
 package com.isw2.dao;
 
+import com.isw2.entity.Ticket;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -8,18 +9,17 @@ import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
 public class JiraDao {
 
     private final String projectName;
-    private final String fixed_bug_query="https://issues.apache.org/jira/rest/api/2/search?jql=project='%s'AND'issueType'='Bug'AND('status'='closed'OR'status'='resolved')AND'resolution'='fixed'&fields=key,resolutiondate,versions,created&startAt=%s&maxResults=%s";
-    private final String all_release_query="https://issues.apache.org/jira/rest/api/2/project/%s/version?orderBy=releaseDate&status=released";
+    private final String fixed_bug_query = "https://issues.apache.org/jira/rest/api/2/search?jql=project='%s'AND'issueType'='Bug'AND('status'='closed'OR'status'='resolved')AND'resolution'='fixed'&fields=key,resolutiondate,versions,created&startAt=%s&maxResults=%s";
+    private final String all_release_query = "https://issues.apache.org/jira/rest/api/2/project/%s/version?orderBy=releaseDate&status=released";
 
-    public JiraDao(String projectName){
-        this.projectName=projectName;
+    public JiraDao(String projectName) {
+        this.projectName = projectName;
     }
 
     private static String readAll(Reader rd) throws IOException {
@@ -47,16 +47,21 @@ public class JiraDao {
         }
     }
 
+    public static String getJSONAttribute(JSONObject object, String attr) {
+        return object.get(attr).toString();
+    }
+
     //In jira the affected version is the field "name" of the version
-    public List<String> getFixedBugTickets(int start)  {
+    public List<String> getFixedBugTickets(int start) {
         ArrayList<String> ticketList = new ArrayList<>();
         int end = 0;
         int total = 1;
+        int max = 1000;
         do {
             //Only gets a max of 1000 at a time, so must do this multiple times if bugs >1000
-            end = start + 1000;
-            String query = String.format(fixed_bug_query, this.projectName, Integer.toString(start), Integer.toString(end));
-            System.out.println(query);
+            end = start + max;
+            String query = String.format(fixed_bug_query, this.projectName, start, end);
+            //System.out.println(query);
             JSONObject json = null;
             try {
                 json = readJsonFromUrl(query);
@@ -66,10 +71,10 @@ public class JiraDao {
             JSONArray issues = json.getJSONArray("issues");
             total = json.getInt("total");
             for (; start < total && start < end; start++) {
-                //Iterate through each bug
-                String key = issues.getJSONObject(start % 1000).get("key").toString();
-                ticketList.add(key);
-                System.out.println(key);
+                //Iterate through each bug TODO Mi serve di fare una funzione più generale che parsi un json contenente lista, qui voglio prendere il ticket e una parte dei suoi dati
+                String issueUrl = getJSONAttribute(issues.getJSONObject(start % max), "self");
+                ticketList.add(String.valueOf(new Ticket()));
+                //System.out.println(key);
             }
         } while (start < total);
 
