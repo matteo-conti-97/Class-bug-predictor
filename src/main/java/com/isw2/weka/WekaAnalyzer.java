@@ -4,6 +4,8 @@ import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
+
+import java.text.MessageFormat;
 import java.util.logging.Logger;
 
 
@@ -28,8 +30,8 @@ public class WekaAnalyzer {
 
         eval.evaluateModel(classifier, testing);
 
-        logger.fine("AUC = " + eval.areaUnderROC(1));
-        logger.fine("kappa = " + eval.kappa());
+        logger.fine(MessageFormat.format("AUC: {}", eval.areaUnderROC(1)));
+        logger.fine(MessageFormat.format("Kappa: {}", eval.kappa()));
 
 
     }
