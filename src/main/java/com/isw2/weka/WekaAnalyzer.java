@@ -1,15 +1,15 @@
 package com.isw2.weka;
 
-//import required classes
-
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
+import java.util.logging.Logger;
 
 
 public class WekaAnalyzer {
     public static void main(String[] args) throws Exception {
+        Logger logger = Logger.getLogger("WekaAnalyzerLogger");
         //load datasets
         DataSource source1 = new DataSource("C:\\Users\\matte\\Documents\\GitHub\\isw2-jira-git-measurement\\src\\main\\java\\resource\\breast-cancer-train.arff");
         Instances training = source1.getDataSet();
@@ -28,8 +28,8 @@ public class WekaAnalyzer {
 
         eval.evaluateModel(classifier, testing);
 
-        System.out.println("AUC = " + eval.areaUnderROC(1));
-        System.out.println("kappa = " + eval.kappa());
+        logger.info("AUC = " + eval.areaUnderROC(1));
+        logger.info("kappa = " + eval.kappa());
 
 
     }
