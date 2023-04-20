@@ -12,6 +12,7 @@ public class Ticket {
     private String creationDate;
     private String versionUrl;
     private String ticketUrl;
+    private String issuer;
     private List<Commit> gitCommits;
 
     public Ticket() {
@@ -27,6 +28,15 @@ public class Ticket {
         this.creationDate = args[5];
         this.versionUrl = args[6];
         this.ticketUrl = args[7];
+        this.issuer= args[8];
+    }
+
+    public String getIssuer() {
+        return issuer;
+    }
+
+    public void setIssuer(String issuer) {
+        this.issuer = issuer;
     }
 
     public String getTicketId() {

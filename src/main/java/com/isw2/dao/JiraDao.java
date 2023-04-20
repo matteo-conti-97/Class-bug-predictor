@@ -1,13 +1,10 @@
 package com.isw2.dao;
 
 import com.isw2.entity.Ticket;
+import com.isw2.util.JsonParser;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.*;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,37 +19,10 @@ public class JiraDao {
         this.projectName = projectName;
     }
 
-    private static String readAll(Reader rd) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        int cp;
-        while ((cp = rd.read()) != -1) {
-            sb.append((char) cp);
-        }
-        return sb.toString();
-    }
-
-    public static JSONArray readJsonArrayFromUrl(String url) throws IOException, JSONException {
-        try (InputStream is = new URL(url).openStream()) {
-            BufferedReader rd = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
-            String jsonText = readAll(rd);
-            return new JSONArray(jsonText);
-        }
-    }
-
-    public static JSONObject readJsonFromUrl(String url) throws IOException, JSONException {
-        try (InputStream is = new URL(url).openStream()) {
-            BufferedReader rd = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
-            String jsonText = readAll(rd);
-            return new JSONObject(jsonText);
-        }
-    }
-
-    public static String getJSONAttribute(JSONObject object, String attr) {
-        return object.get(attr).toString();
-    }
 
     //In jira the affected version is the field "name" of the version
     public List<String> getFixedBugTickets(int start) {
+        JsonParser jsonParser=new JsonParser();
         ArrayList<String> ticketList = new ArrayList<>();
         int end = 0;
         int total = 1;
@@ -64,17 +34,18 @@ public class JiraDao {
             //System.out.println(query);
             JSONObject json = null;
             try {
-                json = readJsonFromUrl(query);
+                json = jsonParser.readJsonFromUrl(query);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            JSONArray issues = json.getJSONArray("issues");
             total = json.getInt("total");
+            JSONArray issues = json.getJSONArray("issues");
             for (; start < total && start < end; start++) {
-                //Iterate through each bug TODO Mi serve di fare una funzione più generale che parsi un json contenente lista, qui voglio prendere il ticket e una parte dei suoi dati
-                String issueUrl = getJSONAttribute(issues.getJSONObject(start % max), "self");
-                ticketList.add(String.valueOf(new Ticket()));
-                //System.out.println(key);
+                //Iterate through each bug
+                String key = issues.getJSONObject(start%1000).get("key").toString();
+                ticketList.add(key);
+                //ticketList.add(String.valueOf(new Ticket()));
+                System.out.println(key);
             }
         } while (start < total);
 
