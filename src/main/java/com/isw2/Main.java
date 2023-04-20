@@ -16,19 +16,19 @@ public class Main {
         project.setCreationDate(gitDao.getProjectCreationDate());
         project.setReleases(jiraDao.getReleaseUntil(""));
         project.setInterestReleases(jiraDao.getReleaseUntil("4.4.0"));
-        logger.info("Project: "+project.getName());
-        logger.info("Creation date: "+project.getCreationDate());
-        logger.info(project.getReleases().size()+" releases:");
+        logger.fine("Project: "+project.getName());
+        logger.fine("Creation date: "+project.getCreationDate());
+        logger.fine(project.getReleases().size()+" releases:");
         for(int i=0;i<project.getReleases().size();i++) {
             Release tmp = project.getReleases().get(i);
-            logger.info(tmp.getName()+" "+tmp.getNumber()+" "+tmp.getReleaseDate()+" "+tmp.getEndDate());
+            logger.fine(tmp.getName()+" "+tmp.getNumber()+" "+tmp.getReleaseDate()+" "+tmp.getEndDate());
         }
-        logger.info(project.getInterestReleases().size()+" interest releases:");
+        logger.fine(project.getInterestReleases().size()+" interest releases:");
         for(int i=0;i<project.getInterestReleases().size();i++) {
             Release tmp = project.getReleases().get(i);
-            logger.info(tmp.getName()+" "+tmp.getNumber()+" "+tmp.getReleaseDate()+" "+tmp.getEndDate());
+            logger.fine(tmp.getName()+" "+tmp.getNumber()+" "+tmp.getReleaseDate()+" "+tmp.getEndDate());
         }
-        //logger.info(jiraDao.getFixedBugTickets(0));
+        //logger.fine(jiraDao.getFixedBugTickets(0));
         //gitDao.getAllCommits();
     }
 }

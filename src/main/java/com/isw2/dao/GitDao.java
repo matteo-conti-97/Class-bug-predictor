@@ -38,7 +38,7 @@ public class GitDao {
         try {
             commitListJson=jsonParser.readJsonArrayFromUrl(repoUrl);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
         for(int i=0; i<commitListJson.length(); i++){
             String commitHash=jsonParser.getJSONAttribute(commitListJson.getJSONObject(i),"sha");
