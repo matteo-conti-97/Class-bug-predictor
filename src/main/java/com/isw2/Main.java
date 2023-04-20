@@ -4,30 +4,31 @@ import com.isw2.dao.GitDao;
 import com.isw2.dao.JiraDao;
 import com.isw2.entity.Project;
 import com.isw2.entity.Release;
+import java.util.logging.Logger;
 
 public class Main {
 
     public static void main(String[] args) {
+        Logger logger = Logger.getLogger("MainLogger");
         Project project=new Project("bookkeeper", "apache");
         GitDao gitDao=new GitDao(project.getName(), project.getAuthor());
         JiraDao jiraDao=new JiraDao(project.getName());
         project.setCreationDate(gitDao.getProjectCreationDate());
         project.setReleases(jiraDao.getReleaseUntil(""));
         project.setInterestReleases(jiraDao.getReleaseUntil("4.4.0"));
-        System.out.println("Project: "+project.getName());
-        System.out.println("Creation date: "+project.getCreationDate());
-        System.out.println(project.getReleases().size()+" releases:");
+        logger.info("Project: "+project.getName());
+        logger.info("Creation date: "+project.getCreationDate());
+        logger.info(project.getReleases().size()+" releases:");
         for(int i=0;i<project.getReleases().size();i++) {
             Release tmp = project.getReleases().get(i);
-            System.out.println(tmp.getName()+" "+tmp.getNumber()+" "+tmp.getReleaseDate()+" "+tmp.getEndDate());
+            logger.info(tmp.getName()+" "+tmp.getNumber()+" "+tmp.getReleaseDate()+" "+tmp.getEndDate());
         }
-        System.out.println(project.getInterestReleases().size()+" interest releases:");
+        logger.info(project.getInterestReleases().size()+" interest releases:");
         for(int i=0;i<project.getInterestReleases().size();i++) {
             Release tmp = project.getReleases().get(i);
-            System.out.println(tmp.getName()+" "+tmp.getNumber()+" "+tmp.getReleaseDate()+" "+tmp.getEndDate());
+            logger.info(tmp.getName()+" "+tmp.getNumber()+" "+tmp.getReleaseDate()+" "+tmp.getEndDate());
         }
-        //JiraDao jiraDao = new JiraDao("BOOKKEEPER");
-        //System.out.println(jiraDao.getFixedBugTickets(0));
+        //logger.info(jiraDao.getFixedBugTickets(0));
         //gitDao.getAllCommits();
     }
 }

@@ -1,7 +1,6 @@
 package com.isw2.dao;
 
 import com.isw2.entity.Release;
-import com.isw2.entity.Ticket;
 import com.isw2.util.JsonParser;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -14,8 +13,8 @@ import java.util.Objects;
 public class JiraDao {
 
     private final String projectName;
-    private static final String fixed_bug_query = "https://issues.apache.org/jira/rest/api/2/search?jql=project='%s'AND'issueType'='Bug'AND('status'='closed'OR'status'='resolved')AND'resolution'='fixed'&fields=key,resolutiondate,versions,created&startAt=%s&maxResults=%s";
-    private static final String all_release_query = "https://issues.apache.org/jira/rest/api/2/project/%s/version?maxResults=1000&orderBy=releaseDate&status=released";
+    private static final String FIXED_BUG_QUERY = "https://issues.apache.org/jira/rest/api/2/search?jql=project='%s'AND'issueType'='Bug'AND('status'='closed'OR'status'='resolved')AND'resolution'='fixed'&fields=key,resolutiondate,versions,created&startAt=%s&maxResults=%s";
+    private static final String ALL_RELEASE_QUERY = "https://issues.apache.org/jira/rest/api/2/project/%s/version?maxResults=1000&orderBy=releaseDate&status=released";
 
     public JiraDao(String projectName) {
         this.projectName = projectName.toUpperCase();
@@ -30,12 +29,12 @@ public class JiraDao {
         List<Release> ret = new ArrayList<>();
         JsonParser jsonParser=new JsonParser();
         JSONObject json = null;
-        String query = String.format(all_release_query, this.projectName);
+        String query = String.format(ALL_RELEASE_QUERY, this.projectName);
         String lastReleaseEndDate;
         try {
             json = jsonParser.readJsonFromUrl(query);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
         JSONArray releases = json.getJSONArray("values");
         for(int i=0; i<releases.length();i++){
@@ -66,13 +65,13 @@ public class JiraDao {
         do {
             //Only gets a max of 1000 at a time, so must do this multiple times if bugs >1000
             end = start + max;
-            String query = String.format(fixed_bug_query, this.projectName, start, end);
+            String query = String.format(FIXED_BUG_QUERY, this.projectName, start, end);
             //System.out.println(query);
             JSONObject json = null;
             try {
                 json = jsonParser.readJsonFromUrl(query);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
             total = json.getInt("total");
             JSONArray issues = json.getJSONArray("issues");

@@ -26,7 +26,7 @@ public class GitDao {
         try {
             projectJson=jsonParser.readJsonFromUrl(repoUrl);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
         return jsonParser.getJSONAttribute(projectJson,"created_at").substring(0,10);
     }
