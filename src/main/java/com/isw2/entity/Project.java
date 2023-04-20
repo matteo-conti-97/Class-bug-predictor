@@ -4,14 +4,29 @@ import java.util.List;
 
 public class Project {
     private String name;
+    private String author;
     private String creationDate;
     private String lastInterestReleaseDate;
     private List<Commit> commits;
     private List<Ticket> tickets;
     private List<Release> releases;
+    private List<Release> interestReleases;
+
+    public Project(String name, String author) {
+        this.name = name;
+        this.author = author;
+    }
 
     public String getName() {
         return name;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
     public void setName(String name) {
@@ -56,5 +71,13 @@ public class Project {
 
     public void setReleases(List<Release> releases) {
         this.releases = releases;
+    }
+
+    public List<Release> getInterestReleases() {
+        return interestReleases;
+    }
+
+    public void setInterestReleases(List<Release> interestReleases) {
+        this.interestReleases = interestReleases;
     }
 }

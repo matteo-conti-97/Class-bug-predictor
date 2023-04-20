@@ -11,11 +11,24 @@ import java.util.List;
 
 public class GitDao {
     private String projectName;
+    private String author;
     private String repoUrl;
 
     public GitDao(String projectName, String author) {
-        this.projectName = projectName;
-        this.repoUrl = "https://api.github.com/repos/"+author.toLowerCase()+"/"+projectName.toLowerCase()+"/commits";
+        this.projectName = projectName.toLowerCase();
+        this.author = author.toLowerCase();
+        this.repoUrl = "https://api.github.com/repos/"+author+"/"+projectName;
+    }
+
+    public String getProjectCreationDate(){
+        JsonParser jsonParser=new JsonParser();
+        JSONObject projectJson=null;
+        try {
+            projectJson=jsonParser.readJsonFromUrl(repoUrl);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return jsonParser.getJSONAttribute(projectJson,"created_at").substring(0,10);
     }
 
     public List<Commit> getAllCommits(){
@@ -49,5 +62,13 @@ public class GitDao {
 
     public void setRepoUrl(String repoUrl) {
         this.repoUrl = repoUrl;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
     }
 }
