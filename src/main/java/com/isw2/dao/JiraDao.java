@@ -1,6 +1,7 @@
 package com.isw2.dao;
 
 import com.isw2.entity.Release;
+import com.isw2.entity.Ticket;
 import com.isw2.util.JsonParser;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -28,15 +29,16 @@ public class JiraDao {
     public List<Release> getReleaseUntil(String lastReleaseName){
         List<Release> ret = new ArrayList<>();
         JsonParser jsonParser=new JsonParser();
-        JSONObject json = null;
+        JSONObject jsonReleases = null;
         String query = String.format(ALL_RELEASE_QUERY, this.projectName);
         String lastReleaseEndDate;
         try {
-            json = jsonParser.readJsonFromUrl(query);
+            jsonReleases = jsonParser.readJsonFromUrl(query);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        JSONArray releases = json.getJSONArray("values");
+        assert jsonReleases != null;
+        JSONArray releases = jsonReleases.getJSONArray("values");
         for(int i=0; i<releases.length();i++){
             JSONObject releaseJson = releases.getJSONObject(i);
             String name = releaseJson.getString("name");
@@ -55,10 +57,41 @@ public class JiraDao {
         return ret;
     }
 
-    //In jira the affected version is the field "name" of the version
-    public List<String> getFixedBugTickets(int start) {
+
+    //Retrieve specified ticket data from jira
+    public Ticket getTicket(String key, String ticketId, String ticketUrl){
+        Ticket ret = new Ticket(key, ticketId, ticketUrl);
         JsonParser jsonParser=new JsonParser();
-        ArrayList<String> ticketList = new ArrayList<>();
+        JSONObject jsonTicket = null;
+        try {
+            long startTime = System.nanoTime();
+            jsonTicket=jsonParser.readJsonFromUrl(ticketUrl);
+            long elapsedTime = System.nanoTime() - startTime;
+            System.out.println(elapsedTime/1000000);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assert jsonTicket != null;
+        JSONObject ticketFields = jsonTicket.getJSONObject("fields");
+        String type= ticketFields.getJSONObject("issuetype").getString("name");
+        String priority= ticketFields.getJSONObject("priority").getString("name");
+        String status = ticketFields.getJSONObject("status").getString("name");
+        String creator = ticketFields.getJSONObject("creator").getString("displayName");
+        String creationDate = ticketFields.getString("created").substring(0,9);
+        String resolutionDate = ticketFields.getString("resolutiondate").substring(0,9);
+        ret.setType(type);
+        ret.setPriority(priority);
+        ret.setStatus(status);
+        ret.setCreator(creator);
+        ret.setCreationDate(creationDate);
+        ret.setResolutionDate(resolutionDate);
+        return ret;
+    }
+
+    //In jira the affected version is the field "name" of the version
+    public List<Ticket> getFixedBugTickets(int start) {
+        JsonParser jsonParser=new JsonParser();
+        ArrayList<Ticket> ret = new ArrayList<>();
         int end = 0;
         int total = 1;
         int max = 1000;
@@ -67,24 +100,25 @@ public class JiraDao {
             end = start + max;
             String query = String.format(FIXED_BUG_QUERY, this.projectName, start, end);
             //System.out.println(query);
-            JSONObject json = null;
+            JSONObject jsonTickets = null;
             try {
-                json = jsonParser.readJsonFromUrl(query);
+                jsonTickets = jsonParser.readJsonFromUrl(query);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            total = json.getInt("total");
-            JSONArray issues = json.getJSONArray("issues");
-            for (; start < total && start < end; start++) {
-                //Iterate through each bug
-                String key = issues.getJSONObject(start%1000).get("key").toString();
-                ticketList.add(key);
-                //ticketList.add(String.valueOf(new Ticket()));
-                System.out.println(key);
+            assert jsonTickets != null;
+            total = jsonTickets.getInt("total");
+            JSONArray issues = jsonTickets.getJSONArray("issues");
+            for (; start < total && start < end; start++) {  //Iterate through each bug
+                JSONObject ticketMetadata=issues.getJSONObject(start%1000);
+                String ticketId = ticketMetadata.get("id").toString();
+                String key = ticketMetadata.get("key").toString();
+                String ticketUrl = ticketMetadata.get("self").toString();
+                ret.add(getTicket(key, ticketId, ticketUrl)); //TODO lento
             }
         } while (start < total);
 
-        return ticketList;
+        return ret;
     }
 
 }
