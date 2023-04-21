@@ -64,10 +64,7 @@ public class JiraDao {
         JsonParser jsonParser=new JsonParser();
         JSONObject jsonTicket = null;
         try {
-            long startTime = System.nanoTime();
             jsonTicket=jsonParser.readJsonFromUrl(ticketUrl);
-            long elapsedTime = System.nanoTime() - startTime;
-            System.out.println(elapsedTime/1000000);
         } catch (IOException e) {
             e.printStackTrace();
         }
