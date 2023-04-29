@@ -6,7 +6,6 @@ public class Project {
     private String name;
     private String author;
     private String creationDate;
-    private String lastInterestReleaseDate;
     private List<Commit> commits;
     private List<Ticket> tickets;
     private List<Release> releases;
@@ -39,14 +38,6 @@ public class Project {
 
     public void setCreationDate(String creationDate) {
         this.creationDate = creationDate;
-    }
-
-    public String getLastInterestReleaseDate() {
-        return lastInterestReleaseDate;
-    }
-
-    public void setLastInterestReleaseDate(String lastInterestReleaseDate) {
-        this.lastInterestReleaseDate = lastInterestReleaseDate;
     }
 
     public List<Commit> getCommits() {

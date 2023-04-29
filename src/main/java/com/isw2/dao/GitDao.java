@@ -17,31 +17,31 @@ public class GitDao {
     public GitDao(String projectName, String author) {
         this.projectName = projectName.toLowerCase();
         this.author = author.toLowerCase();
-        this.repoUrl = "https://api.github.com/repos/"+author+"/"+projectName;
+        this.repoUrl = "https://api.github.com/repos/" + author + "/" + projectName;
     }
 
-    public String getProjectCreationDate(){
-        JsonParser jsonParser=new JsonParser();
-        JSONObject projectJson=null;
+    public String getProjectCreationDate() {
+        JsonParser jsonParser = new JsonParser();
+        JSONObject projectJson = null;
         try {
-            projectJson=jsonParser.readJsonFromUrl(repoUrl);
+            projectJson = jsonParser.readJsonFromUrl(repoUrl);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return jsonParser.getJSONAttribute(projectJson,"created_at").substring(0,10);
+        return jsonParser.getJSONAttribute(projectJson, "created_at").substring(0, 10);
     }
 
-    public List<Commit> getAllCommits(){
-        JsonParser jsonParser=new JsonParser();
-        List<Commit> commits=new ArrayList<>();
-        JSONArray commitListJson=null;
+    public List<Commit> getAllCommits() {
+        JsonParser jsonParser = new JsonParser();
+        List<Commit> commits = new ArrayList<>();
+        JSONArray commitListJson = null;
         try {
-            commitListJson=jsonParser.readJsonArrayFromUrl(repoUrl);
+            commitListJson = jsonParser.readJsonArrayFromUrl(repoUrl);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        for(int i=0; i<commitListJson.length(); i++){
-            String commitHash=jsonParser.getJSONAttribute(commitListJson.getJSONObject(i),"sha");
+        for (int i = 0; i < commitListJson.length(); i++) {
+            String commitHash = jsonParser.getJSONAttribute(commitListJson.getJSONObject(i), "sha");
             //JSONObject commitJson=jsonParser.getJSONAttribute(commitListJson.getJSONObject(i),"commit");
         }
         System.out.println(commitListJson);

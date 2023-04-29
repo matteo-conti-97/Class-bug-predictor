@@ -10,13 +10,13 @@ public class Release {
     private List<Commit> commits;
     private List<Ticket> tickets;
 
-    public Release(String name, int number , String releaseDate) {
+    public Release(String name, int number, String releaseDate) {
         this.name = name;
         this.number = number;
         this.releaseDate = releaseDate;
     }
 
-    public Release(String name, int number , String releaseDate, String endDate){
+    public Release(String name, int number, String releaseDate, String endDate) {
         this.name = name;
         this.number = number;
         this.releaseDate = releaseDate;

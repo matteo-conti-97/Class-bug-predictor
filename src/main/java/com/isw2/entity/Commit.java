@@ -17,11 +17,17 @@ public class Commit {
         this.author = author;
     }
 
-    public String getAuthor() { return author; }
+    public String getAuthor() {
+        return author;
+    }
 
-    public void setAuthor(String author) { this.author = author; }
+    public void setAuthor(String author) {
+        this.author = author;
+    }
 
-    public String getCommitId() { return commitId; }
+    public String getCommitId() {
+        return commitId;
+    }
 
     public void setCommitId(String commitId) {
         this.commitId = commitId;

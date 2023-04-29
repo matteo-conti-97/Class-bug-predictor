@@ -5,7 +5,8 @@ import com.isw2.entity.Ticket;
 import com.isw2.util.JsonParser;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import java.io.*;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -26,9 +27,9 @@ public class JiraDao {
     if a non existent name is specified, the method will return all releases, the method is supposed to work only on
     past and terminated releases
      */
-    public List<Release> getReleaseUntil(String lastReleaseName){
+    public List<Release> getReleaseUntil(String lastReleaseName) {
         List<Release> ret = new ArrayList<>();
-        JsonParser jsonParser=new JsonParser();
+        JsonParser jsonParser = new JsonParser();
         JSONObject jsonReleases = null;
         String query = String.format(ALL_RELEASE_QUERY, this.projectName);
         String lastReleaseEndDate;
@@ -39,18 +40,18 @@ public class JiraDao {
         }
         assert jsonReleases != null;
         JSONArray releases = jsonReleases.getJSONArray("values");
-        for(int i=0; i<releases.length();i++){
+        for (int i = 0; i < releases.length(); i++) {
             JSONObject releaseJson = releases.getJSONObject(i);
             String name = releaseJson.getString("name");
-            String startDate=releaseJson.getString("releaseDate");
-            Release release=new Release(name,i+1,startDate, "Missing"); //+1 cause it start at 0, missing cause if we get all realeases the last has no end date
-            if(i>0){
-                lastReleaseEndDate=startDate;
-                ret.get(i-1).setEndDate(lastReleaseEndDate);
+            String startDate = releaseJson.getString("releaseDate");
+            Release release = new Release(name, i + 1, startDate, "Missing"); //+1 cause it start at 0, missing cause if we get all realeases the last has no end date
+            if (i > 0) {
+                lastReleaseEndDate = startDate;
+                ret.get(i - 1).setEndDate(lastReleaseEndDate);
             }
             ret.add(release);
 
-            if(Objects.equals(name, lastReleaseName)){ //Last release of interest
+            if (Objects.equals(name, lastReleaseName)) { //Last release of interest
                 break;
             }
         }
@@ -59,23 +60,23 @@ public class JiraDao {
 
 
     //Retrieve specified ticket data from jira
-    public Ticket getTicket(String key, String ticketId, String ticketUrl){
+    public Ticket getTicket(String key, String ticketId, String ticketUrl) {
         Ticket ret = new Ticket(key, ticketId, ticketUrl);
-        JsonParser jsonParser=new JsonParser();
+        JsonParser jsonParser = new JsonParser();
         JSONObject jsonTicket = null;
         try {
-            jsonTicket=jsonParser.readJsonFromUrl(ticketUrl);
+            jsonTicket = jsonParser.readJsonFromUrl(ticketUrl);
         } catch (IOException e) {
             e.printStackTrace();
         }
         assert jsonTicket != null;
         JSONObject ticketFields = jsonTicket.getJSONObject("fields");
-        String type= ticketFields.getJSONObject("issuetype").getString("name");
-        String priority= ticketFields.getJSONObject("priority").getString("name");
+        String type = ticketFields.getJSONObject("issuetype").getString("name");
+        String priority = ticketFields.getJSONObject("priority").getString("name");
         String status = ticketFields.getJSONObject("status").getString("name");
         String creator = ticketFields.getJSONObject("creator").getString("displayName");
-        String creationDate = ticketFields.getString("created").substring(0,9);
-        String resolutionDate = ticketFields.getString("resolutiondate").substring(0,9);
+        String creationDate = ticketFields.getString("created").substring(0, 10);
+        String resolutionDate = ticketFields.getString("resolutiondate").substring(0, 10);
         ret.setType(type);
         ret.setPriority(priority);
         ret.setStatus(status);
@@ -87,7 +88,7 @@ public class JiraDao {
 
     //In jira the affected version is the field "name" of the version
     public List<Ticket> getFixedBugTickets(int start) {
-        JsonParser jsonParser=new JsonParser();
+        JsonParser jsonParser = new JsonParser();
         ArrayList<Ticket> ret = new ArrayList<>();
         int end = 0;
         int total = 1;
@@ -107,11 +108,11 @@ public class JiraDao {
             total = jsonTickets.getInt("total");
             JSONArray issues = jsonTickets.getJSONArray("issues");
             for (; start < total && start < end; start++) {  //Iterate through each bug
-                JSONObject ticketMetadata=issues.getJSONObject(start%1000);
+                JSONObject ticketMetadata = issues.getJSONObject(start % 1000);
                 String ticketId = ticketMetadata.get("id").toString();
                 String key = ticketMetadata.get("key").toString();
                 String ticketUrl = ticketMetadata.get("self").toString();
-                ret.add(getTicket(key, ticketId, ticketUrl)); //TODO lento
+                ret.add(getTicket(key, ticketId, ticketUrl));
             }
         } while (start < total);
 
