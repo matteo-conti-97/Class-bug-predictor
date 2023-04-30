@@ -24,10 +24,9 @@ public class JiraDao {
 
     /*
     Get all releases until the specified release, the releaseName must follow the name convention of jira (e.g. 1.0.0)
-    if a non existent name is specified, the method will return all releases, the method is supposed to work only on
-    past and terminated releases
-     */
-    public List<Release> getReleaseUntil(String lastReleaseName) {
+    if an empty or non-existent name is specified, the method will return all releases
+    */
+    public List<Release> getReleases() {
         List<Release> ret = new ArrayList<>();
         JsonParser jsonParser = new JsonParser();
         JSONObject jsonReleases = null;
@@ -44,16 +43,12 @@ public class JiraDao {
             JSONObject releaseJson = releases.getJSONObject(i);
             String name = releaseJson.getString("name");
             String startDate = releaseJson.getString("releaseDate");
-            Release release = new Release(name, i + 1, startDate, "Missing"); //+1 cause it start at 0, missing cause if we get all realeases the last has no end date
+            Release release = new Release(name, i + 1, startDate, "Missing"); //+1 cause it start at 0, use the next release start date as end date of the current release, except for the last release which have missing
             if (i > 0) {
                 lastReleaseEndDate = startDate;
                 ret.get(i - 1).setEndDate(lastReleaseEndDate);
             }
             ret.add(release);
-
-            if (Objects.equals(name, lastReleaseName)) { //Last release of interest
-                break;
-            }
         }
         return ret;
     }

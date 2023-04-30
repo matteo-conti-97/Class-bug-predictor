@@ -1,29 +1,41 @@
 package com.isw2.control;
 
+import com.isw2.dao.GitDao;
 import com.isw2.dao.JiraDao;
+import com.isw2.entity.Project;
 import com.isw2.entity.Release;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ReleaseController {
+    private Project project;
     private JiraDao jiraDao;
-    private List<Release> relOfInterest;
+    private GitDao gitDao;
+    private List<Release> releases;
 
-    public ReleaseController(JiraDao jiraDao) {
-        this.jiraDao = jiraDao;
+    public ReleaseController(Project project) {
+        this.project=project;
+        this.jiraDao = new JiraDao(project.getName());
+        this.gitDao = new GitDao(project.getName(), project.getAuthor());
     }
 
     //Get all releases until the specified release, lastRel must be the name of the jira format e.g 4.4.0
-    public void retrieveReleasesOfInterest(String lastRel) {
-        relOfInterest = jiraDao.getReleaseUntil(lastRel);
+    public List<Release> getReleasesOfInterest(String lastRel) {
+        List<Release> ret=new ArrayList<>();
+        for (Release release : releases) {
+            ret.add(release);
+            if (release.getName().equals(lastRel)) {
+                break;
+            }
+        }
+        return ret;
     }
 
-    public List<Release> getRelOfInterest() {
-        return relOfInterest;
+    public List<Release> getReleases() {
+        this.releases= jiraDao.getReleases();
+        return releases;
     }
 
-    public void setRelOfInterest(List<Release> relOfInterest) {
-        this.relOfInterest = relOfInterest;
-    }
 
 }
