@@ -32,7 +32,7 @@ public class GitDao {
         return jsonParser.getJSONAttribute(projectJson, "created_at").substring(0, 10);
     }
 
-    public List<Commit> getAllCommits() {
+    public List<Commit> getAllCommits() { //TODO finire e rivedere
         JsonParser jsonParser = new JsonParser();
         List<Commit> commits = new ArrayList<>();
         JSONArray commitListJson = null;

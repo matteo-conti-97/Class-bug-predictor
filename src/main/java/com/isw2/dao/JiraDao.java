@@ -91,7 +91,6 @@ public class JiraDao {
             //Only gets a max of 1000 at a time, so must do this multiple times if bugs >1000
             end = start + max;
             String query = String.format(FIXED_BUG_QUERY, this.projectName, start, end);
-            //System.out.println(query);
             JSONObject jsonTickets = null;
             try {
                 jsonTickets = jsonParser.readJsonFromUrl(query);
