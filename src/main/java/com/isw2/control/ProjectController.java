@@ -15,7 +15,7 @@ public class ProjectController {
     private GitDao gitDao;
 
     public ProjectController(String projectName, String projectAuthor) {
-        this.project = new Project("bookkeeper", "apache");
+        this.project = new Project(projectName, projectAuthor);
         this.jiraDao = new JiraDao(project.getName());
         this.gitDao = new GitDao(project.getName(), project.getAuthor());
     }
@@ -29,7 +29,6 @@ public class ProjectController {
     }
 
 
-
     public String getProjectCreationDate() {
         return project.getCreationDate();
     }
@@ -37,6 +36,7 @@ public class ProjectController {
     public void setProjectCreationDate() {
         this.project.setCreationDate(gitDao.getProjectCreationDate());
     }
+
     public void setProjectCreationDate(String creationDate) {
         this.project.setCreationDate(creationDate);
     }
@@ -79,5 +79,21 @@ public class ProjectController {
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    public JiraDao getJiraDao() {
+        return jiraDao;
+    }
+
+    public void setJiraDao(JiraDao jiraDao) {
+        this.jiraDao = jiraDao;
+    }
+
+    public GitDao getGitDao() {
+        return gitDao;
+    }
+
+    public void setGitDao(GitDao gitDao) {
+        this.gitDao = gitDao;
     }
 }

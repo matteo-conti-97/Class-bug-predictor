@@ -1,7 +1,6 @@
 package com.isw2.control;
 
 import com.isw2.dao.JiraDao;
-import com.isw2.entity.Release;
 import com.isw2.entity.Ticket;
 
 import java.text.ParseException;

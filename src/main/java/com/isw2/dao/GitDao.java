@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class GitDao {
     private String projectName;
@@ -40,7 +41,7 @@ public class GitDao {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        for (int i = 0; i < commitListJson.length(); i++) {
+        for (int i = 0; i < Objects.requireNonNull(commitListJson).length(); i++) {
             String commitHash = jsonParser.getJSONAttribute(commitListJson.getJSONObject(i), "sha");
             //JSONObject commitJson=jsonParser.getJSONAttribute(commitListJson.getJSONObject(i),"commit");
         }
