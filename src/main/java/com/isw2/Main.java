@@ -1,8 +1,6 @@
 package com.isw2;
 
-import com.isw2.control.ProjectController;
-import com.isw2.control.ReleaseController;
-import com.isw2.control.TicketController;
+import com.isw2.control.ScraperController;
 import com.isw2.entity.Release;
 import com.isw2.entity.Ticket;
 
@@ -12,20 +10,20 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) throws ParseException {
-        ProjectController projectController = new ProjectController("bookkeeper", "apache");
-        ReleaseController releaseController = new ReleaseController(projectController.getProject());
-        List<Release> allReleases = releaseController.getReleases();
-        List<Release> releasesOfInterest = releaseController.getReleasesOfInterest("4.4.0");
+        ScraperController scraperController = new ScraperController("bookkeeper", "apache");
 
-        projectController.setProjectCreationDate();
-        projectController.setProjectReleases(releaseController.getReleases());
-        projectController.setProjectInterestReleases(releaseController.getReleasesOfInterest("4.4.0"));
-        String lastInterestReleaseEndDate = projectController.getProjectInterestReleases().get(projectController.getProjectInterestReleases().size() - 1).getEndDate();
+        scraperController.setProjectCreationDate();
+        List<Release> allReleases = scraperController.getAllReleases();
+        scraperController.setProjectReleases(allReleases);
+        List<Release> releasesOfInterest = scraperController.getReleasesOfInterest("4.4.0");
+        scraperController.setProjectReleasesOfInterest(releasesOfInterest);
+
+        String lastInterestReleaseEndDate = scraperController.getLastReleaseEndDateOfInterest();
         System.out.println("Last interest release end date: " + lastInterestReleaseEndDate);
 
-        System.out.println("Project: " + projectController.getProjectName());
-        System.out.println("Creation date: " + projectController.getProjectCreationDate());
-        System.out.println("\n" + projectController.getProjectReleases().size() + " releases:");
+        System.out.println("Project: " + scraperController.getProjectName());
+        System.out.println("Creation date: " + scraperController.getProjectCreationDate());
+        System.out.println("\n" + scraperController.getProjectReleases().size() + " releases:");
         for (Release tmp : allReleases) {
             System.out.println(tmp.getName() + " " + tmp.getNumber() + " " + tmp.getReleaseDate() + " " + tmp.getEndDate());
         }
@@ -35,8 +33,10 @@ public class Main {
             System.out.println(tmp.getName() + " " + tmp.getNumber() + " " + tmp.getReleaseDate() + " " + tmp.getEndDate());
         }
 
-        TicketController ticketController = new TicketController(projectController.getProjectName());
-        List<Ticket> ticketOfInterest = ticketController.getAllTicketsUntilRelEndDate(lastInterestReleaseEndDate);
+        List<Ticket> allTickets = scraperController.getAllTickets();
+        scraperController.setProjectFixedBugTickets(allTickets);
+        List<Ticket> ticketOfInterest = scraperController.getTicketsOfInterest(lastInterestReleaseEndDate);
+        scraperController.setProjectFixedBugTicketsOfInterest(ticketOfInterest);
 
         System.out.println("\n" + ticketOfInterest.size() + " tickets of interest:");
         for (Ticket tmp : ticketOfInterest) {

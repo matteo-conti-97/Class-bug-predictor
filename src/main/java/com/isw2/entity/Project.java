@@ -7,9 +7,10 @@ public class Project {
     private String author;
     private String creationDate;
     private List<Commit> commits;
-    private List<Ticket> tickets;
+    private List<Ticket> fixedBugTickets;
     private List<Release> releases;
-    private List<Release> interestReleases;
+    private List<Release> releasesOfInterest;
+    private List<Ticket> fixedBugTicketsOfInterest;
 
     public Project(String name, String author) {
         this.name = name;
@@ -48,12 +49,12 @@ public class Project {
         this.commits = commits;
     }
 
-    public List<Ticket> getTickets() {
-        return tickets;
+    public List<Ticket> getFixedBugTickets() {
+        return fixedBugTickets;
     }
 
-    public void setTickets(List<Ticket> tickets) {
-        this.tickets = tickets;
+    public void setFixedBugTickets(List<Ticket> fixedBugTickets) {
+        this.fixedBugTickets = fixedBugTickets;
     }
 
     public List<Release> getReleases() {
@@ -64,11 +65,19 @@ public class Project {
         this.releases = releases;
     }
 
-    public List<Release> getInterestReleases() {
-        return interestReleases;
+    public List<Release> getReleasesOfInterest() {
+        return releasesOfInterest;
     }
 
-    public void setInterestReleases(List<Release> interestReleases) {
-        this.interestReleases = interestReleases;
+    public void setReleasesOfInterest(List<Release> releasesOfInterest) {
+        this.releasesOfInterest = releasesOfInterest;
+    }
+
+    public List<Ticket> getFixedBugTicketsOfInterest() {
+        return fixedBugTicketsOfInterest;
+    }
+
+    public void setFixedBugTicketsOfInterest(List<Ticket> fixedBugTicketsOfInterest) {
+        this.fixedBugTicketsOfInterest = fixedBugTicketsOfInterest;
     }
 }

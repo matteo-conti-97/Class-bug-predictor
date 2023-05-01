@@ -25,7 +25,7 @@ public class JiraDao {
     Get all releases until the specified release, the releaseName must follow the name convention of jira (e.g. 1.0.0)
     if an empty or non-existent name is specified, the method will return all releases
     */
-    public List<Release> getReleases() {
+    public List<Release> getAllReleases() {
         List<Release> ret = new ArrayList<>();
         JsonParser jsonParser = new JsonParser();
         JSONObject jsonReleases = null;
@@ -81,7 +81,7 @@ public class JiraDao {
     }
 
     //In jira the affected version is the field "name" of the version
-    public List<Ticket> getFixedBugTickets(int start) {
+    public List<Ticket> getAllFixedBugTickets(int start) {
         JsonParser jsonParser = new JsonParser();
         ArrayList<Ticket> ret = new ArrayList<>();
         int end = 0;
