@@ -3,6 +3,9 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+### Token ###
+/src/main/java/resource/token/
+
 ### IntelliJ IDEA ###
 .idea/
 .idea/modules.xml
