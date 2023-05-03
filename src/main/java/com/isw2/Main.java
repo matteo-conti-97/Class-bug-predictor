@@ -4,9 +4,7 @@ import com.isw2.control.ScraperController;
 import com.isw2.entity.Release;
 import org.json.JSONArray;
 
-import java.io.IOException;
 import java.sql.SQLException;
-import java.text.ParseException;
 import java.util.List;
 
 public class Main {
