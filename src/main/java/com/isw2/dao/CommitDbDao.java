@@ -17,33 +17,48 @@ public class CommitDbDao {
         return DriverManager.getConnection(url);
     }
 
-    public void insertCommitJson(Connection conn, String commitJson) throws SQLException {
+    public void insertCommitJson(Connection conn, String commitJson) {
         String query = "INSERT INTO commits(json) VALUES(?)";
-        PreparedStatement pstmt = conn.prepareStatement(query);
-        pstmt.setString(1, commitJson);
-        pstmt.executeUpdate();
-
-    }
-
-    public JSONArray getCommitsJson(Connection conn) throws SQLException {
-        Statement stmt = conn.createStatement();
-        String query = "SELECT json FROM commits";
-        ResultSet rs = stmt.executeQuery(query);
-        JSONArray ret = new JSONArray();
-        while (rs.next()) {
-            ret.put(new JSONObject(rs.getString("json")));
+        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setString(1, commitJson);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        return ret;
+
+
+    }
+
+    public JSONArray getCommitsJson(Connection conn) {
+        String query = "SELECT json FROM commits";
+        try (Statement stmt = conn.createStatement()) {
+            ResultSet rs = stmt.executeQuery(query);
+            JSONArray ret = new JSONArray();
+            while (rs.next()) {
+                ret.put(new JSONObject(rs.getString("json")));
+            }
+            return ret;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+
+
     }
 
 
-    public void createCommitTable(Connection conn) throws SQLException {
-        Statement stmt = conn.createStatement();
+    public void createCommitTable(Connection conn)  {
         String query = "CREATE TABLE IF NOT EXISTS commits (\n"
                 + "id integer PRIMARY KEY AUTOINCREMENT,\n"
                 + "json text NOT NULL\n"
                 + ");";
-        stmt.executeUpdate(query);
+        try (Statement stmt = conn.createStatement()) {
+            stmt.executeUpdate(query);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+
     }
 
 
