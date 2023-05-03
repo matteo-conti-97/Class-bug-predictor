@@ -1,6 +1,7 @@
 package com.isw2.dao;
 
 import com.isw2.entity.Commit;
+import com.isw2.util.AuthJsonParser;
 import com.isw2.util.JsonParser;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -8,7 +9,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class GitDao {
     private String projectName;
@@ -22,7 +22,7 @@ public class GitDao {
     }
 
     public String getProjectCreationDate() {
-        JsonParser jsonParser = new JsonParser();
+        JsonParser jsonParser = new AuthJsonParser();
         JSONObject projectJson = null;
         try {
             projectJson = jsonParser.readJsonFromUrl(repoUrl);
@@ -32,21 +32,62 @@ public class GitDao {
         return jsonParser.getJSONAttribute(projectJson, "created_at").substring(0, 10);
     }
 
-    public List<Commit> getAllCommits() { //TODO finire e rivedere
-        JsonParser jsonParser = new JsonParser();
-        List<Commit> commits = new ArrayList<>();
-        JSONArray commitListJson = null;
+    private JSONObject getCommitJson(String commitUrl) {
+        JsonParser jsonParser = new AuthJsonParser();
+        JSONObject ret = null;
         try {
-            commitListJson = jsonParser.readJsonArrayFromUrl(repoUrl);
+            ret = jsonParser.readJsonFromUrl(commitUrl);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        for (int i = 0; i < Objects.requireNonNull(commitListJson).length(); i++) {
-            String commitHash = jsonParser.getJSONAttribute(commitListJson.getJSONObject(i), "sha");
-            //JSONObject commitJson=jsonParser.getJSONAttribute(commitListJson.getJSONObject(i),"commit");
+
+        return ret;
+    }
+
+    //Get all commits until a given date, in the format YYYY-MM-DD for our purpose the date is the end date of the interest release
+    public JSONArray getAllCommitsJsonUntil(String RelEndDate) throws IOException {
+        JsonParser jsonParser = new AuthJsonParser();
+        JSONArray ret = new JSONArray();
+        int page = 1;
+        while (true) {
+            JSONArray tmp;
+            System.out.println("page: " + page);
+            String query = repoUrl + "/commits?until=" + RelEndDate + "&per_page=100&page=" + page;
+            System.out.println(query);
+            tmp = jsonParser.readJsonArrayFromUrl(query);
+            if (tmp.length() == 0) break;
+            for (int i = 0; i < tmp.length(); i++) {
+                ret.put(getCommitJson(tmp.getJSONObject(i).getString("url")));
+            }
+            page++;
         }
-        System.out.println(commitListJson);
-        return commits;
+        return ret;
+    }
+
+    private Commit getCommit(String commitUrl) {
+        Commit ret = null;
+        return ret;
+    }
+
+    //Get all commits until a given date, in the format YYYY-MM-DD for our purpose the date is the end date of the interest release
+    public List<Commit> getAllCommitsUntil(String RelEndDate) throws IOException {
+        JsonParser jsonParser = new JsonParser();
+        List<Commit> ret = new ArrayList<>();
+        JSONArray commitListJson = new JSONArray();
+        JSONArray tmp = null;
+        int page = 1;
+        while (true) {
+            System.out.println("page: " + page);
+            String query = repoUrl + "/commits?until=" + RelEndDate + "&per_page=100&page=" + page;
+            System.out.println(query);
+            tmp = jsonParser.readJsonArrayFromUrl(query);
+            if (tmp.length() == 0) break;
+            for (int i = 0; i < tmp.length(); i++) {
+                ret.add(getCommit(tmp.getJSONObject(i).getString("url")));
+            }
+            page++;
+        }
+        return ret;
     }
 
     public String getProjectName() {

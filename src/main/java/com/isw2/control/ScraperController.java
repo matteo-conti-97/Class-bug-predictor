@@ -1,12 +1,17 @@
 package com.isw2.control;
 
+import com.isw2.dao.CommitDbDao;
 import com.isw2.dao.GitDao;
 import com.isw2.dao.JiraDao;
 import com.isw2.entity.Commit;
 import com.isw2.entity.Project;
 import com.isw2.entity.Release;
 import com.isw2.entity.Ticket;
+import org.json.JSONArray;
 
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -16,11 +21,13 @@ public class ScraperController {
     private Project project;
     private JiraDao jiraDao;
     private GitDao gitDao;
+    private final CommitDbDao commitDbDao;
 
     public ScraperController(String projectName, String projectAuthor) {
         this.project = new Project(projectName, projectAuthor);
         this.jiraDao = new JiraDao(project.getName());
         this.gitDao = new GitDao(project.getName(), project.getAuthor());
+        this.commitDbDao = new CommitDbDao(project.getName());
     }
 
     public List<Release> getAllReleases() {
@@ -30,6 +37,20 @@ public class ScraperController {
 
     public List<Ticket> getAllTickets() {
         return jiraDao.getAllFixedBugTickets(0);
+    }
+
+    public void createAllCommitsJsonUntilDb(String relEndDate, String dbName) throws IOException, SQLException {
+        Connection conn = commitDbDao.getConnection(dbName);
+        commitDbDao.createCommitTable(conn);
+        JSONArray commitList = gitDao.getAllCommitsJsonUntil(relEndDate);
+        for (int i = 0; i < commitList.length(); i++) {
+            commitDbDao.insertCommitJson(conn, commitList.getJSONObject(i).toString());
+        }
+    }
+
+    public JSONArray getCommitsJsonFromDb(String dbName) throws SQLException {
+        Connection conn = commitDbDao.getConnection(dbName);
+        return commitDbDao.getCommitsJson(conn);
     }
 
     //Get all tickets closed until the specified release so with the resolution date in the date range of the release

@@ -1,15 +1,15 @@
 package com.isw2.entity;
 
 public class Commit {
-    private String commitId;
+    private String commitSha;
     private String commitMessage;
     private String commitDate;
     private String commitUrl;
     private String ticketId;
     private String author;
 
-    public Commit(String commitId, String commitMessage, String commitDate, String commitUrl, String ticketId, String author) {
-        this.commitId = commitId;
+    public Commit(String commitSha, String commitMessage, String commitDate, String commitUrl, String ticketId, String author) {
+        this.commitSha = commitSha;
         this.commitMessage = commitMessage;
         this.commitDate = commitDate;
         this.commitUrl = commitUrl;
@@ -25,12 +25,12 @@ public class Commit {
         this.author = author;
     }
 
-    public String getCommitId() {
-        return commitId;
+    public String getCommitSha() {
+        return commitSha;
     }
 
-    public void setCommitId(String commitId) {
-        this.commitId = commitId;
+    public void setCommitSha(String commitSha) {
+        this.commitSha = commitSha;
     }
 
     public String getCommitMessage() {

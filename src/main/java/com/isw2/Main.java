@@ -2,14 +2,16 @@ package com.isw2;
 
 import com.isw2.control.ScraperController;
 import com.isw2.entity.Release;
-import com.isw2.entity.Ticket;
+import org.json.JSONArray;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.List;
 
 public class Main {
 
-    public static void main(String[] args) throws ParseException {
+    public static void main(String[] args) throws ParseException, IOException, SQLException {
         ScraperController scraperController = new ScraperController("bookkeeper", "apache");
 
         scraperController.setProjectCreationDate();
@@ -23,7 +25,13 @@ public class Main {
 
         System.out.println("Project: " + scraperController.getProjectName());
         System.out.println("Creation date: " + scraperController.getProjectCreationDate());
-        System.out.println("\n" + scraperController.getProjectReleases().size() + " releases:");
+        System.out.println("Last interest release end date: " + lastInterestReleaseEndDate);
+        //scraperController.createAllCommitsJsonUntilDb(lastInterestReleaseEndDate,"commitDb");
+        JSONArray commitsJson = scraperController.getCommitsJsonFromDb("commitDb");
+        System.out.println("Size: " + commitsJson.length());
+        System.out.println(commitsJson);
+
+        /*System.out.println("\n" + scraperController.getProjectReleases().size() + " releases:");
         for (Release tmp : allReleases) {
             System.out.println(tmp.getName() + " " + tmp.getNumber() + " " + tmp.getReleaseDate() + " " + tmp.getEndDate());
         }
@@ -44,6 +52,6 @@ public class Main {
         }
 
         //logger.fine(jiraDao.getFixedBugTickets(0));
-        //gitDao.getAllCommits();
+        //gitDao.getAllCommits();*/
     }
 }
