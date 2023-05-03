@@ -23,7 +23,7 @@ public class CommitDbDao {
             pstmt.setString(1, commitJson);
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
 
 
@@ -39,7 +39,7 @@ public class CommitDbDao {
             }
             return ret;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
 
 
@@ -55,7 +55,7 @@ public class CommitDbDao {
         try (Statement stmt = conn.createStatement()) {
             stmt.executeUpdate(query);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
 
 
