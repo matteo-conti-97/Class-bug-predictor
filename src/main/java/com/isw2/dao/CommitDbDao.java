@@ -31,19 +31,17 @@ public class CommitDbDao {
 
     public JSONArray getCommitsJson(Connection conn) {
         String query = "SELECT json FROM commits";
+        JSONArray ret = new JSONArray();
         try (Statement stmt = conn.createStatement()) {
             ResultSet rs = stmt.executeQuery(query);
-            JSONArray ret = new JSONArray();
             while (rs.next()) {
                 ret.put(new JSONObject(rs.getString("json")));
             }
-            return ret;
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-
-
+        return ret;
     }
 
 
