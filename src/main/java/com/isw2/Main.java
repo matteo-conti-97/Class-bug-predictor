@@ -11,7 +11,7 @@ import java.util.List;
 
 public class Main {
 
-    public static void main(String[] args) throws ParseException, IOException, SQLException {
+    public static void main(String[] args) throws SQLException {
         ScraperController scraperController = new ScraperController("bookkeeper", "apache");
 
         scraperController.setProjectCreationDate();

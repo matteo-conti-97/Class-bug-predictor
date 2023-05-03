@@ -45,14 +45,14 @@ public class GitDao {
     }
 
     //Get all commits until a given date, in the format YYYY-MM-DD for our purpose the date is the end date of the interest release
-    public JSONArray getAllCommitsJsonUntil(String RelEndDate) throws IOException {
+    public JSONArray getAllCommitsJsonUntil(String relEndDate) throws IOException {
         JsonParser jsonParser = new AuthJsonParser();
         JSONArray ret = new JSONArray();
         int page = 1;
         while (true) {
             JSONArray tmp;
             System.out.println("page: " + page);
-            String query = repoUrl + "/commits?until=" + RelEndDate + "&per_page=100&page=" + page;
+            String query = repoUrl + "/commits?until=" + relEndDate + "&per_page=100&page=" + page;
             System.out.println(query);
             tmp = jsonParser.readJsonArrayFromUrl(query);
             if (tmp.length() == 0) break;
@@ -70,15 +70,14 @@ public class GitDao {
     }
 
     //Get all commits until a given date, in the format YYYY-MM-DD for our purpose the date is the end date of the interest release
-    public List<Commit> getAllCommitsUntil(String RelEndDate) throws IOException {
+    public List<Commit> getAllCommitsUntil(String relEndDate) throws IOException {
         JsonParser jsonParser = new JsonParser();
         List<Commit> ret = new ArrayList<>();
-        JSONArray commitListJson = new JSONArray();
-        JSONArray tmp = null;
+        JSONArray tmp;
         int page = 1;
         while (true) {
             System.out.println("page: " + page);
-            String query = repoUrl + "/commits?until=" + RelEndDate + "&per_page=100&page=" + page;
+            String query = repoUrl + "/commits?until=" + relEndDate + "&per_page=100&page=" + page;
             System.out.println(query);
             tmp = jsonParser.readJsonArrayFromUrl(query);
             if (tmp.length() == 0) break;

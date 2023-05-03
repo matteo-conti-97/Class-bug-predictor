@@ -32,12 +32,14 @@ public class AuthJsonParser extends JsonParser {
         return new InputStreamReader(uc.getInputStream(), StandardCharsets.UTF_8);
     }
 
+    @Override
     public JSONArray readJsonArrayFromUrl(String url) throws IOException, JSONException {
         BufferedReader rd = new BufferedReader(getAuthStream(new URL(url)));
         String jsonText = readAll(rd);
         return new JSONArray(jsonText);
     }
 
+    @Override
     public JSONObject readJsonFromUrl(String url) throws IOException, JSONException {
         BufferedReader rd = new BufferedReader(getAuthStream(new URL(url)));
         String jsonText = readAll(rd);
