@@ -1,15 +1,18 @@
 package com.isw2;
 
 import com.isw2.control.ScraperController;
+import com.isw2.entity.Commit;
 import com.isw2.entity.Release;
-import org.json.JSONArray;
 
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
 
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) throws SQLException, ParseException {
         ScraperController scraperController = new ScraperController("bookkeeper", "apache");
 
         scraperController.setProjectCreationDate();
@@ -25,9 +28,14 @@ public class Main {
         System.out.println("Creation date: " + scraperController.getProjectCreationDate());
         System.out.println("Last interest release end date: " + lastInterestReleaseEndDate);
         //scraperController.createAllCommitsJsonUntilDb(lastInterestReleaseEndDate,"commitDb");
-        JSONArray commitsJson = scraperController.getCommitsJsonFromDb("commitDb");
-        System.out.println("Size: " + commitsJson.length());
-        System.out.println(commitsJson);
+        List<Commit> commits = scraperController.getCommitsFromDb("commitDb");
+        //System.out.println(commits);
+        scraperController.setProjectCommits(commits);
+        scraperController.linkCommitsToReleases();
+        for (Release release : scraperController.getProjectReleasesOfInterest()) {
+            System.out.println("Release: " + release.getName() + " has " + release.getCommits().size() + " commits and starts at "+ release.getStartDate()+ " and ends at "+release.getEndDate());
+        }
+
 
         /*System.out.println("\n" + scraperController.getProjectReleases().size() + " releases:");
         for (Release tmp : allReleases) {

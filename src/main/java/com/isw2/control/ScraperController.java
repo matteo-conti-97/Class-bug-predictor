@@ -3,10 +3,7 @@ package com.isw2.control;
 import com.isw2.dao.CommitDbDao;
 import com.isw2.dao.GitDao;
 import com.isw2.dao.JiraDao;
-import com.isw2.entity.Commit;
-import com.isw2.entity.Project;
-import com.isw2.entity.Release;
-import com.isw2.entity.Ticket;
+import com.isw2.entity.*;
 import org.json.JSONArray;
 
 import java.io.IOException;
@@ -30,53 +27,6 @@ public class ScraperController {
         this.commitDbDao = new CommitDbDao(project.getName());
     }
 
-    public List<Release> getAllReleases() {
-
-        return jiraDao.getAllReleases();
-    }
-
-    public List<Ticket> getAllTickets() {
-        return jiraDao.getAllFixedBugTickets(0);
-    }
-
-    public void createAllCommitsJsonUntilDb(String relEndDate, String dbName) throws IOException, SQLException {
-        Connection conn = commitDbDao.getConnection(dbName);
-        commitDbDao.createCommitTable(conn);
-        JSONArray commitList = gitDao.getAllCommitsJsonUntil(relEndDate);
-        for (int i = 0; i < commitList.length(); i++) {
-            commitDbDao.insertCommitJson(conn, commitList.getJSONObject(i).toString());
-        }
-    }
-
-    public JSONArray getCommitsJsonFromDb(String dbName) throws SQLException {
-        Connection conn = commitDbDao.getConnection(dbName);
-        return commitDbDao.getCommitsJson(conn);
-    }
-
-    //Get all tickets closed until the specified release so with the resolution date in the date range of the release
-    public List<Ticket> getTicketsOfInterest(String relEndDate) throws ParseException {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        List<Ticket> ret = new ArrayList<>();
-        for (Ticket ticket : project.getFixedBugTickets()) {
-            String ticketResDate = ticket.getResolutionDate();
-            if (sdf.parse(ticketResDate).before(sdf.parse(relEndDate))) {
-                ret.add(ticket);
-            }
-        }
-        return ret;
-    }
-
-    //Get all releases until the specified release, lastRel must be the name of the jira format e.g 4.4.0
-    public List<Release> getReleasesOfInterest(String lastRel) {
-        List<Release> ret = new ArrayList<>();
-        for (Release release : project.getReleases()) {
-            ret.add(release);
-            if (release.getName().equals(lastRel)) {
-                break;
-            }
-        }
-        return ret;
-    }
 
     public String getProjectName() {
         return project.getName();
@@ -138,7 +88,6 @@ public class ScraperController {
         this.project.setReleasesOfInterest(interestReleases);
     }
 
-
     public Project getProject() {
         return project;
     }
@@ -166,4 +115,97 @@ public class ScraperController {
     public String getLastReleaseEndDateOfInterest() {
         return project.getReleasesOfInterest().get(project.getReleasesOfInterest().size() - 1).getEndDate();
     }
+
+    public List<Release> getAllReleases() {
+        return jiraDao.getAllReleases();
+    }
+
+    public List<Ticket> getAllTickets() {
+        return jiraDao.getAllFixedBugTickets(0);
+    }
+
+    //Get all releases until the specified release, lastRel must be the name of the jira format e.g 4.4.0
+    public List<Release> getReleasesOfInterest(String lastRel) {
+        List<Release> ret = new ArrayList<>();
+        for (Release release : project.getReleases()) {
+            ret.add(release);
+            if (release.getName().equals(lastRel)) {
+                break;
+            }
+        }
+        return ret;
+    }
+
+    //Get all tickets closed until the specified release so with the resolution date in the date range of the release
+    public List<Ticket> getTicketsOfInterest(String relEndDate) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        List<Ticket> ret = new ArrayList<>();
+        for (Ticket ticket : project.getFixedBugTickets()) {
+            String ticketResDate = ticket.getResolutionDate();
+            if (sdf.parse(ticketResDate).before(sdf.parse(relEndDate))) {
+                ret.add(ticket);
+            }
+        }
+        return ret;
+    }
+
+    public void createAllCommitsJsonUntilDb(String relEndDate, String dbName) throws IOException, SQLException {
+        Connection conn = commitDbDao.getConnection(dbName);
+        commitDbDao.createCommitTable(conn);
+        JSONArray commitList = gitDao.getAllCommitsJsonUntil(relEndDate);
+        for (int i = 0; i < commitList.length(); i++) {
+            commitDbDao.insertCommitJson(conn, commitList.getJSONObject(i).toString());
+        }
+    }
+
+    private List<File> getFiles(JSONArray fileList){
+        List<File> ret=new ArrayList<>();
+        for(int i=0;i<fileList.length();i++){
+            String fileName=fileList.getJSONObject(i).getString("filename");
+
+            String rawUrl=fileList.getJSONObject(i).getString("raw_url");
+            ret.add(new File(fileName,rawUrl));
+        }
+        return ret;
+    }
+
+    public List<Commit> getCommitsFromDb(String dbName) throws SQLException {
+        List<Commit> ret=new ArrayList<>();
+        Connection conn = commitDbDao.getConnection(dbName);
+        JSONArray commitsJson= commitDbDao.getCommitsJson(conn);
+        for(int i=0;i<commitsJson.length();i++){
+            String commitSha=commitsJson.getJSONObject(i).getString("sha");
+            String commitMessage=commitsJson.getJSONObject(i).getJSONObject("commit").getString("message");
+            String commitDate=commitsJson.getJSONObject(i).getJSONObject("commit").getJSONObject("author").getString("date").substring(0,10);
+            String commitUrl=commitsJson.getJSONObject(i).getString("url");
+            String author=commitsJson.getJSONObject(i).getJSONObject("commit").getJSONObject("author").getString("name");
+            List<File> files=getFiles(commitsJson.getJSONObject(i).getJSONArray("files"));
+            ret.add(new Commit(commitSha,commitMessage,commitDate,commitUrl,author,files));
+        }
+        return ret;
+    }
+
+
+
+    public void linkCommitsToReleases() throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        for(int j=0;j<this.project.getReleasesOfInterest().size();j++){
+            Release release=this.project.getReleasesOfInterest().get(j);
+            for(int i=0;i<this.project.getCommits().size();i++){
+                Commit commit=this.project.getCommits().get(i);
+                String commitDate=commit.getCommitDate();
+                String releaseStartDate=release.getStartDate();
+                String releaseEndDate=release.getEndDate();
+                //ASSUNZIONE se la commit è antecedente alla data di inizio della prima release, la inglobo nella prima release
+                if((release.getNumber().equals("1"))&&(sdf.parse(commitDate).before(sdf.parse(releaseStartDate)))){
+                    this.project.getReleasesOfInterest().get(j).addCommit(commit);
+                }
+                //Se la data della commit si trova all'interno del range di date di una release o combacia con la data di inizio della release la considero appartenente alla release
+                if (((sdf.parse(commitDate).compareTo(sdf.parse(releaseStartDate))==0))||((sdf.parse(commitDate).after(sdf.parse(releaseStartDate)))&&(sdf.parse(commitDate).before(sdf.parse(releaseEndDate))))){
+                    this.project.getReleasesOfInterest().get(j).addCommit(commit);
+                }
+            }
+        }
+    }
+
 }

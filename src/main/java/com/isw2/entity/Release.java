@@ -1,26 +1,31 @@
 package com.isw2.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Release {
     private String name;
     private int number;
-    private String releaseDate;
+    private String startDate;
     private String endDate;
     private List<Commit> commits;
     private List<Ticket> tickets;
 
-    public Release(String name, int number, String releaseDate) {
+    public Release(String name, int number, String startDate) {
         this.name = name;
         this.number = number;
-        this.releaseDate = releaseDate;
+        this.startDate = startDate;
+        this.commits=new ArrayList<>();
+        this.tickets=new ArrayList<>();
     }
 
-    public Release(String name, int number, String releaseDate, String endDate) {
+    public Release(String name, int number, String startDate, String endDate) {
         this.name = name;
         this.number = number;
-        this.releaseDate = releaseDate;
+        this.startDate = startDate;
         this.endDate = endDate;
+        this.commits=new ArrayList<>();
+        this.tickets=new ArrayList<>();
     }
 
     public String getName() {
@@ -39,12 +44,12 @@ public class Release {
         this.number = number;
     }
 
-    public String getReleaseDate() {
-        return releaseDate;
+    public String getStartDate() {
+        return startDate;
     }
 
-    public void setReleaseDate(String releaseDate) {
-        this.releaseDate = releaseDate;
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
     }
 
     public String getEndDate() {
@@ -69,5 +74,13 @@ public class Release {
 
     public void setTickets(List<Ticket> tickets) {
         this.tickets = tickets;
+    }
+
+    public void addCommit(Commit commit){
+        this.commits.add(commit);
+    }
+
+    public void addTicket(Ticket ticket){
+        this.tickets.add(ticket);
     }
 }

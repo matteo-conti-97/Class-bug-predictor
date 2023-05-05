@@ -25,8 +25,6 @@ public class CommitDbDao {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-
     }
 
     public JSONArray getCommitsJson(Connection conn) {

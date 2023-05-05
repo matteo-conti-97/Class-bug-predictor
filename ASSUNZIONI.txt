@@ -1,0 +1,5 @@
+-Quando ho associato le commit alle release vi erano delle commit con data precedente a quella della prima release, ho scelto
+di associarle alla prima release in quanto 1 è una cosa ragionevole 2 molte sono di configurazione e non associate a ticket e di conseguenza scartate
+in fasi di filtraggio successive.
+
+-Release 4.1.0 ossia release numero 3 dura solamente 3 giorni ed ha 0 commit, la scarto in quanto non è significativa.

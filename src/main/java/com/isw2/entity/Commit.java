@@ -1,5 +1,7 @@
 package com.isw2.entity;
 
+import java.util.List;
+
 public class Commit {
     private String commitSha;
     private String commitMessage;
@@ -7,14 +9,15 @@ public class Commit {
     private String commitUrl;
     private String ticketId;
     private String author;
+    private List<File> files;
 
-    public Commit(String commitSha, String commitMessage, String commitDate, String commitUrl, String ticketId, String author) {
+    public Commit(String commitSha, String commitMessage, String commitDate, String commitUrl, String author, List <File> files) {
         this.commitSha = commitSha;
         this.commitMessage = commitMessage;
         this.commitDate = commitDate;
         this.commitUrl = commitUrl;
-        this.ticketId = ticketId;
         this.author = author;
+        this.files=files;
     }
 
     public String getAuthor() {
@@ -63,5 +66,13 @@ public class Commit {
 
     public void setTicketId(String ticketId) {
         this.ticketId = ticketId;
+    }
+
+    public List<File> getFiles() {
+        return files;
+    }
+
+    public void setFiles(List<File> files) {
+        this.files = files;
     }
 }
