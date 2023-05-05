@@ -15,8 +15,8 @@ public class Release {
         this.name = name;
         this.number = number;
         this.startDate = startDate;
-        this.commits=new ArrayList<>();
-        this.tickets=new ArrayList<>();
+        this.commits = new ArrayList<>();
+        this.tickets = new ArrayList<>();
     }
 
     public Release(String name, int number, String startDate, String endDate) {
@@ -24,8 +24,8 @@ public class Release {
         this.number = number;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.commits=new ArrayList<>();
-        this.tickets=new ArrayList<>();
+        this.commits = new ArrayList<>();
+        this.tickets = new ArrayList<>();
     }
 
     public String getName() {
@@ -76,11 +76,11 @@ public class Release {
         this.tickets = tickets;
     }
 
-    public void addCommit(Commit commit){
+    public void addCommit(Commit commit) {
         this.commits.add(commit);
     }
 
-    public void addTicket(Ticket ticket){
+    public void addTicket(Ticket ticket) {
         this.tickets.add(ticket);
     }
 }

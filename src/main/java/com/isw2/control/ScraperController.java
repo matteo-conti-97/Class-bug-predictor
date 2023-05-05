@@ -5,6 +5,7 @@ import com.isw2.dao.GitDao;
 import com.isw2.dao.JiraDao;
 import com.isw2.entity.*;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -158,50 +159,50 @@ public class ScraperController {
         }
     }
 
-    private List<File> getFiles(JSONArray fileList){
-        List<File> ret=new ArrayList<>();
-        for(int i=0;i<fileList.length();i++){
-            String fileName=fileList.getJSONObject(i).getString("filename");
+    private List<File> getFiles(JSONArray fileList) {
+        List<File> ret = new ArrayList<>();
+        for (int i = 0; i < fileList.length(); i++) {
+            String fileName = fileList.getJSONObject(i).getString("filename");
 
-            String rawUrl=fileList.getJSONObject(i).getString("raw_url");
-            ret.add(new File(fileName,rawUrl));
+            String rawUrl = fileList.getJSONObject(i).getString("raw_url");
+            ret.add(new File(fileName, rawUrl));
         }
         return ret;
     }
 
     public List<Commit> getCommitsFromDb(String dbName) throws SQLException {
-        List<Commit> ret=new ArrayList<>();
+        List<Commit> ret = new ArrayList<>();
         Connection conn = commitDbDao.getConnection(dbName);
-        JSONArray commitsJson= commitDbDao.getCommitsJson(conn);
-        for(int i=0;i<commitsJson.length();i++){
-            String commitSha=commitsJson.getJSONObject(i).getString("sha");
-            String commitMessage=commitsJson.getJSONObject(i).getJSONObject("commit").getString("message");
-            String commitDate=commitsJson.getJSONObject(i).getJSONObject("commit").getJSONObject("author").getString("date").substring(0,10);
-            String commitUrl=commitsJson.getJSONObject(i).getString("url");
-            String author=commitsJson.getJSONObject(i).getJSONObject("commit").getJSONObject("author").getString("name");
-            List<File> files=getFiles(commitsJson.getJSONObject(i).getJSONArray("files"));
-            ret.add(new Commit(commitSha,commitMessage,commitDate,commitUrl,author,files));
+        JSONArray commitsJson = commitDbDao.getCommitsJson(conn);
+        for (int i = 0; i < commitsJson.length(); i++) {
+            String commitSha = commitsJson.getJSONObject(i).getString("sha");
+            String commitUrl = commitsJson.getJSONObject(i).getString("url");
+            List<File> files = getFiles(commitsJson.getJSONObject(i).getJSONArray("files"));
+            JSONObject commitCamp = commitsJson.getJSONObject(i).getJSONObject("commit");
+            String commitMessage = commitCamp.getString("message");
+            String commitDate = commitCamp.getJSONObject("author").getString("date").substring(0, 10);
+            String author = commitCamp.getJSONObject("author").getString("name");
+            ret.add(new Commit(commitSha, commitMessage, commitDate, commitUrl, author, files));
         }
         return ret;
     }
 
 
-
     public void linkCommitsToReleases() throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        for(int j=0;j<this.project.getReleasesOfInterest().size();j++){
-            Release release=this.project.getReleasesOfInterest().get(j);
-            for(int i=0;i<this.project.getCommits().size();i++){
-                Commit commit=this.project.getCommits().get(i);
-                String commitDate=commit.getCommitDate();
-                String releaseStartDate=release.getStartDate();
-                String releaseEndDate=release.getEndDate();
+        for (int j = 0; j < this.project.getReleasesOfInterest().size(); j++) {
+            Release release = this.project.getReleasesOfInterest().get(j);
+            for (int i = 0; i < this.project.getCommits().size(); i++) {
+                Commit commit = this.project.getCommits().get(i);
+                String commitDate = commit.getCommitDate();
+                String releaseStartDate = release.getStartDate();
+                String releaseEndDate = release.getEndDate();
                 //ASSUNZIONE se la commit è antecedente alla data di inizio della prima release, la inglobo nella prima release
-                if((release.getNumber().equals("1"))&&(sdf.parse(commitDate).before(sdf.parse(releaseStartDate)))){
+                if ((release.getNumber().equals("1")) && (sdf.parse(commitDate).before(sdf.parse(releaseStartDate)))) {
                     this.project.getReleasesOfInterest().get(j).addCommit(commit);
                 }
                 //Se la data della commit si trova all'interno del range di date di una release o combacia con la data di inizio della release la considero appartenente alla release
-                if (((sdf.parse(commitDate).compareTo(sdf.parse(releaseStartDate))==0))||((sdf.parse(commitDate).after(sdf.parse(releaseStartDate)))&&(sdf.parse(commitDate).before(sdf.parse(releaseEndDate))))){
+                if ((sdf.parse(commitDate).compareTo(sdf.parse(releaseStartDate)) == 0) || ((sdf.parse(commitDate).after(sdf.parse(releaseStartDate))) && (sdf.parse(commitDate).before(sdf.parse(releaseEndDate))))) {
                     this.project.getReleasesOfInterest().get(j).addCommit(commit);
                 }
             }

@@ -16,7 +16,7 @@ public class File {
 
     public File(String name, String rawUrl) {
         this.name = name;
-        this.rawUrl=rawUrl;
+        this.rawUrl = rawUrl;
     }
 
     public String getName() {

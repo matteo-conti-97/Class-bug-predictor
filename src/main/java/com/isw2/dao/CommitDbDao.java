@@ -43,7 +43,7 @@ public class CommitDbDao {
     }
 
 
-    public void createCommitTable(Connection conn)  {
+    public void createCommitTable(Connection conn) {
         String query = "CREATE TABLE IF NOT EXISTS commits (\n"
                 + "id integer PRIMARY KEY AUTOINCREMENT,\n"
                 + "json text NOT NULL\n"

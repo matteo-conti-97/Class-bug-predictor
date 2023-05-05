@@ -1,14 +1,11 @@
 package com.isw2.dao;
 
-import com.isw2.entity.Commit;
 import com.isw2.util.AuthJsonParser;
 import com.isw2.util.JsonParser;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class GitDao {
     private String projectName;
@@ -58,31 +55,6 @@ public class GitDao {
             if (tmp.length() == 0) break;
             for (int i = 0; i < tmp.length(); i++) {
                 ret.put(getCommitJson(tmp.getJSONObject(i).getString("url")));
-            }
-            page++;
-        }
-        return ret;
-    }
-
-    private Commit getCommit(String commitUrl) {
-        Commit ret = null;
-        return ret;
-    }
-
-    //Get all commits until a given date, in the format YYYY-MM-DD for our purpose the date is the end date of the interest release
-    public List<Commit> getAllCommitsUntil(String relEndDate) throws IOException {
-        JsonParser jsonParser = new JsonParser();
-        List<Commit> ret = new ArrayList<>();
-        JSONArray tmp;
-        int page = 1;
-        while (true) {
-            System.out.println("page: " + page);
-            String query = repoUrl + "/commits?until=" + relEndDate + "&per_page=100&page=" + page;
-            System.out.println(query);
-            tmp = jsonParser.readJsonArrayFromUrl(query);
-            if (tmp.length() == 0) break;
-            for (int i = 0; i < tmp.length(); i++) {
-                ret.add(getCommit(tmp.getJSONObject(i).getString("url")));
             }
             page++;
         }

@@ -11,13 +11,13 @@ public class Commit {
     private String author;
     private List<File> files;
 
-    public Commit(String commitSha, String commitMessage, String commitDate, String commitUrl, String author, List <File> files) {
+    public Commit(String commitSha, String commitMessage, String commitDate, String commitUrl, String author, List<File> files) {
         this.commitSha = commitSha;
         this.commitMessage = commitMessage;
         this.commitDate = commitDate;
         this.commitUrl = commitUrl;
         this.author = author;
-        this.files=files;
+        this.files = files;
     }
 
     public String getAuthor() {

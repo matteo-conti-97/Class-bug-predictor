@@ -6,8 +6,6 @@ import com.isw2.entity.Release;
 
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -29,11 +27,10 @@ public class Main {
         System.out.println("Last interest release end date: " + lastInterestReleaseEndDate);
         //scraperController.createAllCommitsJsonUntilDb(lastInterestReleaseEndDate,"commitDb");
         List<Commit> commits = scraperController.getCommitsFromDb("commitDb");
-        //System.out.println(commits);
         scraperController.setProjectCommits(commits);
         scraperController.linkCommitsToReleases();
         for (Release release : scraperController.getProjectReleasesOfInterest()) {
-            System.out.println("Release: " + release.getName() + " has " + release.getCommits().size() + " commits and starts at "+ release.getStartDate()+ " and ends at "+release.getEndDate());
+            System.out.println("Release: " + release.getName() + " has " + release.getCommits().size() + " commits and starts at " + release.getStartDate() + " and ends at " + release.getEndDate());
         }
 
 
