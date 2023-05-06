@@ -9,7 +9,10 @@ import java.util.List;
 
 public class CsvHandler {
 
+    private CsvHandler(){}
+
     //takes a list of lists which containt all the filenames of a release for each release
+    //TODO modificare la lista di liste di stringhe in lista di liste di file
     public static void writeDataLineByLine(List<List<String>> files, int numReleases) {
         // first create file object for file placed at location
         // specified by filepath

@@ -219,7 +219,7 @@ public class ScraperController {
         for(int i=0;i<releases.size();i++){
             release = releases.get(i);
             //ASSUNZIONE se la release non ha commit associati, la lista di file è vuota, avrò due file dataset uguali, lo cancello manualmente
-            if(release.getCommits().size()==0){
+            if(release.getCommits().isEmpty()){
                 releaseFiles.add(new ArrayList<>());
             }
             else{
