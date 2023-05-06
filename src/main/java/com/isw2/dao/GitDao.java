@@ -6,6 +6,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GitDao {
     private String projectName;
@@ -57,6 +59,27 @@ public class GitDao {
                 ret.put(getCommitJson(tmp.getJSONObject(i).getString("url")));
             }
             page++;
+        }
+        return ret;
+    }
+
+    //Ritorna solo i nomi dei file modificare poi per far tornare un istanza di File
+    public List<String> getRepoFileAtReleaseEnd(String treeUrl){
+        List<String> ret=new ArrayList<>();
+        JsonParser jsonParser = new AuthJsonParser();
+        JSONObject treeJson = null;
+        try {
+            treeJson=jsonParser.readJsonFromUrl(treeUrl+"?recursive=1");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assert treeJson != null;
+        JSONArray tree=treeJson.getJSONArray("tree");
+        for(int i=0;i<tree.length();i++){
+            String filename=tree.getJSONObject(i).getString("path");
+            if((filename.endsWith(".java"))&&((!filename.contains("test"))||(!filename.contains("Test")))){
+                ret.add(filename);
+            }
         }
         return ret;
     }

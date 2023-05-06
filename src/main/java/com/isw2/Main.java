@@ -30,8 +30,10 @@ public class Main {
         scraperController.setProjectCommits(commits);
         scraperController.linkCommitsToReleases();
         for (Release release : scraperController.getProjectReleasesOfInterest()) {
-            System.out.println("Release: " + release.getName() + " has " + release.getCommits().size() + " commits and starts at " + release.getStartDate() + " and ends at " + release.getEndDate());
+            System.out.println("Release: " + release.getName() + " number " + release.getNumber() + " has " + release.getCommits().size() + " commits and starts at " + release.getStartDate() + " and ends at " + release.getEndDate());
         }
+
+        scraperController.createWalkForwardDatasets();
 
 
         /*System.out.println("\n" + scraperController.getProjectReleases().size() + " releases:");

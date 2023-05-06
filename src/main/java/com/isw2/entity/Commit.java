@@ -7,17 +7,19 @@ public class Commit {
     private String commitMessage;
     private String commitDate;
     private String commitUrl;
+    private String treeUrl;
     private String ticketId;
     private String author;
-    private List<File> files;
+    private List<File> touchedFiles;
 
-    public Commit(String commitSha, String commitMessage, String commitDate, String commitUrl, String author, List<File> files) {
+    public Commit(String commitSha, String commitMessage, String commitDate, String commitUrl, String treeUrl,String author, List<File> touchedFiles) {
         this.commitSha = commitSha;
         this.commitMessage = commitMessage;
         this.commitDate = commitDate;
         this.commitUrl = commitUrl;
         this.author = author;
-        this.files = files;
+        this.touchedFiles = touchedFiles;
+        this.treeUrl=treeUrl;
     }
 
     public String getAuthor() {
@@ -68,11 +70,19 @@ public class Commit {
         this.ticketId = ticketId;
     }
 
-    public List<File> getFiles() {
-        return files;
+    public List<File> getTouchedFiles() {
+        return touchedFiles;
     }
 
-    public void setFiles(List<File> files) {
-        this.files = files;
+    public void setTouchedFiles(List<File> touchedFiles) {
+        this.touchedFiles = touchedFiles;
+    }
+
+    public String getTreeUrl() {
+        return treeUrl;
+    }
+
+    public void setTreeUrl(String treeUrl) {
+        this.treeUrl = treeUrl;
     }
 }

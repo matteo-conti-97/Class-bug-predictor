@@ -4,6 +4,7 @@ import com.isw2.dao.CommitDbDao;
 import com.isw2.dao.GitDao;
 import com.isw2.dao.JiraDao;
 import com.isw2.entity.*;
+import com.isw2.util.CsvHandler;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -179,10 +180,11 @@ public class ScraperController {
             String commitUrl = commitsJson.getJSONObject(i).getString("url");
             List<File> files = getFiles(commitsJson.getJSONObject(i).getJSONArray("files"));
             JSONObject commitCamp = commitsJson.getJSONObject(i).getJSONObject("commit");
+            String treeUrl = commitCamp.getJSONObject("tree").getString("url");
             String commitMessage = commitCamp.getString("message");
             String commitDate = commitCamp.getJSONObject("author").getString("date").substring(0, 10);
             String author = commitCamp.getJSONObject("author").getString("name");
-            ret.add(new Commit(commitSha, commitMessage, commitDate, commitUrl, author, files));
+            ret.add(new Commit(commitSha, commitMessage, commitDate, commitUrl, treeUrl, author, files));
         }
         return ret;
     }
@@ -206,6 +208,30 @@ public class ScraperController {
                     this.project.getReleasesOfInterest().get(j).addCommit(commit);
                 }
             }
+        }
+    }
+
+    public void createWalkForwardDatasets(){
+        List <List<String>> releaseFiles=new ArrayList<>();
+        Commit lastCommit;
+        List<Release> releases=this.project.getReleasesOfInterest();
+        Release release;
+        for(int i=0;i<releases.size();i++){
+            release = releases.get(i);
+            //ASSUNZIONE se la release non ha commit associati, la lista di file è vuota, avrò due file dataset uguali, lo cancello manualmente
+            if(release.getCommits().size()==0){
+                releaseFiles.add(new ArrayList<>());
+            }
+            else{
+                lastCommit=release.getCommits().get(0);
+                String commitTreeUrl=lastCommit.getTreeUrl();
+                releaseFiles.add(gitDao.getRepoFileAtReleaseEnd(commitTreeUrl));
+                System.out.println("Release "+release.getName()+" has "+releaseFiles.get(i).size()+" non test java files based on commit "+lastCommit.getCommitSha());
+
+            }
+            //TODO Create CSV Format
+            CsvHandler.writeDataLineByLine(releaseFiles, i+1);
+
         }
     }
 
