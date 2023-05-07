@@ -1,0 +1,10 @@
+-LOC of file at end of the release
+-NAuth of file at end of the release
+-Avg Churn in the commit of the release
+-Avg LOC Added in the commit of the release
+-Number of Revisions in the release
+-Number of Revisions from the start
+-LOC Touched in the commit of the release
+-Avg Change Set Size in the commit of the release
+-Nfix in the release
+-Nticket bug le cui commit associate coinvolgono la classe?
