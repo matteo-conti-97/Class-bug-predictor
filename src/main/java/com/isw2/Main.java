@@ -1,16 +1,19 @@
 package com.isw2;
-
 import com.isw2.control.ScraperController;
 import com.isw2.entity.Commit;
 import com.isw2.entity.Release;
+import com.isw2.util.CodeParser;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.List;
 
 public class Main {
-
-    public static void main(String[] args) throws SQLException, ParseException {
+    public static void main(String[] args) throws IOException {
+        CodeParser.getCodeStats("CodeParser.java");
+    }
+    public static void man(String[] args) throws SQLException, ParseException {
         ScraperController scraperController = new ScraperController("bookkeeper", "apache");
 
         scraperController.setProjectCreationDate();
@@ -21,6 +24,9 @@ public class Main {
 
         String lastInterestReleaseEndDate = scraperController.getLastReleaseEndDateOfInterest();
         System.out.println("Last interest release end date: " + lastInterestReleaseEndDate);
+        /*ASSUNZIONE la seguente istruzione è per troncare l'ultima release di interesse bookeeper alla data di migrazione
+        a github issue*/
+        //scraperController.setLastReleaseEndDateOfInterest("2017-06-16");
 
         System.out.println("Project: " + scraperController.getProjectName());
         System.out.println("Creation date: " + scraperController.getProjectCreationDate());

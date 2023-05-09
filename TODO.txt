@@ -1,7 +1,9 @@
--Associare tutte le commit alla relativa release
+-Associare tutte le commit alla relativa release - DONE
 
 -Prendere l'ultima commit di ogni release e tirare fuori il tree contenente la lista di tutti i file java presenti
-nel repository in quel momento, utilizzare questi dati per cominciare a fare una bozza dei csv da analizzare.
+nel repository in quel momento, utilizzare questi dati per cominciare a fare una bozza dei csv da analizzare. -DONE
+
+-Calcolare LOC utilizzando il CLOC, installare CLOC - DONE
 
 -Per ogni file java calcolare le varie feature, per quelle tipo "lines of code added" può aver senso prendere la versione
 del file della release di interesse e della versione precedente e vedere quante righe di codice sono state aggiunte
@@ -15,3 +17,4 @@ che cadono tra OV e IV con IV=FV-(FV-OV)*P dove P è la proportion
 -Probabilmente toccherà anche fare tracking degli ultimi ticket bug tramite github issue, però qui potrei anche dire
 che non ho avuto il tempo e prenderla come assunzione, magari troncando la release.
 
+-Calcolo linkage

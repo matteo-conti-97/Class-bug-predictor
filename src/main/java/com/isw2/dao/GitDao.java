@@ -77,7 +77,7 @@ public class GitDao {
         JSONArray tree=treeJson.getJSONArray("tree");
         for(int i=0;i<tree.length();i++){
             String filename=tree.getJSONObject(i).getString("path");
-            if((filename.endsWith(".java"))&&((!filename.contains("test"))||(!filename.contains("Test")))){
+            if((filename.endsWith(".java"))&&(!filename.contains("package-info"))&&(!filename.contains("test"))&&(!filename.contains("Test"))){
                 ret.add(filename);
             }
         }

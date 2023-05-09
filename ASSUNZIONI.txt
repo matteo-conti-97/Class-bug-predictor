@@ -3,3 +3,16 @@ di associarle alla prima release in quanto 1 è una cosa ragionevole 2 molte son
 in fasi di filtraggio successive.
 
 -Release 4.1.0 ossia release numero 3 dura solamente 3 giorni ed ha 0 commit, la scarto in quanto non è significativa.
+
+-Ho tolto i test perchè se in fase di predizione mi dice che un test di una classe è buggy ma la classe testata ha passato il test che faccio?
+La considero buggy anche se non lo era? Mi darebbe "falsi positivi" o se la classe passa il test ma il test è buggy mi darebbe "falsi negativi".
+
+-Ho tolto i package-info.java perchè penso siano poco significativi ai fine della predizione
+
+-Nell'ultima release apache ha fatto la migrazione da jira a github issue pertanto alcuni ticket non sono presenti su jira
+in particolare dal 16-06-2017 ci sono ticket su github issue, per questioni di tempo (SE NON HO TEMPO) ho deciso di non
+considerare questi ticket e per fare una scelta consistente ho fatto finta che la release termini il 16-06-2018
+invece del 10-08-2017, potevo anche scartare la release intera tuttavia la precedente termina l'anno precedente il che significa
+parecchi dati in meno.
+
+-Sto misurando solo e soltanto il sorgente, cioè quello che sta in src

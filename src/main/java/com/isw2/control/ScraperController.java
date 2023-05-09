@@ -117,6 +117,9 @@ public class ScraperController {
     public String getLastReleaseEndDateOfInterest() {
         return project.getReleasesOfInterest().get(project.getReleasesOfInterest().size() - 1).getEndDate();
     }
+    public void setLastReleaseEndDateOfInterest(String date) {
+        this.project.getReleasesOfInterest().get(this.project.getReleasesOfInterest().size() - 1).setEndDate(date);
+    }
 
     public List<Release> getAllReleases() {
         return jiraDao.getAllReleases();
