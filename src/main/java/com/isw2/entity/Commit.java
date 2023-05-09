@@ -12,14 +12,14 @@ public class Commit {
     private String author;
     private List<File> touchedFiles;
 
-    public Commit(String commitSha, String commitMessage, String commitDate, String commitUrl, String treeUrl,String author, List<File> touchedFiles) {
+    public Commit(String commitSha, String commitMessage, String commitDate, String commitUrl, String treeUrl, String author, List<File> touchedFiles) {
         this.commitSha = commitSha;
         this.commitMessage = commitMessage;
         this.commitDate = commitDate;
         this.commitUrl = commitUrl;
         this.author = author;
         this.touchedFiles = touchedFiles;
-        this.treeUrl=treeUrl;
+        this.treeUrl = treeUrl;
     }
 
     public String getAuthor() {

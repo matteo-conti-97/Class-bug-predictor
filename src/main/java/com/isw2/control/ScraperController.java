@@ -117,6 +117,7 @@ public class ScraperController {
     public String getLastReleaseEndDateOfInterest() {
         return project.getReleasesOfInterest().get(project.getReleasesOfInterest().size() - 1).getEndDate();
     }
+
     public void setLastReleaseEndDateOfInterest(String date) {
         this.project.getReleasesOfInterest().get(this.project.getReleasesOfInterest().size() - 1).setEndDate(date);
     }
@@ -214,26 +215,25 @@ public class ScraperController {
         }
     }
 
-    public void createWalkForwardDatasets(){
-        List <List<String>> releaseFiles=new ArrayList<>();
+    public void createWalkForwardDatasets() {
+        List<List<String>> releaseFiles = new ArrayList<>();
         Commit lastCommit;
-        List<Release> releases=this.project.getReleasesOfInterest();
+        List<Release> releases = this.project.getReleasesOfInterest();
         Release release;
-        for(int i=0;i<releases.size();i++){
+        for (int i = 0; i < releases.size(); i++) {
             release = releases.get(i);
             //ASSUNZIONE se la release non ha commit associati, la lista di file è vuota, avrò due file dataset uguali, lo cancello manualmente
-            if(release.getCommits().isEmpty()){
+            if (release.getCommits().isEmpty()) {
                 releaseFiles.add(new ArrayList<>());
-            }
-            else{
-                lastCommit=release.getCommits().get(0);
-                String commitTreeUrl=lastCommit.getTreeUrl();
+            } else {
+                lastCommit = release.getCommits().get(0);
+                String commitTreeUrl = lastCommit.getTreeUrl();
                 releaseFiles.add(gitDao.getRepoFileAtReleaseEnd(commitTreeUrl));
-                System.out.println("Release "+release.getName()+" has "+releaseFiles.get(i).size()+" non test java files based on commit "+lastCommit.getCommitSha());
+                System.out.println("Release " + release.getName() + " has " + releaseFiles.get(i).size() + " non test java files based on commit " + lastCommit.getCommitSha());
 
             }
             //TODO Create CSV Format
-            CsvHandler.writeDataLineByLine(releaseFiles, i+1);
+            CsvHandler.writeDataLineByLine(releaseFiles, i + 1);
 
         }
     }
