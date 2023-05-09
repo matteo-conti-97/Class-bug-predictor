@@ -1,10 +1,14 @@
 package com.isw2.util;
 
+import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
 import com.opencsv.CSVWriter;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CsvHandler {
@@ -42,5 +46,23 @@ public class CsvHandler {
         catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static List<String[]> readCsv(String path){
+        List<String[]> ret=new ArrayList<>();
+        try {
+            // Create an object of file reader
+            // class with CSV file as a parameter.
+            FileReader filereader = new FileReader(path);
+
+            // create csvReader object and skip first Line
+            CSVReader csvReader = new CSVReaderBuilder(filereader).withSkipLines(1).build(); //Skip title line
+            ret = csvReader.readAll();
+
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ret;
     }
 }
