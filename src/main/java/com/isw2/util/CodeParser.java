@@ -16,17 +16,28 @@ public class CodeParser {
     private CodeParser() {
     }
 
-    public static List<String> getCodeStats(String fileContent) throws IOException {
-        List<String> ret = new ArrayList<>();
+    public static String getCodeLineCount(String fileContent) throws IOException {
         String decFileContent = base64Decode(fileContent);
-        System.out.println(decFileContent);
         writeOnFile(decFileContent);
         Runtime.getRuntime().exec(CMD);
         List<String[]> csvRead = CsvHandler.readCsv("./src/main/java/resource/cloc/tmp/out.csv");
-        ret.add(csvRead.get(0)[2]); //Blank line count
-        ret.add(csvRead.get(0)[3]); //Comment line count
-        ret.add(csvRead.get(0)[4]); //Code line count
-        return ret;
+        return csvRead.get(0)[4]; //Code line count
+    }
+
+    public static String getBlankLineCount(String fileContent) throws IOException {
+        String decFileContent = base64Decode(fileContent);
+        writeOnFile(decFileContent);
+        Runtime.getRuntime().exec(CMD);
+        List<String[]> csvRead = CsvHandler.readCsv("./src/main/java/resource/cloc/tmp/out.csv");
+        return csvRead.get(0)[2]; //Code line count
+    }
+
+    public static String getCommentLineCount(String fileContent) throws IOException {
+        String decFileContent = base64Decode(fileContent);
+        writeOnFile(decFileContent);
+        Runtime.getRuntime().exec(CMD);
+        List<String[]> csvRead = CsvHandler.readCsv("./src/main/java/resource/cloc/tmp/out.csv");
+        return csvRead.get(0)[3]; //Code line count
     }
 
     private static String base64Decode(String encodedString) {
