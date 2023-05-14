@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 public class CommitDbDao {
     private String projectName;
     private Connection conn;
-    private static final Logger myLogger = Logger.getLogger("logger");
+    private static Logger myLogger = Logger.getLogger("logger");
     private static final String DB_URL = "jdbc:mysql://localhost:3306/isw2_scraping_db?allowPublicKeyRetrieval=true&useSSL=false";
     private static final String DB_USERNAME = "root";
     private static final String DB_PASSWORD = "root";
@@ -89,7 +89,7 @@ public class CommitDbDao {
 
     public List<JavaFile> getTouchedFiles(String commitSha, String project) throws SQLException {
         ResultSet rs = null;
-        PreparedStatement ps;
+        PreparedStatement ps = null;
         List<JavaFile> ret = new ArrayList<>();
 
         try {
@@ -108,13 +108,18 @@ public class CommitDbDao {
         } catch (SQLException e) {
             e.printStackTrace();
             myLogger.info("Select touched files fallito");// definire un eccezione apposita con logger serio
+        }finally{
+            assert ps != null;
+            ps.close();
+            assert rs != null;
+            rs.close();
         }
         return ret;
     }
 
     public List<Commit> getCommits(String project) throws SQLException {
         ResultSet rs = null;
-        PreparedStatement ps;
+        PreparedStatement ps = null;
         List<Commit> ret = new ArrayList<>();
 
         try {
@@ -136,6 +141,11 @@ public class CommitDbDao {
         } catch (SQLException e) {
             e.printStackTrace();
             myLogger.info("Select commits fallito");// definire un eccezione apposita con logger serio
+        }finally{
+            assert ps != null;
+            ps.close();
+            assert rs != null;
+            rs.close();
         }
         return ret;
     }
