@@ -175,7 +175,7 @@ public class ScraperController {
         }
     }
 
-    public void SaveReleasesOnDb() {
+    public void saveReleasesOnDb() {
         for (Release release : this.project.getReleases()) {
             commitDbDao.insertRelease(release.getName(), release.getNumber(), release.getStartDate(), release.getEndDate(), this.project.getName());
         }

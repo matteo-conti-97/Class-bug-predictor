@@ -3,14 +3,12 @@ package com.isw2;
 import com.isw2.control.ScraperController;
 import com.isw2.entity.Commit;
 import com.isw2.entity.Release;
-
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.List;
 
 public class Main {
 
-    public static void main(String[] args) throws SQLException, ParseException {
+    public static void main(String[] args) throws ParseException {
         ScraperController scraperController = new ScraperController("bookkeeper", "apache");
 
         scraperController.setProjectCreationDate();
