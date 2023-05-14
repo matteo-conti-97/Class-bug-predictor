@@ -26,7 +26,7 @@ public class Main {
         System.out.println("Last interest release end date: " + lastInterestReleaseEndDate);
         System.out.println("Releases of interest: ");
         for (Release release : releasesOfInterest) {
-            System.out.println("Release: " + release.getName() + " number " + release.getNumber() + "starts at " + release.getStartDate() + " and ends at " + release.getEndDate());
+            System.out.println("Release: " + release.getName() + " number " + release.getNumber() + " starts at " + release.getStartDate() + " and ends at " + release.getEndDate());
         }
 
         scraperController.saveProjectOnDb();

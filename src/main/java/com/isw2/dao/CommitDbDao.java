@@ -168,7 +168,7 @@ public class CommitDbDao {
 
     public void insertTouchedFile(String filename, String commitSha, String add, String del, String content, String project) {
         try (PreparedStatement ps = conn.prepareStatement(
-                "REPLACE INTO touchedfiles(commit_sha, commit_project_name, filename, add, del, content) VALUES(?,?,?,?,?,?)")) {
+                "REPLACE INTO touchedFiles(commit_sha, commit_project_name, filename, add, del, content) VALUES(?,?,?,?,?,?)")) {
 
             ps.setString(1, commitSha);
             ps.setString(2, project);
