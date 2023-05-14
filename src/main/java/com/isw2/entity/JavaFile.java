@@ -1,8 +1,11 @@
 package com.isw2.entity;
 
-public class File {
+public class JavaFile {
     String name;
     String rawUrl;
+    String add;
+    String del;
+    String content;
     String feature1;
     String feature2;
     String feature3;
@@ -14,9 +17,16 @@ public class File {
     String feature9;
     String feature10;
 
-    public File(String name, String rawUrl) {
+    public JavaFile(String name, String rawUrl) {
         this.name = name;
         this.rawUrl = rawUrl;
+    }
+
+    public JavaFile(String name, String add, String del, String content) {
+        this.name = name;
+        this.add = add;
+        this.del = del;
+        this.content = content;
     }
 
     public String getName() {
@@ -27,6 +37,29 @@ public class File {
         this.name = name;
     }
 
+    public String getAdd() {
+        return add;
+    }
+
+    public void setAdd(String add) {
+        this.add = add;
+    }
+
+    public String getDel() {
+        return del;
+    }
+
+    public void setDel(String del) {
+        this.del = del;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
 
     public String getRawUrl() {
         return rawUrl;

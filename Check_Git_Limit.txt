@@ -1,0 +1,1 @@
+curl -H "Authorization: token YOUR-OAUTH-TOKEN" -X GET https://api.github.com/rate_limit

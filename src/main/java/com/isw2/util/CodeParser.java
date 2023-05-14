@@ -40,7 +40,7 @@ public class CodeParser {
         return csvRead.get(0)[3]; //Code line count
     }
 
-    private static String base64Decode(String encodedString) {
+    public static String base64Decode(String encodedString) {
         return new String(Base64.decodeBase64(encodedString), StandardCharsets.UTF_8);
     }
 

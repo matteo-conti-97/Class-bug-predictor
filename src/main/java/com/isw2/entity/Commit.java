@@ -3,23 +3,42 @@ package com.isw2.entity;
 import java.util.List;
 
 public class Commit {
-    private String commitSha;
-    private String commitMessage;
-    private String commitDate;
+    private String sha;
+    private String message;
+    private String date;
+    private String projectName;
     private String commitUrl;
     private String treeUrl;
     private String ticketId;
     private String author;
-    private List<File> touchedFiles;
+    private List<JavaFile> touchedFiles;
 
-    public Commit(String commitSha, String commitMessage, String commitDate, String commitUrl, String treeUrl, String author, List<File> touchedFiles) {
-        this.commitSha = commitSha;
-        this.commitMessage = commitMessage;
-        this.commitDate = commitDate;
+    public Commit(String sha, String message, String date, String commitUrl, String treeUrl, String author, List<JavaFile> touchedFiles) {
+        this.sha = sha;
+        this.message = message;
+        this.date = date;
         this.commitUrl = commitUrl;
         this.author = author;
         this.touchedFiles = touchedFiles;
         this.treeUrl = treeUrl;
+    }
+
+    //Used for db creation
+    public Commit(String sha, String message, String date, String author, String treeUrl, List<JavaFile> touchedFiles){
+        this.sha = sha;
+        this.message = message;
+        this.date = date;
+        this.author = author;
+        this.touchedFiles = touchedFiles;
+        this.treeUrl = treeUrl;
+    }
+
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
     }
 
     public String getAuthor() {
@@ -30,28 +49,28 @@ public class Commit {
         this.author = author;
     }
 
-    public String getCommitSha() {
-        return commitSha;
+    public String getSha() {
+        return sha;
     }
 
-    public void setCommitSha(String commitSha) {
-        this.commitSha = commitSha;
+    public void setSha(String sha) {
+        this.sha = sha;
     }
 
-    public String getCommitMessage() {
-        return commitMessage;
+    public String getMessage() {
+        return message;
     }
 
-    public void setCommitMessage(String commitMessage) {
-        this.commitMessage = commitMessage;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
-    public String getCommitDate() {
-        return commitDate;
+    public String getDate() {
+        return date;
     }
 
-    public void setCommitDate(String commitDate) {
-        this.commitDate = commitDate;
+    public void setDate(String date) {
+        this.date = date;
     }
 
     public String getCommitUrl() {
@@ -70,11 +89,11 @@ public class Commit {
         this.ticketId = ticketId;
     }
 
-    public List<File> getTouchedFiles() {
+    public List<JavaFile> getTouchedFiles() {
         return touchedFiles;
     }
 
-    public void setTouchedFiles(List<File> touchedFiles) {
+    public void setTouchedFiles(List<JavaFile> touchedFiles) {
         this.touchedFiles = touchedFiles;
     }
 

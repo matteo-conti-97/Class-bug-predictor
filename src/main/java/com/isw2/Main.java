@@ -22,23 +22,29 @@ public class Main {
         scraperController.setProjectReleasesOfInterest(releasesOfInterest);
 
         String lastInterestReleaseEndDate = scraperController.getLastReleaseEndDateOfInterest();
-        System.out.println("Last interest release end date: " + lastInterestReleaseEndDate);
         /*ASSUNZIONE la seguente istruzione è per troncare l'ultima release di interesse bookeeper alla data di migrazione
         a github issue*/
         //scraperController.setLastReleaseEndDateOfInterest("2017-06-16");
-
         System.out.println("Project: " + scraperController.getProjectName());
         System.out.println("Creation date: " + scraperController.getProjectCreationDate());
         System.out.println("Last interest release end date: " + lastInterestReleaseEndDate);
+        System.out.println("Releases of interest: ");
+        for(Release release : releasesOfInterest){
+            System.out.println("Release: " + release.getName() + " number " + release.getNumber() + "starts at " + release.getStartDate() + " and ends at " + release.getEndDate());
+        }
+
+        scraperController.saveProjectOnDb();
+        scraperController.saveCommitDataOnDb(lastInterestReleaseEndDate);
+
         //scraperController.createAllCommitsJsonUntilDb(lastInterestReleaseEndDate,"commitDb");
-        List<Commit> commits = scraperController.getCommitsFromDb("commitDb");
+        List<Commit> commits = scraperController.getCommitsFromDbSql();
         scraperController.setProjectCommits(commits);
         scraperController.linkCommitsToReleases();
         for (Release release : scraperController.getProjectReleasesOfInterest()) {
             System.out.println("Release: " + release.getName() + " number " + release.getNumber() + " has " + release.getCommits().size() + " commits and starts at " + release.getStartDate() + " and ends at " + release.getEndDate());
         }
 
-        scraperController.createWalkForwardDatasets();
+        //scraperController.createWalkForwardDatasets();
 
 
         /*System.out.println("\n" + scraperController.getProjectReleases().size() + " releases:");

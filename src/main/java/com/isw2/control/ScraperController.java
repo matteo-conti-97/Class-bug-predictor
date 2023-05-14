@@ -26,7 +26,8 @@ public class ScraperController {
         this.project = new Project(projectName, projectAuthor);
         this.jiraDao = new JiraDao(project.getName());
         this.gitDao = new GitDao(project.getName(), project.getAuthor());
-        this.commitDbDao = new CommitDbDao(project.getName());
+        //this.commitDbDao = new CommitDbDao(project.getName());
+        this.commitDbDao = new CommitDbDao();
     }
 
 
@@ -155,22 +156,68 @@ public class ScraperController {
         return ret;
     }
 
-    public void createAllCommitsJsonUntilDb(String relEndDate, String dbName) throws IOException, SQLException {
+    public void saveProjectOnDb(){
+        commitDbDao.insertProject(this.project.getName(), this.project.getAuthor());
+    }
+
+    public void saveCommitDataOnDb(String lastRelOfInterestEndDate){
+        List<Commit> commits = null;
+        commits = gitDao.getAllCommitsUntil(lastRelOfInterestEndDate);
+        assert commits != null;
+        for (Commit commit: commits) {
+            commitDbDao.insertCommit(commit.getSha(), commit.getMessage(), commit.getAuthor(), commit.getDate(), commit.getTreeUrl(), this.project.getName());
+            saveTouchedFilesDataOnDb(commit);
+        }
+    }
+
+    private void saveTouchedFilesDataOnDb(Commit commit){
+        for (JavaFile file: commit.getTouchedFiles()) {
+            commitDbDao.insertTouchedFile(file.getName(),commit.getSha(), file.getAdd(), file.getDel(), file.getContent(), this.project.getName());
+        }
+    }
+
+    public void SaveReleasesOnDb(){
+        for (Release release: this.project.getReleases()) {
+            commitDbDao.insertRelease(release.getName(), release.getNumber(), release.getStartDate(), release.getEndDate(), this.project.getName());
+        }
+    }
+
+    public List<Commit> getCommitsFromDbSql(){
+        List<Commit> ret = null;
+        try {
+            ret=commitDbDao.getCommits(this.project.getName());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return ret;
+    }
+
+    //TODO
+    /*public void saveReleaseTreeFilesOnDb(){
+        for (Release release: this.project.getReleases()) {
+            insertFile(String filename, String commitSha, String project, String release)
+            commitDbDao.insertReleaseTree(release.getName(), release.getNumber(), release.getStartDate(), release.getEndDate(), this.project.getName());
+        }
+    }*/
+
+
+
+    /*public void createAllCommitsJsonUntilDb(String relEndDate, String dbName) throws IOException, SQLException {
         Connection conn = commitDbDao.getConnection(dbName);
         commitDbDao.createCommitTable(conn);
         JSONArray commitList = gitDao.getAllCommitsJsonUntil(relEndDate);
         for (int i = 0; i < commitList.length(); i++) {
             commitDbDao.insertCommitJson(conn, commitList.getJSONObject(i).toString());
         }
-    }
+    }*/
 
-    private List<File> getFiles(JSONArray fileList) {
-        List<File> ret = new ArrayList<>();
+    private List<JavaFile> getFiles(JSONArray fileList) {
+        List<JavaFile> ret = new ArrayList<>();
         for (int i = 0; i < fileList.length(); i++) {
             String fileName = fileList.getJSONObject(i).getString("filename");
 
             String rawUrl = fileList.getJSONObject(i).getString("raw_url");
-            ret.add(new File(fileName, rawUrl));
+            ret.add(new JavaFile(fileName, rawUrl));
         }
         return ret;
     }
@@ -182,7 +229,7 @@ public class ScraperController {
         for (int i = 0; i < commitsJson.length(); i++) {
             String commitSha = commitsJson.getJSONObject(i).getString("sha");
             String commitUrl = commitsJson.getJSONObject(i).getString("url");
-            List<File> files = getFiles(commitsJson.getJSONObject(i).getJSONArray("files"));
+            List<JavaFile> files = getFiles(commitsJson.getJSONObject(i).getJSONArray("files"));
             JSONObject commitCamp = commitsJson.getJSONObject(i).getJSONObject("commit");
             String treeUrl = commitCamp.getJSONObject("tree").getString("url");
             String commitMessage = commitCamp.getString("message");
@@ -200,7 +247,7 @@ public class ScraperController {
             Release release = this.project.getReleasesOfInterest().get(j);
             for (int i = 0; i < this.project.getCommits().size(); i++) {
                 Commit commit = this.project.getCommits().get(i);
-                String commitDate = commit.getCommitDate();
+                String commitDate = commit.getDate();
                 String releaseStartDate = release.getStartDate();
                 String releaseEndDate = release.getEndDate();
                 //ASSUNZIONE se la commit è antecedente alla data di inizio della prima release, la inglobo nella prima release
@@ -235,7 +282,7 @@ public class ScraperController {
                 lastCommit = commits.get(i).get(0); //Ultima commit della release i-esima
                 String commitTreeUrl = lastCommit.getTreeUrl();
                 releaseFiles.add(gitDao.getRepoFileAtReleaseEnd(commitTreeUrl));
-                System.out.println("Release " + release.getName() + " has " + releaseFiles.get(i).size() + " non test java files based on commit " + lastCommit.getCommitSha());
+                System.out.println("Release " + release.getName() + " has " + releaseFiles.get(i).size() + " non test java files based on commit " + lastCommit.getSha());
                 //TODO Ora ho la lista dei file per ogni release, per ogni lista dei file devo girarmela e calcolarmi tutte le feature per la release associata alla lista
                 features.add(measureAuthorsInRelease(releaseFiles.get(i), commits.get(i)));
                 //TODO Probabilmente mi conviene fare un array feature per ogni feature
@@ -253,8 +300,8 @@ public class ScraperController {
         for(String filename : releaseFiles){
             List<String> authors=new ArrayList<>();
             for(Commit commit : commits){
-                List<File> touchedFiles=commit.getTouchedFiles();
-                    for(File file : touchedFiles){
+                List<JavaFile> touchedFiles=commit.getTouchedFiles();
+                    for(JavaFile file : touchedFiles){
                     if(file.getName().equals(filename)){
                         String author=commit.getAuthor();
                         if(!authors.contains(author)){

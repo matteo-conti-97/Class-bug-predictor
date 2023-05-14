@@ -16,3 +16,5 @@ invece del 10-08-2017, potevo anche scartare la release intera tuttavia la prece
 parecchi dati in meno.
 
 -Sto misurando solo e soltanto il sorgente, cioè quello che sta in src
+
+-Nei touched files non conto changes.txt

@@ -10,7 +10,7 @@ public class Release {
     private String endDate;
     private List<Commit> commits; //The first element is the last commit of the release and the last element is the first commit of the release
     private List<Ticket> tickets;
-    private List<File> repoFilesAtReleaseEnd;
+    private List<JavaFile> repoFilesAtReleaseEnd;
 
     public Release(String name, int number, String startDate) {
         this.name = name;
@@ -85,11 +85,11 @@ public class Release {
         this.tickets.add(ticket);
     }
 
-    public List<File> getRepoFilesAtReleaseEnd() {
+    public List<JavaFile> getRepoFilesAtReleaseEnd() {
         return repoFilesAtReleaseEnd;
     }
 
-    public void setRepoFilesAtReleaseEnd(List<File> repoFilesAtReleaseEnd) {
+    public void setRepoFilesAtReleaseEnd(List<JavaFile> repoFilesAtReleaseEnd) {
         this.repoFilesAtReleaseEnd = repoFilesAtReleaseEnd;
     }
 }
