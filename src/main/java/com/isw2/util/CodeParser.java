@@ -11,6 +11,7 @@ import java.util.List;
 public class CodeParser {
     static final String CMD = "cmd /c start C:\\Users\\matte\\Documents\\GitHub\\isw2-jira-git-measurement\\src\\main\\java\\resource\\cloc\\cloc.exe C:\\Users\\matte\\Documents\\GitHub\\isw2-jira-git-measurement\\src\\main\\java\\resource\\cloc\\tmp\\inFile --lang-no-ext=Java --csv --out=C:\\Users\\matte\\Documents\\GitHub\\isw2-jira-git-measurement\\src\\main\\java\\resource\\cloc\\tmp\\out.csv";
     static final String IN_PATH = "./src/main/java/resource/cloc/tmp/inFile";
+    static final String OUT_CSV_PATH = "./src/main/java/resource/cloc/tmp/out.csv";
 
     private CodeParser() {
     }
@@ -19,7 +20,7 @@ public class CodeParser {
         String decFileContent = base64Decode(fileContent);
         writeOnFile(decFileContent);
         Runtime.getRuntime().exec(CMD);
-        List<String[]> csvRead = CsvHandler.readCsv("./src/main/java/resource/cloc/tmp/out.csv");
+        List<String[]> csvRead = CsvHandler.readCsv(OUT_CSV_PATH);
         return csvRead.get(0)[4]; //Code line count
     }
 
@@ -27,7 +28,7 @@ public class CodeParser {
         String decFileContent = base64Decode(fileContent);
         writeOnFile(decFileContent);
         Runtime.getRuntime().exec(CMD);
-        List<String[]> csvRead = CsvHandler.readCsv("./src/main/java/resource/cloc/tmp/out.csv");
+        List<String[]> csvRead = CsvHandler.readCsv(OUT_CSV_PATH);
         return csvRead.get(0)[2]; //Code line count
     }
 
@@ -35,7 +36,7 @@ public class CodeParser {
         String decFileContent = base64Decode(fileContent);
         writeOnFile(decFileContent);
         Runtime.getRuntime().exec(CMD);
-        List<String[]> csvRead = CsvHandler.readCsv("./src/main/java/resource/cloc/tmp/out.csv");
+        List<String[]> csvRead = CsvHandler.readCsv(OUT_CSV_PATH);
         return csvRead.get(0)[3]; //Code line count
     }
 
