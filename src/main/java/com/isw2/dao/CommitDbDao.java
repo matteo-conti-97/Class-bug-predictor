@@ -37,17 +37,7 @@ public class CommitDbDao {
             e.printStackTrace();
         }
     }
-
-    public Connection openConnection() {
-        try {
-            if (!conn.isClosed()) closeConnection();
-            conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
-        } catch (SQLException e) {
-            myLogger.info("Connessione fallita");
-            e.printStackTrace();
-        }
-        return conn;
-    }
+    
 
     public void insertProject(String name, String author) {
         try (PreparedStatement ps = conn.prepareStatement(
