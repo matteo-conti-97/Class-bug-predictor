@@ -13,8 +13,7 @@ import java.util.List;
 
 public class CsvHandler {
 
-    private CsvHandler() {
-    }
+    private CsvHandler() {}
 
     //takes a list of lists which containt all the filenames of a release for each release
     //TODO modificare la lista di liste di stringhe in lista di liste di file
@@ -41,7 +40,6 @@ public class CsvHandler {
                     writer.writeNext(data);
                 }
             }
-
             // closing writer connection
             writer.close();
         } catch (IOException e) {

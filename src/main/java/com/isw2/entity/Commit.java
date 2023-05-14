@@ -14,15 +14,6 @@ public class Commit {
     private String author;
     private List<JavaFile> touchedFiles;
 
-    public Commit(String sha, String message, String date, String commitUrl, String treeUrl, String author, List<JavaFile> touchedFiles, long id) {
-        this.sha = sha;
-        this.message = message;
-        this.date = date;
-        this.commitUrl = commitUrl;
-        this.author = author;
-        this.touchedFiles = touchedFiles;
-        this.treeUrl = treeUrl;
-    }
 
     //Used for db creation
     public Commit(String id, String sha, String message, String date, String author, String treeUrl, List<JavaFile> touchedFiles) {
