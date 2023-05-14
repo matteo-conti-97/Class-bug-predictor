@@ -4,7 +4,6 @@ import com.isw2.dao.CommitDbDao;
 import com.isw2.dao.GitDao;
 import com.isw2.dao.JiraDao;
 import com.isw2.entity.*;
-import com.isw2.util.CsvHandler;
 
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -213,6 +212,21 @@ public class ScraperController {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        //Get file tree for each release
+        assert ret != null;
+        for (Release release : ret) {
+            release.setFileTreeAtReleaseEnd(getReleaseFileTreeFromDb(release));
+        }
+        return ret;
+    }
+
+    public List<JavaFile> getReleaseFileTreeFromDb(Release release) {
+        List<JavaFile> ret = null;
+        try {
+            ret = commitDbDao.getReleaseFileTree(this.project.getName(), release.getNumber());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return ret;
     }
 
@@ -244,28 +258,39 @@ public class ScraperController {
         }
     }
 
+    public void removeEmptyReleases() {
+        List<Release> releaseToRemove = new ArrayList<>();
+        for (Release release : this.project.getReleasesOfInterest()) {
+            if (release.getCommits().size() == 0) {
+                releaseToRemove.add(release);
+            }
+        }
+        for (Release release : releaseToRemove) {
+            this.project.getReleasesOfInterest().remove(release);
+        }
+    }
+
     public void getProjectDataFromDb() throws ParseException {
         setProjectCreationDate();
         List<Release> releasesOfInterest = getReleasesOfInterestFromDb();
         setProjectReleasesOfInterest(releasesOfInterest);
         String lastInterestReleaseEndDate = getLastReleaseEndDateOfInterest();
-        /*ASSUNZIONE la seguente istruzione è per troncare l'ultima release di interesse bookeeper alla data di migrazione
-        a github issue*/
+        //ASSUNZIONE la seguente istruzione è per troncare l'ultima release di interesse bookeeper alla data di migrazione a github issue
         //scraperController.setLastReleaseEndDateOfInterest("2017-06-16");
+        List<Commit> commits = getCommitsFromDb();
+        setProjectCommits(commits);
+        linkCommitsToReleases();
+        removeEmptyReleases(); //ASSUNZIONE le release senza commit le butto
         System.out.println("Project: " + getProjectName());
         System.out.println("Creation date: " + getProjectCreationDate());
         System.out.println("Last interest release end date: " + lastInterestReleaseEndDate);
         System.out.println("\nReleases of interest: ");
-
-        List<Commit> commits = getCommitsFromDb();
-        setProjectCommits(commits);
-        linkCommitsToReleases();
         for (Release release : releasesOfInterest) {
-            System.out.println("Release: " + release.getName() + " number " + release.getNumber() + " has " + release.getCommits().size() + " commits and starts at " + release.getStartDate() + " and ends at " + release.getEndDate());
+            System.out.println("Release: " + release.getName() + " number " + release.getNumber() + " has " + release.getCommits().size() + " commits and " + release.getFileTreeAtReleaseEnd().size() + " non test java files, starts at " + release.getStartDate() + " and ends at " + release.getEndDate());
         }
     }
 
-    public void saveProjectDataOnDb(){
+    public void saveProjectDataOnDb() {
         setProjectCreationDate();
         List<Release> allReleases = getAllReleases();
         setProjectReleases(allReleases);
@@ -293,7 +318,7 @@ public class ScraperController {
             e.printStackTrace();
         }
         for (Release release : releasesOfInterest) {
-            System.out.println("Release: " + release.getName() + " number " + release.getNumber() + " has " + release.getCommits().size() + " commits and starts at " + release.getStartDate() + " and ends at " + release.getEndDate());
+            System.out.println("Release: " + release.getName() + " number " + release.getNumber() + " has " + release.getCommits().size() + " commits and " + release.getFileTreeAtReleaseEnd().size() + " non test java files, starts at " + release.getStartDate() + " and ends at " + release.getEndDate());
         }
         saveFileTreeOnDb();
     }

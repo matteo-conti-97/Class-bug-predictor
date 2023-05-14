@@ -86,71 +86,6 @@ public class CommitDbDao {
         }
     }
 
-    public List<JavaFile> getTouchedFiles(String commitSha, String project, String commitId) throws SQLException {
-        ResultSet rs = null;
-        PreparedStatement ps = null;
-        List<JavaFile> ret = new ArrayList<>();
-
-        try {
-            ps = conn.prepareStatement(
-                    "SELECT * FROM touchedfiles WHERE commit_sha = ? AND commit_project_name = ? AND commit_id = ?");
-
-            ps.setString(1, commitSha);
-            ps.setString(2, project);
-            ps.setString(3, commitId);
-            rs = ps.executeQuery();
-            while (rs.next()) {
-                ret.add(new JavaFile(rs.getString("filename"), rs.getString("adds"), rs.getString("dels"), rs.getString("content")));
-            }
-            rs.close();
-            return ret;
-
-        } catch (SQLException e) {
-            //e.printStackTrace();
-            myLogger.info("Select touched files fallito");// definire un eccezione apposita con logger serio
-        } finally {
-            assert ps != null;
-            ps.close();
-            assert rs != null;
-            rs.close();
-        }
-        return ret;
-    }
-
-    public List<Commit> getCommits(String project) throws SQLException {
-        ResultSet rs = null;
-        PreparedStatement ps = null;
-        List<Commit> ret = new ArrayList<>();
-
-        try {
-            ps = conn.prepareStatement(
-                    "SELECT * FROM commit WHERE project_name = ? ORDER BY cdate DESC");
-
-            ps.setString(1, project);
-            rs = ps.executeQuery();
-            while (rs.next()) {
-                String commitId = rs.getString("id");
-                String commitSha = rs.getString("sha");
-                String commitMessage = rs.getString("message");
-                String commitDate = rs.getString("cdate");
-                String commitAuthor = rs.getString("author");
-                String commitTreeUrl = rs.getString("treeUrl");
-                List<JavaFile> touchedFile = getTouchedFiles(commitSha, project, commitId);
-                ret.add(new Commit(commitId, commitSha, commitMessage, commitDate, commitAuthor, commitTreeUrl, touchedFile));
-            }
-            rs.close();
-        } catch (SQLException e) {
-            //e.printStackTrace();
-            myLogger.info("Select commits fallito");// definire un eccezione apposita con logger serio
-        } finally {
-            assert ps != null;
-            ps.close();
-            assert rs != null;
-            rs.close();
-        }
-        return ret;
-    }
-
     public void insertRealeaseFileTree(String filename, String content, String project, String releaseNum) {
         try (PreparedStatement ps = conn.prepareStatement(
                 "INSERT INTO treefile(filename, content, release_project_name, release_number) VALUES(?,?,?,?)" +
@@ -232,6 +167,101 @@ public class CommitDbDao {
         } catch (SQLException e) {
             //e.printStackTrace();
             myLogger.info("Select commits fallito");// definire un eccezione apposita con logger serio
+        } finally {
+            assert ps != null;
+            ps.close();
+            assert rs != null;
+            rs.close();
+        }
+        return ret;
+    }
+
+    public List<JavaFile> getTouchedFiles(String commitSha, String project, String commitId) throws SQLException {
+        ResultSet rs = null;
+        PreparedStatement ps = null;
+        List<JavaFile> ret = new ArrayList<>();
+
+        try {
+            ps = conn.prepareStatement(
+                    "SELECT * FROM touchedfiles WHERE commit_sha = ? AND commit_project_name = ? AND commit_id = ?");
+
+            ps.setString(1, commitSha);
+            ps.setString(2, project);
+            ps.setString(3, commitId);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                ret.add(new JavaFile(rs.getString("filename"), rs.getString("adds"), rs.getString("dels"), rs.getString("content")));
+            }
+            rs.close();
+            return ret;
+
+        } catch (SQLException e) {
+            //e.printStackTrace();
+            myLogger.info("Select touched files fallito");// definire un eccezione apposita con logger serio
+        } finally {
+            assert ps != null;
+            ps.close();
+            assert rs != null;
+            rs.close();
+        }
+        return ret;
+    }
+
+    public List<Commit> getCommits(String project) throws SQLException {
+        ResultSet rs = null;
+        PreparedStatement ps = null;
+        List<Commit> ret = new ArrayList<>();
+
+        try {
+            ps = conn.prepareStatement(
+                    "SELECT * FROM commit WHERE project_name = ? ORDER BY cdate DESC");
+
+            ps.setString(1, project);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                String commitId = rs.getString("id");
+                String commitSha = rs.getString("sha");
+                String commitMessage = rs.getString("message");
+                String commitDate = rs.getString("cdate");
+                String commitAuthor = rs.getString("author");
+                String commitTreeUrl = rs.getString("treeUrl");
+                List<JavaFile> touchedFile = getTouchedFiles(commitSha, project, commitId);
+                ret.add(new Commit(commitId, commitSha, commitMessage, commitDate, commitAuthor, commitTreeUrl, touchedFile));
+            }
+            rs.close();
+        } catch (SQLException e) {
+            //e.printStackTrace();
+            myLogger.info("Select commits fallito");// definire un eccezione apposita con logger serio
+        } finally {
+            assert ps != null;
+            ps.close();
+            assert rs != null;
+            rs.close();
+        }
+        return ret;
+    }
+
+    public List<JavaFile> getReleaseFileTree(String project, String releaseNum) throws SQLException {
+        ResultSet rs = null;
+        PreparedStatement ps = null;
+        List<JavaFile> ret = new ArrayList<>();
+
+        try {
+            ps = conn.prepareStatement(
+                    "SELECT * FROM treefile WHERE release_number = ? AND release_project_name = ?");
+
+            ps.setString(1, releaseNum);
+            ps.setString(2, project);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                ret.add(new JavaFile(rs.getString("filename"), rs.getString("content")));
+            }
+            rs.close();
+            return ret;
+
+        } catch (SQLException e) {
+            //e.printStackTrace();
+            myLogger.info("Select touched files fallito");// definire un eccezione apposita con logger serio
         } finally {
             assert ps != null;
             ps.close();

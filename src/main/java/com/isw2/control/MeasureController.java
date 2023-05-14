@@ -3,8 +3,6 @@ package com.isw2.control;
 import com.isw2.entity.Commit;
 import com.isw2.entity.JavaFile;
 import com.isw2.entity.Project;
-import com.isw2.entity.Release;
-import com.isw2.util.CsvHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +14,8 @@ public class MeasureController {
         this.project = project;
     }
 
-    public void createWalkForwardDatasets() {
+    //TODO MODIFICARLA PER ADATTARLA ALLA NUOVA IMPLEMENTAZIONE DEL RESTO
+    /*public void createWalkForwardDatasets() {
         List<List<String>> releaseFiles = new ArrayList<>();
         List<List<String>> features = new ArrayList<>();
         List<List<Commit>> commits = new ArrayList<>();
@@ -39,7 +38,7 @@ public class MeasureController {
             CsvHandler.writeDataLineByLine(releaseFiles, features, i + 1);
 
         }
-    }
+    }*/
 
     //Per ogni commit nella release che ha toccato il file si guarda l'autore e si aggiunge ad una lista senza duplicati
     private List<String> measureAuthorsInRelease(List<String> releaseFiles, List<Commit> commits) {

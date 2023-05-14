@@ -17,6 +17,10 @@ public class Project {
         this.author = author;
     }
 
+    public void removeRelease(Release release) {
+        releases.remove(release);
+    }
+
     public String getName() {
         return name;
     }
