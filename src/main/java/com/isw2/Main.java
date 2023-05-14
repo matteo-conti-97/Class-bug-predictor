@@ -13,10 +13,8 @@ public class Main {
         scraperController.getProjectDataFromDb();
 
         MeasureController measureController = new MeasureController(scraperController.getProject());
-        measureController.createWalkForwardDatasets();
-
-
-
+        //measureController.createWalkForwardDatasets();
+        
 
         /*List<Ticket> allTickets = scraperController.getAllTickets();
         scraperController.setProjectFixedBugTickets(allTickets);
