@@ -29,8 +29,8 @@ public class WekaAnalyzer {
 
         eval.evaluateModel(classifier, testing);
 
-        myLogger.info("AUC = " + eval.areaUnderROC(1));
-        myLogger.info("Kappa = " + eval.kappa());
+        myLogger.info(new String("AUC = " + eval.areaUnderROC(1)));
+        myLogger.info(new String("Kappa = " + eval.kappa()));
 
 
     }
