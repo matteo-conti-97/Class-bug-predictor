@@ -13,7 +13,9 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ScraperController {
     private Project project;
@@ -25,7 +27,6 @@ public class ScraperController {
         this.project = new Project(projectName, projectAuthor);
         this.jiraDao = new JiraDao(project.getName());
         this.gitDao = new GitDao(project.getName(), project.getAuthor());
-        //this.commitDbDao = new CommitDbDao(project.getName());
         this.commitDbDao = new CommitDbDao();
     }
 
@@ -160,18 +161,19 @@ public class ScraperController {
     }
 
     public void saveCommitDataOnDb(String lastRelOfInterestEndDate) {
-        List<Commit> commits = null;
+        List<Commit> commits;
         commits = gitDao.getAllCommitsUntil(lastRelOfInterestEndDate);
         assert commits != null;
+        System.out.println("commit list size: "+commits.size());
         for (Commit commit : commits) {
-            commitDbDao.insertCommit(commit.getSha(), commit.getMessage(), commit.getAuthor(), commit.getDate(), commit.getTreeUrl(), this.project.getName());
+            commitDbDao.insertCommit(commit.getSha(), commit.getId(), commit.getMessage(), commit.getAuthor(), commit.getDate(), commit.getTreeUrl(), this.project.getName());
             saveTouchedFilesDataOnDb(commit);
         }
     }
 
     private void saveTouchedFilesDataOnDb(Commit commit) {
         for (JavaFile file : commit.getTouchedFiles()) {
-            commitDbDao.insertTouchedFile(file.getName(), commit.getSha(), file.getAdd(), file.getDel(), file.getContent(), this.project.getName());
+            commitDbDao.insertTouchedFile(file.getName(), commit.getSha(), commit.getId(), file.getAdd(), file.getDel(), file.getContent(), this.project.getName());
         }
     }
 
@@ -181,7 +183,7 @@ public class ScraperController {
         }
     }
 
-    public List<Commit> getCommitsFromDbSql() {
+    public List<Commit> getCommitsFromDb() {
         List<Commit> ret = null;
         try {
             ret = commitDbDao.getCommits(this.project.getName());
@@ -217,24 +219,6 @@ public class ScraperController {
 
             String rawUrl = fileList.getJSONObject(i).getString("raw_url");
             ret.add(new JavaFile(fileName, rawUrl));
-        }
-        return ret;
-    }
-
-    public List<Commit> getCommitsFromDb(String dbName) throws SQLException {
-        List<Commit> ret = new ArrayList<>();
-        Connection conn = commitDbDao.getConnection(dbName);
-        JSONArray commitsJson = commitDbDao.getCommitsJson(conn);
-        for (int i = 0; i < commitsJson.length(); i++) {
-            String commitSha = commitsJson.getJSONObject(i).getString("sha");
-            String commitUrl = commitsJson.getJSONObject(i).getString("url");
-            List<JavaFile> files = getFiles(commitsJson.getJSONObject(i).getJSONArray("files"));
-            JSONObject commitCamp = commitsJson.getJSONObject(i).getJSONObject("commit");
-            String treeUrl = commitCamp.getJSONObject("tree").getString("url");
-            String commitMessage = commitCamp.getString("message");
-            String commitDate = commitCamp.getJSONObject("author").getString("date").substring(0, 10);
-            String author = commitCamp.getJSONObject("author").getString("name");
-            ret.add(new Commit(commitSha, commitMessage, commitDate, commitUrl, treeUrl, author, files));
         }
         return ret;
     }
@@ -316,7 +300,7 @@ public class ScraperController {
     }
 
     //Per ogni commit nella release che ha toccato il file si guarda loc e si fa la media
-    private String measureAvgLocInRelease(String filename, int release) {
+    private String measureLocAtEndRelease(String filename, int release) {
         String ret = "";
         return ret;
     }
@@ -327,8 +311,8 @@ public class ScraperController {
         return ret;
     }
 
-    //Per ogni commit nella release che ha toccato il file si fa locAdded e si fa la media
-    private String measureAvgLocAddedInRelease(String filename, int release) {
+    //Per ogni commit che ha toccato il file si fa locAdded - locDeleted e si fa la media
+    private String measureAvgChurnFromStart(String filename, int release) {
         String ret = "";
         return ret;
     }
@@ -339,21 +323,27 @@ public class ScraperController {
         return ret;
     }
 
+    //Per ogni file si contano le commit nella release che lo hanno toccato
+    private String measureRevisionNumFromStart(String filename, int release) {
+        String ret = "";
+        return ret;
+    }
+
     //
     private String measureRevisionAge(String filename, int release) {
         String ret = "";
         return ret;
     }
 
-    //Per ogni commit nella release che ha toccato il file si fa locAdded + locDeleted e si fa la media
-    private String measureAvgLocTouchedInRelease(String filename, int release) {
+    //Per ogni commit nella release che ha toccato il file prende fa locAdded e si fa la media
+    private String measureAvgLocAddedInRelease(String filename, int release) {
         String ret = "";
         return ret;
     }
 
 
-    //Per ogni commit nella release si guarda quanti file vengono committati insieme e se ne fa la media
-    private String measureAvgChangeSetInRelease(String filename, int release) {
+    //Per ogni commit nella release che ha toccato il file prende fa locAdded e si fa la media
+    private String measureAvgLocAddedFromStart(String filename, int release) {
         String ret = "";
         return ret;
     }
@@ -365,7 +355,7 @@ public class ScraperController {
     }
 
     //Per ogni commit che ha toccato il file si conta quante sono afferenti ad un bugFix
-    private String measureFixCommits(String filename, int release) {
+    private String measureFixCommitsFromStart(String filename, int release) {
         String ret = "";
         return ret;
     }

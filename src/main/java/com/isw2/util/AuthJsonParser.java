@@ -15,6 +15,7 @@ import java.util.Base64;
 
 public class AuthJsonParser extends JsonParser {
     private static final String USERNAME = "matteo-conti-97";
+    private static final String USERNAME2 = "OniBaku972";
 
     private InputStreamReader getAuthStream(URL url) throws IOException {
         String token;
@@ -24,7 +25,7 @@ public class AuthJsonParser extends JsonParser {
         try (BufferedReader oauthReader = new BufferedReader(new FileReader("src/main/java/resource/token/git_token"))) {
             token = oauthReader.readLine();
         }
-        String userPass = USERNAME + ":" + token;
+        String userPass = USERNAME2 + ":" + token;
         byte[] encodedBytes = Base64.getEncoder().encode(userPass.getBytes());
         String basicAuth = "Basic " + new String(encodedBytes);
         uc.setRequestProperty("Authorization", basicAuth);

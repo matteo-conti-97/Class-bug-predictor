@@ -34,7 +34,7 @@ public class GitDao {
         return jsonParser.getJSONAttribute(projectJson, "created_at").substring(0, 10);
     }
 
-    private Commit getCommit(String commitUrl) {
+    private Commit getCommit(String commitUrl, long commitId){
         JsonParser jsonParser = new AuthJsonParser();
         Commit ret = null;
         try {
@@ -53,14 +53,16 @@ public class GitDao {
                 if (filename.endsWith(".java")) {
                     String add = Integer.toString(touchedFilesJson.getJSONObject(i).getInt("additions"));
                     String del = Integer.toString(touchedFilesJson.getJSONObject(i).getInt("deletions"));
-                    String contentUrl = touchedFilesJson.getJSONObject(i).getString("contents_url");
-                    JSONObject contentJson = jsonParser.readJsonFromUrl(contentUrl);
-                    String content = CodeParser.base64Decode(contentJson.getString("content"));
+                    //Se possibile evitare il seguente pezzo di codice perchè consuma troppi accessi all'api
+                    /*String contentUrl = touchedFilesJson.getJSONObject(i).getString("contents_url");
+                    //JSONObject contentJson = jsonParser.readJsonFromUrl(contentUrl);
+                    String content = CodeParser.base64Decode(contentJson.getString("content"));*/
+                    String content = "";
                     JavaFile touchedFile = new JavaFile(filename, add, del, content);
                     touchedFiles.add(touchedFile);
                 }
             }
-            ret = new Commit(sha, message, date, authorName, treeUrl, touchedFiles);
+            ret = new Commit(Long.toString(commitId), sha, message, date, authorName, treeUrl, touchedFiles);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -72,7 +74,8 @@ public class GitDao {
     public List<Commit> getAllCommitsUntil(String relEndDate) {
         JsonParser jsonParser = new AuthJsonParser();
         List<Commit> ret = new ArrayList<>();
-        int page = 1; //Mettere un numero di pagina più alto se si finiscono gli accessi dell'api
+        int page = 1; //*****Mettere un numero di pagina più alto se si finiscono gli accessi dell'api*****
+        long commitId = 0;
         while (true) {
             JSONArray tmp;
             System.out.println("page: " + page);
@@ -83,7 +86,8 @@ public class GitDao {
                 if (tmp.length() == 0) break;
                 for (int i = 0; i < tmp.length(); i++) {
                     String commitUrl = tmp.getJSONObject(i).getString("url");
-                    ret.add(getCommit(commitUrl));
+                    ret.add(getCommit(commitUrl, commitId));
+                    commitId++;
                 }
                 page++;
 

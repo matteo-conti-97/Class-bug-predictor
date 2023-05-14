@@ -1,8 +1,11 @@
 package com.isw2;
 
 import com.isw2.control.ScraperController;
+import com.isw2.dao.CommitDbDao;
 import com.isw2.entity.Commit;
 import com.isw2.entity.Release;
+import com.isw2.util.CodeParser;
+
 import java.text.ParseException;
 import java.util.List;
 
@@ -25,18 +28,14 @@ public class Main {
         System.out.println("Creation date: " + scraperController.getProjectCreationDate());
         System.out.println("Last interest release end date: " + lastInterestReleaseEndDate);
         System.out.println("Releases of interest: ");
-        for (Release release : releasesOfInterest) {
-            System.out.println("Release: " + release.getName() + " number " + release.getNumber() + " starts at " + release.getStartDate() + " and ends at " + release.getEndDate());
-        }
 
-        scraperController.saveProjectOnDb();
-        scraperController.saveCommitDataOnDb(lastInterestReleaseEndDate);
+        //scraperController.saveProjectOnDb();
+        //scraperController.saveCommitDataOnDb(lastInterestReleaseEndDate);
 
-        //scraperController.createAllCommitsJsonUntilDb(lastInterestReleaseEndDate,"commitDb");
-        List<Commit> commits = scraperController.getCommitsFromDbSql();
+        List<Commit> commits = scraperController.getCommitsFromDb();
         scraperController.setProjectCommits(commits);
         scraperController.linkCommitsToReleases();
-        for (Release release : scraperController.getProjectReleasesOfInterest()) {
+        for (Release release : releasesOfInterest) {
             System.out.println("Release: " + release.getName() + " number " + release.getNumber() + " has " + release.getCommits().size() + " commits and starts at " + release.getStartDate() + " and ends at " + release.getEndDate());
         }
 
