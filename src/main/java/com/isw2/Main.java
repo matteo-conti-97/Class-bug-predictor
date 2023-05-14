@@ -1,10 +1,9 @@
 package com.isw2;
 
+import com.isw2.control.MeasureController;
 import com.isw2.control.ScraperController;
-import com.isw2.dao.CommitDbDao;
 import com.isw2.entity.Commit;
 import com.isw2.entity.Release;
-import com.isw2.util.CodeParser;
 
 import java.text.ParseException;
 import java.util.List;
@@ -13,13 +12,12 @@ public class Main {
 
     public static void main(String[] args) throws ParseException {
         ScraperController scraperController = new ScraperController("bookkeeper", "apache");
-
         scraperController.setProjectCreationDate();
-        List<Release> allReleases = scraperController.getAllReleases();
-        scraperController.setProjectReleases(allReleases);
-        List<Release> releasesOfInterest = scraperController.getReleasesOfInterest("4.4.0");
+        //List<Release> allReleases = scraperController.getAllReleases();
+        //scraperController.setProjectReleases(allReleases);
+        //List<Release> releasesOfInterest = scraperController.getReleasesOfInterest("4.4.0");
+        List<Release> releasesOfInterest = scraperController.getReleasesOfInterestFromDb();
         scraperController.setProjectReleasesOfInterest(releasesOfInterest);
-
         String lastInterestReleaseEndDate = scraperController.getLastReleaseEndDateOfInterest();
         /*ASSUNZIONE la seguente istruzione è per troncare l'ultima release di interesse bookeeper alla data di migrazione
         a github issue*/
@@ -27,10 +25,11 @@ public class Main {
         System.out.println("Project: " + scraperController.getProjectName());
         System.out.println("Creation date: " + scraperController.getProjectCreationDate());
         System.out.println("Last interest release end date: " + lastInterestReleaseEndDate);
-        System.out.println("Releases of interest: ");
+        System.out.println("\nReleases of interest: ");
 
         //scraperController.saveProjectOnDb();
         //scraperController.saveCommitDataOnDb(lastInterestReleaseEndDate);
+        //scraperController.saveReleasesOnDb();
 
         List<Commit> commits = scraperController.getCommitsFromDb();
         scraperController.setProjectCommits(commits);
@@ -38,8 +37,10 @@ public class Main {
         for (Release release : releasesOfInterest) {
             System.out.println("Release: " + release.getName() + " number " + release.getNumber() + " has " + release.getCommits().size() + " commits and starts at " + release.getStartDate() + " and ends at " + release.getEndDate());
         }
+        //scraperController.saveFileTreeOnDb();
 
-        //scraperController.createWalkForwardDatasets();
+        MeasureController measureController = new MeasureController(scraperController.getProject());
+        measureController.createWalkForwardDatasets();
 
 
         /*System.out.println("\n" + scraperController.getProjectReleases().size() + " releases:");

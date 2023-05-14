@@ -26,7 +26,7 @@ public class Commit {
 
     //Used for db creation
     public Commit(String id, String sha, String message, String date, String author, String treeUrl, List<JavaFile> touchedFiles) {
-        this.id=id;
+        this.id = id;
         this.sha = sha;
         this.message = message;
         this.date = date;

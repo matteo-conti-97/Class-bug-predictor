@@ -17,11 +17,14 @@ public class JavaFile {
     String feature9;
     String feature10;
 
-    public JavaFile(String name, String rawUrl) {
+
+    //Usato per riempire la tabella del file tree nel db
+    public JavaFile(String name, String content) {
         this.name = name;
-        this.rawUrl = rawUrl;
+        this.content = content;
     }
 
+    //Usato per riempire la tabella delle commit nel db
     public JavaFile(String name, String add, String del, String content) {
         this.name = name;
         this.add = add;

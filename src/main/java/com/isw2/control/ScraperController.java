@@ -5,17 +5,12 @@ import com.isw2.dao.GitDao;
 import com.isw2.dao.JiraDao;
 import com.isw2.entity.*;
 import com.isw2.util.CsvHandler;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class ScraperController {
     private Project project;
@@ -164,7 +159,7 @@ public class ScraperController {
         List<Commit> commits;
         commits = gitDao.getAllCommitsUntil(lastRelOfInterestEndDate);
         assert commits != null;
-        System.out.println("commit list size: "+commits.size());
+        System.out.println("commit list size: " + commits.size());
         for (Commit commit : commits) {
             commitDbDao.insertCommit(commit.getSha(), commit.getId(), commit.getMessage(), commit.getAuthor(), commit.getDate(), commit.getTreeUrl(), this.project.getName());
             saveTouchedFilesDataOnDb(commit);
@@ -178,8 +173,26 @@ public class ScraperController {
     }
 
     public void saveReleasesOnDb() {
-        for (Release release : this.project.getReleases()) {
+        for (Release release : this.project.getReleasesOfInterest()) {
             commitDbDao.insertRelease(release.getName(), release.getNumber(), release.getStartDate(), release.getEndDate(), this.project.getName());
+        }
+    }
+
+    public void saveFileTreeOnDb() {
+        List<Release> releaseOfInterest = this.project.getReleasesOfInterest();
+        int start = 0; //*****Mettere un numero più alto in caso si finiscano le chiamate all'api******
+        for (int i = start; i < releaseOfInterest.size(); i++) {
+            Release release = releaseOfInterest.get(i);
+            List<Commit> commits = release.getCommits();
+            System.out.println("Processing release " + release.getName() + " number " + release.getNumber() + " tree");
+            if (!commits.isEmpty()) { //Questo check è necessario per evitare eccezioni in caso la release non abbia commit
+                Commit lastCommit = commits.get(0);
+                List<JavaFile> treeFiles = gitDao.getRepoFileAtReleaseEnd(lastCommit.getTreeUrl());
+                for (JavaFile file : treeFiles) {
+                    commitDbDao.insertRealeaseFileTree(file.getName(), file.getContent(), this.project.getName(), release.getNumber());
+                }
+            }
+
         }
     }
 
@@ -193,36 +206,15 @@ public class ScraperController {
         return ret;
     }
 
-    //TODO
-    /*public void saveReleaseTreeFilesOnDb(){
-        for (Release release: this.project.getReleases()) {
-            insertFile(String filename, String commitSha, String project, String release)
-            commitDbDao.insertReleaseTree(release.getName(), release.getNumber(), release.getStartDate(), release.getEndDate(), this.project.getName());
-        }
-    }*/
-
-
-
-    /*public void createAllCommitsJsonUntilDb(String relEndDate, String dbName) throws IOException, SQLException {
-        Connection conn = commitDbDao.getConnection(dbName);
-        commitDbDao.createCommitTable(conn);
-        JSONArray commitList = gitDao.getAllCommitsJsonUntil(relEndDate);
-        for (int i = 0; i < commitList.length(); i++) {
-            commitDbDao.insertCommitJson(conn, commitList.getJSONObject(i).toString());
-        }
-    }*/
-
-    private List<JavaFile> getFiles(JSONArray fileList) {
-        List<JavaFile> ret = new ArrayList<>();
-        for (int i = 0; i < fileList.length(); i++) {
-            String fileName = fileList.getJSONObject(i).getString("filename");
-
-            String rawUrl = fileList.getJSONObject(i).getString("raw_url");
-            ret.add(new JavaFile(fileName, rawUrl));
+    public List<Release> getReleasesOfInterestFromDb() {
+        List<Release> ret = null;
+        try {
+            ret = commitDbDao.getReleases(this.project.getName());
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         return ret;
     }
-
 
     public void linkCommitsToReleases() throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -236,6 +228,13 @@ public class ScraperController {
                 //ASSUNZIONE se la commit è antecedente alla data di inizio della prima release, la inglobo nella prima release
                 if ((release.getNumber().equals("1")) && (sdf.parse(commitDate).before(sdf.parse(releaseStartDate)))) {
                     this.project.getReleasesOfInterest().get(j).addCommit(commit);
+                    continue;
+                }
+
+                //Se la data della commit combacia con la fine dell'ultima commit la assegno all'ultima release perche non posso metterla come prima commit della successiva
+                if ((release.getNumber().equals(Integer.toString(this.project.getReleasesOfInterest().size()))) && (sdf.parse(commitDate).compareTo(sdf.parse(releaseEndDate)) == 0)) {
+                    this.project.getReleasesOfInterest().get(j).addCommit(commit);
+                    continue;
                 }
                 //Se la data della commit si trova all'interno del range di date di una release o combacia con la data di inizio della release la considero appartenente alla release
                 if ((sdf.parse(commitDate).compareTo(sdf.parse(releaseStartDate)) == 0) || ((sdf.parse(commitDate).after(sdf.parse(releaseStartDate))) && (sdf.parse(commitDate).before(sdf.parse(releaseEndDate))))) {
@@ -245,119 +244,57 @@ public class ScraperController {
         }
     }
 
-    public void createWalkForwardDatasets() {
-        List<List<String>> releaseFiles = new ArrayList<>();
-        List<List<String>> features = new ArrayList<>();
-        List<List<Commit>> commits = new ArrayList<>();
-        Commit lastCommit;
-        List<Release> releases = this.project.getReleasesOfInterest();
-        Release release;
-        for (int i = 0; i < releases.size(); i++) {
-            release = releases.get(i);
-            //ASSUNZIONE se la release non ha commit associati, la lista di file è vuota e la lista di commit anche, avrò due file dataset uguali, lo cancello manualmente
-            if (release.getCommits().isEmpty()) {
-                releaseFiles.add(new ArrayList<>());
-                commits.add(new ArrayList<>());
-                features.add(new ArrayList<>());
-            } else {
-                System.out.println(i);
-                commits.add(release.getCommits()); //Lista i cui elementi sono la lista di commits della release i-esima
-                lastCommit = commits.get(i).get(0); //Ultima commit della release i-esima
-                String commitTreeUrl = lastCommit.getTreeUrl();
-                releaseFiles.add(gitDao.getRepoFileAtReleaseEnd(commitTreeUrl));
-                System.out.println("Release " + release.getName() + " has " + releaseFiles.get(i).size() + " non test java files based on commit " + lastCommit.getSha());
-                //TODO Ora ho la lista dei file per ogni release, per ogni lista dei file devo girarmela e calcolarmi tutte le feature per la release associata alla lista
-                features.add(measureAuthorsInRelease(releaseFiles.get(i), commits.get(i)));
-                //TODO Probabilmente mi conviene fare un array feature per ogni feature
-                System.out.println(features);
-            }
-            //TODO Create CSV Format modificarlo per prendere anche le feature
-            CsvHandler.writeDataLineByLine(releaseFiles, features, i + 1);
+    public void getProjectDataFromDb() throws ParseException {
+        setProjectCreationDate();
+        List<Release> releasesOfInterest = getReleasesOfInterestFromDb();
+        setProjectReleasesOfInterest(releasesOfInterest);
+        String lastInterestReleaseEndDate = getLastReleaseEndDateOfInterest();
+        /*ASSUNZIONE la seguente istruzione è per troncare l'ultima release di interesse bookeeper alla data di migrazione
+        a github issue*/
+        //scraperController.setLastReleaseEndDateOfInterest("2017-06-16");
+        System.out.println("Project: " + getProjectName());
+        System.out.println("Creation date: " + getProjectCreationDate());
+        System.out.println("Last interest release end date: " + lastInterestReleaseEndDate);
+        System.out.println("\nReleases of interest: ");
 
+        List<Commit> commits = getCommitsFromDb();
+        setProjectCommits(commits);
+        linkCommitsToReleases();
+        for (Release release : releasesOfInterest) {
+            System.out.println("Release: " + release.getName() + " number " + release.getNumber() + " has " + release.getCommits().size() + " commits and starts at " + release.getStartDate() + " and ends at " + release.getEndDate());
         }
     }
 
-    //Per ogni commit nella release che ha toccato il file si guarda l'autore e si aggiunge ad una lista senza duplicati
-    private List<String> measureAuthorsInRelease(List<String> releaseFiles, List<Commit> commits) {
-        List<String> ret = new ArrayList<>();
-        for (String filename : releaseFiles) {
-            List<String> authors = new ArrayList<>();
-            for (Commit commit : commits) {
-                List<JavaFile> touchedFiles = commit.getTouchedFiles();
-                for (JavaFile file : touchedFiles) {
-                    if (file.getName().equals(filename)) {
-                        String author = commit.getAuthor();
-                        if (!authors.contains(author)) {
-                            authors.add(author);
-                        }
-                    }
-                }
-            }
-            ret.add(Integer.toString(authors.size()));
+    public void saveProjectDataOnDb(){
+        setProjectCreationDate();
+        List<Release> allReleases = getAllReleases();
+        setProjectReleases(allReleases);
+        List<Release> releasesOfInterest = getReleasesOfInterest("4.4.0");
+        setProjectReleasesOfInterest(releasesOfInterest);
+
+        String lastInterestReleaseEndDate = getLastReleaseEndDateOfInterest();
+        /*ASSUNZIONE la seguente istruzione è per troncare l'ultima release di interesse bookeeper alla data di migrazione
+        a github issue*/
+        //scraperController.setLastReleaseEndDateOfInterest("2017-06-16");
+        System.out.println("Project: " + getProjectName());
+        System.out.println("Creation date: " + getProjectCreationDate());
+        System.out.println("Last interest release end date: " + lastInterestReleaseEndDate);
+        System.out.println("Releases of interest: ");
+
+        saveProjectOnDb();
+        saveCommitDataOnDb(lastInterestReleaseEndDate);
+        saveReleasesOnDb();
+
+        List<Commit> commits = getCommitsFromDb();
+        setProjectCommits(commits);
+        try {
+            linkCommitsToReleases();
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
-        System.out.println((ret.size()));
-        return ret;
+        for (Release release : releasesOfInterest) {
+            System.out.println("Release: " + release.getName() + " number " + release.getNumber() + " has " + release.getCommits().size() + " commits and starts at " + release.getStartDate() + " and ends at " + release.getEndDate());
+        }
+        saveFileTreeOnDb();
     }
-
-    //Per ogni commit nella release che ha toccato il file si guarda loc e si fa la media
-    private String measureLocAtEndRelease(String filename, int release) {
-        String ret = "";
-        return ret;
-    }
-
-    //Per ogni commit nella release che ha toccato il file si fa locAdded - locDeleted e si fa la media
-    private String measureAvgChurnInRelease(String filename, int release) {
-        String ret = "";
-        return ret;
-    }
-
-    //Per ogni commit che ha toccato il file si fa locAdded - locDeleted e si fa la media
-    private String measureAvgChurnFromStart(String filename, int release) {
-        String ret = "";
-        return ret;
-    }
-
-    //Per ogni file si contano le commit nella release che lo hanno toccato
-    private String measureRevisionNumInRelease(String filename, int release) {
-        String ret = "";
-        return ret;
-    }
-
-    //Per ogni file si contano le commit nella release che lo hanno toccato
-    private String measureRevisionNumFromStart(String filename, int release) {
-        String ret = "";
-        return ret;
-    }
-
-    //
-    private String measureRevisionAge(String filename, int release) {
-        String ret = "";
-        return ret;
-    }
-
-    //Per ogni commit nella release che ha toccato il file prende fa locAdded e si fa la media
-    private String measureAvgLocAddedInRelease(String filename, int release) {
-        String ret = "";
-        return ret;
-    }
-
-
-    //Per ogni commit nella release che ha toccato il file prende fa locAdded e si fa la media
-    private String measureAvgLocAddedFromStart(String filename, int release) {
-        String ret = "";
-        return ret;
-    }
-
-    //Per ogni commit nella release che ha toccato il file si conta quante sono afferenti ad un bugFix
-    private String measureFixCommitsInRelease(String filename, int release) {
-        String ret = "";
-        return ret;
-    }
-
-    //Per ogni commit che ha toccato il file si conta quante sono afferenti ad un bugFix
-    private String measureFixCommitsFromStart(String filename, int release) {
-        String ret = "";
-        return ret;
-    }
-
 }

@@ -31,10 +31,11 @@ public class GitDao {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        assert projectJson != null;
         return jsonParser.getJSONAttribute(projectJson, "created_at").substring(0, 10);
     }
 
-    private Commit getCommit(String commitUrl, long commitId){
+    private Commit getCommit(String commitUrl, long commitId) {
         JsonParser jsonParser = new AuthJsonParser();
         Commit ret = null;
         try {
@@ -99,9 +100,9 @@ public class GitDao {
         return ret;
     }
 
-    //Ritorna solo i nomi dei file modificare poi per far tornare un istanza di File
-    public List<String> getRepoFileAtReleaseEnd(String treeUrl) {
-        List<String> ret = new ArrayList<>();
+    //Prende una copia di tutti i file al termine della release
+    public List<JavaFile> getRepoFileAtReleaseEnd(String treeUrl) {
+        List<JavaFile> ret = new ArrayList<>();
         JsonParser jsonParser = new AuthJsonParser();
         JSONObject treeJson = null;
         try {
@@ -112,9 +113,19 @@ public class GitDao {
         assert treeJson != null;
         JSONArray tree = treeJson.getJSONArray("tree");
         for (int i = 0; i < tree.length(); i++) {
-            String filename = tree.getJSONObject(i).getString("path");
+            JSONObject treeElem = tree.getJSONObject(i);
+            String filename = treeElem.getString("path");
             if ((filename.endsWith(".java")) && (!filename.contains("package-info")) && (!filename.contains("test")) && (!filename.contains("Test"))) {
-                ret.add(filename);
+                String fileUrl = treeElem.getString("url");
+                JSONObject fileJson = null;
+                try {
+                    fileJson = jsonParser.readJsonFromUrl(fileUrl);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                assert fileJson != null;
+                String fileContent = CodeParser.base64Decode(fileJson.getString("content"));
+                ret.add(new JavaFile(filename, fileContent));
             }
         }
         return ret;

@@ -18,3 +18,5 @@ parecchi dati in meno.
 -Sto misurando solo e soltanto il sorgente, cioè quello che sta in src
 
 -Nei touched files ho contato solamente file java
+
+-Le commit con data uguale alla fine di una release e quindi all'inizio della successiva le considero appartententi alla release che termina

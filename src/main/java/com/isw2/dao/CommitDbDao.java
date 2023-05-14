@@ -2,8 +2,7 @@ package com.isw2.dao;
 
 import com.isw2.entity.Commit;
 import com.isw2.entity.JavaFile;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.isw2.entity.Release;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -109,7 +108,7 @@ public class CommitDbDao {
         } catch (SQLException e) {
             //e.printStackTrace();
             myLogger.info("Select touched files fallito");// definire un eccezione apposita con logger serio
-        }finally{
+        } finally {
             assert ps != null;
             ps.close();
             assert rs != null;
@@ -125,7 +124,7 @@ public class CommitDbDao {
 
         try {
             ps = conn.prepareStatement(
-                    "SELECT * FROM commit WHERE project_name = ?");
+                    "SELECT * FROM commit WHERE project_name = ? ORDER BY cdate DESC");
 
             ps.setString(1, project);
             rs = ps.executeQuery();
@@ -143,7 +142,7 @@ public class CommitDbDao {
         } catch (SQLException e) {
             //e.printStackTrace();
             myLogger.info("Select commits fallito");// definire un eccezione apposita con logger serio
-        }finally{
+        } finally {
             assert ps != null;
             ps.close();
             assert rs != null;
@@ -152,7 +151,7 @@ public class CommitDbDao {
         return ret;
     }
 
-    public void insertRealeaseTreeFile(String filename, String content, String project, String releaseNum) {
+    public void insertRealeaseFileTree(String filename, String content, String project, String releaseNum) {
         try (PreparedStatement ps = conn.prepareStatement(
                 "INSERT INTO treefile(filename, content, release_project_name, release_number) VALUES(?,?,?,?)" +
                         "ON DUPLICATE KEY UPDATE content = ?")) {
@@ -165,7 +164,7 @@ public class CommitDbDao {
             ps.executeUpdate();
 
         } catch (SQLException | NumberFormatException e) {
-            //e.printStackTrace();
+            e.printStackTrace();
             myLogger.info("Salvataggio tree fallito");// definire un eccezione apposita con logger serio
         }
     }
@@ -194,7 +193,7 @@ public class CommitDbDao {
 
     public void insertRelease(String name, String number, String start, String end, String project) {
         try (PreparedStatement ps = conn.prepareStatement(
-                "INSERT INTO release(name, number, rstart, rend, project_name) VALUES(?,?,?,?,?)" +
+                "INSERT INTO releases(rname, rnumber, rstart, rend, project_name) VALUES(?,?,?,?,?)" +
                         "ON DUPLICATE KEY UPDATE rstart = ?")) {
 
             ps.setString(1, name);
@@ -206,9 +205,39 @@ public class CommitDbDao {
             ps.executeUpdate();
 
         } catch (SQLException | NumberFormatException e) {
-            //e.printStackTrace();
+            e.printStackTrace();
             myLogger.info("Salvataggio release fallito");// definire un eccezione apposita con logger serio
         }
     }
 
+    public List<Release> getReleases(String project) throws SQLException {
+        ResultSet rs = null;
+        PreparedStatement ps = null;
+        List<Release> ret = new ArrayList<>();
+
+        try {
+            ps = conn.prepareStatement(
+                    "SELECT * FROM releases WHERE project_name = ? ORDER BY rstart ASC");
+
+            ps.setString(1, project);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                String releaseNum = rs.getString("rnumber");
+                String releaseName = rs.getString("rname");
+                String releaseStart = rs.getString("rstart");
+                String releaseEnd = rs.getString("rend");
+                ret.add(new Release(releaseName, Integer.parseInt(releaseNum), releaseStart, releaseEnd));
+            }
+            rs.close();
+        } catch (SQLException e) {
+            //e.printStackTrace();
+            myLogger.info("Select commits fallito");// definire un eccezione apposita con logger serio
+        } finally {
+            assert ps != null;
+            ps.close();
+            assert rs != null;
+            rs.close();
+        }
+        return ret;
+    }
 }
