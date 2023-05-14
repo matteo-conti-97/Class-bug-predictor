@@ -244,16 +244,13 @@ public class ScraperController {
                 //ASSUNZIONE se la commit è antecedente alla data di inizio della prima release, la inglobo nella prima release
                 if ((release.getNumber().equals("1")) && (sdf.parse(commitDate).before(sdf.parse(releaseStartDate)))) {
                     this.project.getReleasesOfInterest().get(j).addCommit(commit);
-                    continue;
                 }
-
                 //Se la data della commit combacia con la fine dell'ultima commit la assegno all'ultima release perche non posso metterla come prima commit della successiva
-                if ((release.getNumber().equals(Integer.toString(this.project.getReleasesOfInterest().size()))) && (sdf.parse(commitDate).compareTo(sdf.parse(releaseEndDate)) == 0)) {
+                else if ((release.getNumber().equals(Integer.toString(this.project.getReleasesOfInterest().size()))) && (sdf.parse(commitDate).compareTo(sdf.parse(releaseEndDate)) == 0)) {
                     this.project.getReleasesOfInterest().get(j).addCommit(commit);
-                    continue;
                 }
                 //Se la data della commit si trova all'interno del range di date di una release o combacia con la data di inizio della release la considero appartenente alla release
-                if ((sdf.parse(commitDate).compareTo(sdf.parse(releaseStartDate)) == 0) || ((sdf.parse(commitDate).after(sdf.parse(releaseStartDate))) && (sdf.parse(commitDate).before(sdf.parse(releaseEndDate))))) {
+                else if ((sdf.parse(commitDate).compareTo(sdf.parse(releaseStartDate)) == 0) || ((sdf.parse(commitDate).after(sdf.parse(releaseStartDate))) && (sdf.parse(commitDate).before(sdf.parse(releaseEndDate))))) {
                     this.project.getReleasesOfInterest().get(j).addCommit(commit);
                 }
             }
@@ -263,7 +260,7 @@ public class ScraperController {
     public void removeEmptyReleases() {
         List<Release> releaseToRemove = new ArrayList<>();
         for (Release release : this.project.getReleasesOfInterest()) {
-            if (release.getCommits().size() == 0) {
+            if (release.getCommits().isEmpty()) {
                 releaseToRemove.add(release);
             }
         }
