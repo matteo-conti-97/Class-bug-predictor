@@ -5,8 +5,11 @@ import weka.classifiers.bayes.NaiveBayes;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
 
+import java.util.logging.Logger;
+
 
 public class WekaAnalyzer {
+    private static final Logger myLogger = Logger.getLogger("logger");
     public static void main(String[] args) throws Exception {
         //load datasets
         DataSource source1 = new DataSource("C:\\Users\\matte\\Documents\\GitHub\\isw2-jira-git-measurement\\src\\main\\java\\resource\\breast-cancer-train.arff");
@@ -26,8 +29,8 @@ public class WekaAnalyzer {
 
         eval.evaluateModel(classifier, testing);
 
-        System.out.println("AUC = " + eval.areaUnderROC(1));
-        System.out.println("kappa = " + eval.kappa());
+        myLogger.info("AUC = " + eval.areaUnderROC(1));
+        myLogger.info("Kappa = " + eval.kappa());
 
 
     }

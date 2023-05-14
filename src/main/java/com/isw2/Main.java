@@ -2,7 +2,6 @@ package com.isw2;
 
 import com.isw2.control.MeasureController;
 import com.isw2.control.ScraperController;
-
 import java.text.ParseException;
 
 
@@ -14,7 +13,7 @@ public class Main {
 
         MeasureController measureController = new MeasureController(scraperController.getProject());
         //measureController.createWalkForwardDatasets();
-        
+
 
         /*List<Ticket> allTickets = scraperController.getAllTickets();
         scraperController.setProjectFixedBugTickets(allTickets);

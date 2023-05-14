@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.logging.Logger;
 
 public class CommitDbDao {
-    private String projectName;
     private Connection conn;
     private static final Logger myLogger = Logger.getLogger("logger");
     private static final String DB_URL = "jdbc:mysql://localhost:3306/isw2_scraping_db?allowPublicKeyRetrieval=true&useSSL=false";

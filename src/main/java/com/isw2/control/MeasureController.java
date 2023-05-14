@@ -3,12 +3,13 @@ package com.isw2.control;
 import com.isw2.entity.Commit;
 import com.isw2.entity.JavaFile;
 import com.isw2.entity.Project;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class MeasureController {
     private final Project project;
+    private static final Logger myLogger = Logger.getLogger("logger");
 
     public MeasureController(Project project) {
         this.project = project;
@@ -29,11 +30,11 @@ public class MeasureController {
                 commits.add(new ArrayList<>());
                 features.add(new ArrayList<>());
             } else {
-                System.out.println("Release " + release.getName() + " has " + releaseFiles.get(i).size() + " non test java files based on commit " + lastCommit.getSha());
+                myLogger.info("Release " + release.getName() + " has " + releaseFiles.get(i).size() + " non test java files based on commit " + lastCommit.getSha());
                 //TODO Ora ho la lista dei file per ogni release, per ogni lista dei file devo girarmela e calcolarmi tutte le feature per la release associata alla lista
                 features.add(measureAuthorsInRelease(releaseFiles.get(i), commits.get(i)));
                 //TODO Probabilmente mi conviene fare un array feature per ogni feature
-                System.out.println(features);
+                myLogger.info(features);
             }
             CsvHandler.writeDataLineByLine(releaseFiles, features, i + 1);
 
@@ -58,7 +59,7 @@ public class MeasureController {
             }
             ret.add(Integer.toString(authors.size()));
         }
-        System.out.println((ret.size()));
+        myLogger.info(Integer.toString(ret.size()));
         return ret;
     }
 

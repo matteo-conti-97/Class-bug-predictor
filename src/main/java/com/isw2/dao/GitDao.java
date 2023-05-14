@@ -10,11 +10,13 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class GitDao {
     private String projectName;
     private String author;
     private String repoUrl;
+    private static final Logger myLogger = Logger.getLogger("logger");
 
     public GitDao(String projectName, String author) {
         this.projectName = projectName.toLowerCase();
@@ -78,9 +80,9 @@ public class GitDao {
         long commitId = 0;
         while (true) {
             JSONArray tmp;
-            System.out.println("page: " + page);
+            myLogger.info("page: " + page);
             String query = repoUrl + "/commits?until=" + relEndDate + "&per_page=100&page=" + page;
-            System.out.println(query);
+            myLogger.info(query);
             try {
                 tmp = jsonParser.readJsonArrayFromUrl(query);
                 if (tmp.length() == 0) break;

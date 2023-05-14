@@ -10,12 +10,14 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class ScraperController {
     private Project project;
     private JiraDao jiraDao;
     private GitDao gitDao;
     private final CommitDbDao commitDbDao;
+    private static final Logger myLogger = Logger.getLogger("logger");
 
     public ScraperController(String projectName, String projectAuthor) {
         this.project = new Project(projectName, projectAuthor);
@@ -158,7 +160,7 @@ public class ScraperController {
         List<Commit> commits;
         commits = gitDao.getAllCommitsUntil(lastRelOfInterestEndDate);
         assert commits != null;
-        System.out.println("commit list size: " + commits.size());
+        myLogger.info("commit list size: " + commits.size());
         for (Commit commit : commits) {
             commitDbDao.insertCommit(commit.getSha(), commit.getId(), commit.getMessage(), commit.getAuthor(), commit.getDate(), commit.getTreeUrl(), this.project.getName());
             saveTouchedFilesDataOnDb(commit);
@@ -183,7 +185,7 @@ public class ScraperController {
         for (int i = start; i < releaseOfInterest.size(); i++) {
             Release release = releaseOfInterest.get(i);
             List<Commit> commits = release.getCommits();
-            System.out.println("Processing release " + release.getName() + " number " + release.getNumber() + " tree");
+            myLogger.info("Processing release " + release.getName() + " - " + release.getNumber() + " tree");
             if (!commits.isEmpty()) { //Questo check è necessario per evitare eccezioni in caso la release non abbia commit
                 Commit lastCommit = commits.get(0);
                 List<JavaFile> treeFiles = gitDao.getRepoFileAtReleaseEnd(lastCommit.getTreeUrl());
@@ -281,12 +283,12 @@ public class ScraperController {
         setProjectCommits(commits);
         linkCommitsToReleases();
         removeEmptyReleases(); //ASSUNZIONE le release senza commit le butto
-        System.out.println("Project: " + getProjectName());
-        System.out.println("Creation date: " + getProjectCreationDate());
-        System.out.println("Last interest release end date: " + lastInterestReleaseEndDate);
-        System.out.println("\nReleases of interest: ");
+        myLogger.info("Project: " + getProjectName());
+        myLogger.info("Creation date: " + getProjectCreationDate());
+        myLogger.info("Last interest release end date: " + lastInterestReleaseEndDate);
+        myLogger.info("\nReleases of interest: ");
         for (Release release : releasesOfInterest) {
-            System.out.println("Release: " + release.getName() + " number " + release.getNumber() + " has " + release.getCommits().size() + " commits and " + release.getFileTreeAtReleaseEnd().size() + " non test java files, starts at " + release.getStartDate() + " and ends at " + release.getEndDate());
+            myLogger.info("Release: " + release.getName() + " number " + release.getNumber() + " has " + release.getCommits().size() + " commits and " + release.getFileTreeAtReleaseEnd().size() + " non test java files, starts at " + release.getStartDate() + " and ends at " + release.getEndDate());
         }
     }
 
@@ -301,10 +303,10 @@ public class ScraperController {
         /*ASSUNZIONE la seguente istruzione è per troncare l'ultima release di interesse bookeeper alla data di migrazione
         a github issue*/
         //scraperController.setLastReleaseEndDateOfInterest("2017-06-16");
-        System.out.println("Project: " + getProjectName());
-        System.out.println("Creation date: " + getProjectCreationDate());
-        System.out.println("Last interest release end date: " + lastInterestReleaseEndDate);
-        System.out.println("Releases of interest: ");
+        myLogger.info("Project: " + getProjectName());
+        myLogger.info("Creation date: " + getProjectCreationDate());
+        myLogger.info("Last interest release end date: " + lastInterestReleaseEndDate);
+        myLogger.info("Releases of interest: ");
 
         saveProjectOnDb();
         saveCommitDataOnDb(lastInterestReleaseEndDate);
@@ -318,7 +320,7 @@ public class ScraperController {
             e.printStackTrace();
         }
         for (Release release : releasesOfInterest) {
-            System.out.println("Release: " + release.getName() + " number " + release.getNumber() + " has " + release.getCommits().size() + " commits and " + release.getFileTreeAtReleaseEnd().size() + " non test java files, starts at " + release.getStartDate() + " and ends at " + release.getEndDate());
+            myLogger.info("Release: " + release.getName() + " number " + release.getNumber() + " has " + release.getCommits().size() + " commits and " + release.getFileTreeAtReleaseEnd().size() + " non test java files, starts at " + release.getStartDate() + " and ends at " + release.getEndDate());
         }
         saveFileTreeOnDb();
     }
