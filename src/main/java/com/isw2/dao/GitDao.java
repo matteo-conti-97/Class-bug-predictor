@@ -38,24 +38,24 @@ public class GitDao {
         JsonParser jsonParser = new AuthJsonParser();
         Commit ret = null;
         try {
-            JSONObject commitJson= jsonParser.readJsonFromUrl(commitUrl);
+            JSONObject commitJson = jsonParser.readJsonFromUrl(commitUrl);
             String sha = commitJson.getString("sha");
-            JSONObject commit= commitJson.getJSONObject("commit");
+            JSONObject commit = commitJson.getJSONObject("commit");
             String message = commit.getString("message");
-            JSONObject author= commit.getJSONObject("author");
-            String date= author.getString("date").substring(0, 10);
-            String authorName= author.getString("name");
+            JSONObject authorJson = commit.getJSONObject("author");
+            String date = authorJson.getString("date").substring(0, 10);
+            String authorName = authorJson.getString("name");
             JSONArray touchedFilesJson = commitJson.getJSONArray("files");
             String treeUrl = commitJson.getJSONObject("commit").getJSONObject("tree").getString("url");
             List<JavaFile> touchedFiles = new ArrayList<>();
             for (int i = 0; i < touchedFilesJson.length(); i++) {
                 String filename = touchedFilesJson.getJSONObject(i).getString("filename");
-                if(filename.endsWith(".java")){
+                if (filename.endsWith(".java")) {
                     String add = Integer.toString(touchedFilesJson.getJSONObject(i).getInt("additions"));
-                    String del= Integer.toString(touchedFilesJson.getJSONObject(i).getInt("deletions"));
-                    String contentUrl= touchedFilesJson.getJSONObject(i).getString("contents_url");
-                    JSONObject contentJson= jsonParser.readJsonFromUrl(contentUrl);
-                    String content= CodeParser.base64Decode(contentJson.getString("content"));
+                    String del = Integer.toString(touchedFilesJson.getJSONObject(i).getInt("deletions"));
+                    String contentUrl = touchedFilesJson.getJSONObject(i).getString("contents_url");
+                    JSONObject contentJson = jsonParser.readJsonFromUrl(contentUrl);
+                    String content = CodeParser.base64Decode(contentJson.getString("content"));
                     JavaFile touchedFile = new JavaFile(filename, add, del, content);
                     touchedFiles.add(touchedFile);
                 }
@@ -69,7 +69,7 @@ public class GitDao {
     }
 
     //Get all commits until a given date, in the format YYYY-MM-DD for our purpose the date is the end date of the interest release
-    public List<Commit> getAllCommitsUntil(String relEndDate)  {
+    public List<Commit> getAllCommitsUntil(String relEndDate) {
         JsonParser jsonParser = new AuthJsonParser();
         List<Commit> ret = new ArrayList<>();
         int page = 1; //Mettere un numero di pagina più alto se si finiscono gli accessi dell'api
@@ -82,7 +82,7 @@ public class GitDao {
                 tmp = jsonParser.readJsonArrayFromUrl(query);
                 if (tmp.length() == 0) break;
                 for (int i = 0; i < tmp.length(); i++) {
-                    String commitUrl= tmp.getJSONObject(i).getString("url");
+                    String commitUrl = tmp.getJSONObject(i).getString("url");
                     ret.add(getCommit(commitUrl));
                 }
                 page++;

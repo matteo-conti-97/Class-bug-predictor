@@ -8,7 +8,6 @@ import com.isw2.util.CsvHandler;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -156,36 +155,36 @@ public class ScraperController {
         return ret;
     }
 
-    public void saveProjectOnDb(){
+    public void saveProjectOnDb() {
         commitDbDao.insertProject(this.project.getName(), this.project.getAuthor());
     }
 
-    public void saveCommitDataOnDb(String lastRelOfInterestEndDate){
+    public void saveCommitDataOnDb(String lastRelOfInterestEndDate) {
         List<Commit> commits = null;
         commits = gitDao.getAllCommitsUntil(lastRelOfInterestEndDate);
         assert commits != null;
-        for (Commit commit: commits) {
+        for (Commit commit : commits) {
             commitDbDao.insertCommit(commit.getSha(), commit.getMessage(), commit.getAuthor(), commit.getDate(), commit.getTreeUrl(), this.project.getName());
             saveTouchedFilesDataOnDb(commit);
         }
     }
 
-    private void saveTouchedFilesDataOnDb(Commit commit){
-        for (JavaFile file: commit.getTouchedFiles()) {
-            commitDbDao.insertTouchedFile(file.getName(),commit.getSha(), file.getAdd(), file.getDel(), file.getContent(), this.project.getName());
+    private void saveTouchedFilesDataOnDb(Commit commit) {
+        for (JavaFile file : commit.getTouchedFiles()) {
+            commitDbDao.insertTouchedFile(file.getName(), commit.getSha(), file.getAdd(), file.getDel(), file.getContent(), this.project.getName());
         }
     }
 
-    public void SaveReleasesOnDb(){
-        for (Release release: this.project.getReleases()) {
+    public void SaveReleasesOnDb() {
+        for (Release release : this.project.getReleases()) {
             commitDbDao.insertRelease(release.getName(), release.getNumber(), release.getStartDate(), release.getEndDate(), this.project.getName());
         }
     }
 
-    public List<Commit> getCommitsFromDbSql(){
+    public List<Commit> getCommitsFromDbSql() {
         List<Commit> ret = null;
         try {
-            ret=commitDbDao.getCommits(this.project.getName());
+            ret = commitDbDao.getCommits(this.project.getName());
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -265,7 +264,7 @@ public class ScraperController {
     public void createWalkForwardDatasets() {
         List<List<String>> releaseFiles = new ArrayList<>();
         List<List<String>> features = new ArrayList<>();
-        List <List<Commit>> commits = new ArrayList<>();
+        List<List<Commit>> commits = new ArrayList<>();
         Commit lastCommit;
         List<Release> releases = this.project.getReleasesOfInterest();
         Release release;
@@ -274,7 +273,7 @@ public class ScraperController {
             //ASSUNZIONE se la release non ha commit associati, la lista di file è vuota e la lista di commit anche, avrò due file dataset uguali, lo cancello manualmente
             if (release.getCommits().isEmpty()) {
                 releaseFiles.add(new ArrayList<>());
-                commits.add(new ArrayList<>());;
+                commits.add(new ArrayList<>());
                 features.add(new ArrayList<>());
             } else {
                 System.out.println(i);
@@ -295,16 +294,16 @@ public class ScraperController {
     }
 
     //Per ogni commit nella release che ha toccato il file si guarda l'autore e si aggiunge ad una lista senza duplicati
-    private List<String> measureAuthorsInRelease(List<String> releaseFiles, List <Commit> commits){
-        List<String> ret=new ArrayList<>();
-        for(String filename : releaseFiles){
-            List<String> authors=new ArrayList<>();
-            for(Commit commit : commits){
-                List<JavaFile> touchedFiles=commit.getTouchedFiles();
-                    for(JavaFile file : touchedFiles){
-                    if(file.getName().equals(filename)){
-                        String author=commit.getAuthor();
-                        if(!authors.contains(author)){
+    private List<String> measureAuthorsInRelease(List<String> releaseFiles, List<Commit> commits) {
+        List<String> ret = new ArrayList<>();
+        for (String filename : releaseFiles) {
+            List<String> authors = new ArrayList<>();
+            for (Commit commit : commits) {
+                List<JavaFile> touchedFiles = commit.getTouchedFiles();
+                for (JavaFile file : touchedFiles) {
+                    if (file.getName().equals(filename)) {
+                        String author = commit.getAuthor();
+                        if (!authors.contains(author)) {
                             authors.add(author);
                         }
                     }
@@ -317,57 +316,57 @@ public class ScraperController {
     }
 
     //Per ogni commit nella release che ha toccato il file si guarda loc e si fa la media
-    private String measureAvgLocInRelease(String filename, int release){
-        String ret="";
+    private String measureAvgLocInRelease(String filename, int release) {
+        String ret = "";
         return ret;
     }
 
     //Per ogni commit nella release che ha toccato il file si fa locAdded - locDeleted e si fa la media
-    private String measureAvgChurnInRelease(String filename, int release){
-        String ret="";
+    private String measureAvgChurnInRelease(String filename, int release) {
+        String ret = "";
         return ret;
     }
 
     //Per ogni commit nella release che ha toccato il file si fa locAdded e si fa la media
-    private String measureAvgLocAddedInRelease(String filename, int release){
-        String ret="";
+    private String measureAvgLocAddedInRelease(String filename, int release) {
+        String ret = "";
         return ret;
     }
 
     //Per ogni file si contano le commit nella release che lo hanno toccato
-    private String measureRevisionNumInRelease(String filename, int release){
-        String ret="";
+    private String measureRevisionNumInRelease(String filename, int release) {
+        String ret = "";
         return ret;
     }
 
     //
-    private String measureRevisionAge(String filename, int release){
-        String ret="";
+    private String measureRevisionAge(String filename, int release) {
+        String ret = "";
         return ret;
     }
 
     //Per ogni commit nella release che ha toccato il file si fa locAdded + locDeleted e si fa la media
-    private String measureAvgLocTouchedInRelease(String filename, int release){
-        String ret="";
+    private String measureAvgLocTouchedInRelease(String filename, int release) {
+        String ret = "";
         return ret;
     }
 
 
     //Per ogni commit nella release si guarda quanti file vengono committati insieme e se ne fa la media
-    private String measureAvgChangeSetInRelease(String filename, int release){
-        String ret="";
+    private String measureAvgChangeSetInRelease(String filename, int release) {
+        String ret = "";
         return ret;
     }
 
     //Per ogni commit nella release che ha toccato il file si conta quante sono afferenti ad un bugFix
-    private String measureFixCommitsInRelease(String filename, int release){
-        String ret="";
+    private String measureFixCommitsInRelease(String filename, int release) {
+        String ret = "";
         return ret;
     }
 
     //Per ogni commit che ha toccato il file si conta quante sono afferenti ad un bugFix
-    private String measureFixCommits(String filename, int release){
-        String ret="";
+    private String measureFixCommits(String filename, int release) {
+        String ret = "";
         return ret;
     }
 
