@@ -80,9 +80,9 @@ public class GitDao {
         long commitId = 0;
         while (true) {
             JSONArray tmp;
-            myLogger.info(new String(("page: " + page)));
+            myLogger.info("page: " + page);
             String query = repoUrl + "/commits?until=" + relEndDate + "&per_page=100&page=" + page;
-            myLogger.info(new String((query)));
+            myLogger.info(query);
             try {
                 tmp = jsonParser.readJsonArrayFromUrl(query);
                 if (tmp.length() == 0) break;

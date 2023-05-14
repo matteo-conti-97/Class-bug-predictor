@@ -21,7 +21,7 @@ public class CommitDbDao {
             conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
         } catch (Exception e) {
             e.printStackTrace();
-            myLogger.info(new String(("Connessione fallita")));
+            myLogger.info("Connessione fallita");
         }
     }
 
@@ -33,7 +33,7 @@ public class CommitDbDao {
         try {
             this.conn.close();
         } catch (SQLException e) {
-            myLogger.info(new String(("Chiusura connesione fallita")));
+            myLogger.info("Chiusura connesione fallita");
             e.printStackTrace();
         }
     }
@@ -43,7 +43,7 @@ public class CommitDbDao {
             if (!conn.isClosed()) closeConnection();
             conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
         } catch (SQLException e) {
-            myLogger.info(new String(("Connessione fallita")));
+            myLogger.info("Connessione fallita");
             e.printStackTrace();
         }
         return conn;
@@ -60,7 +60,7 @@ public class CommitDbDao {
 
         } catch (SQLException | NumberFormatException e) {
             //e.printStackTrace();
-            myLogger.info(new String(("Salvataggio progetto fallito")));// definire un eccezione apposita con logger serio
+            myLogger.info("Salvataggio progetto fallito");// definire un eccezione apposita con logger serio
         }
     }
 
@@ -81,7 +81,7 @@ public class CommitDbDao {
 
         } catch (SQLException | NumberFormatException e) {
             e.printStackTrace();
-            myLogger.info(new String(("Salvataggio commit fallito")));// definire un eccezione apposita con logger serio
+            myLogger.info("Salvataggio commit fallito");// definire un eccezione apposita con logger serio
         }
     }
 
@@ -99,7 +99,7 @@ public class CommitDbDao {
 
         } catch (SQLException | NumberFormatException e) {
             e.printStackTrace();
-            myLogger.info(new String(("Salvataggio tree fallito")));// definire un eccezione apposita con logger serio
+            myLogger.info("Salvataggio tree fallito");// definire un eccezione apposita con logger serio
         }
     }
 
@@ -120,8 +120,8 @@ public class CommitDbDao {
 
         } catch (SQLException | NumberFormatException e) {
             e.printStackTrace();
-            myLogger.info(new String(("Salvataggio touched files fallito")));// definire un eccezione apposita con logger serio
-            myLogger.info(new String(("commitSha: " + commitSha + "commitId" + commitId + filename + " add: " + add + " del: " + del + " content: " + content + " project: " + project)));
+            myLogger.info("Salvataggio touched files fallito");// definire un eccezione apposita con logger serio
+            myLogger.info("commitSha: " + commitSha + "commitId" + commitId + filename + " add: " + add + " del: " + del + " content: " + content + " project: " + project);
         }
     }
 
@@ -140,7 +140,7 @@ public class CommitDbDao {
 
         } catch (SQLException | NumberFormatException e) {
             e.printStackTrace();
-            myLogger.info(new String(("Salvataggio release fallito")));// definire un eccezione apposita con logger serio
+            myLogger.info("Salvataggio release fallito");// definire un eccezione apposita con logger serio
         }
     }
 
@@ -165,7 +165,7 @@ public class CommitDbDao {
             rs.close();
         } catch (SQLException e) {
             //e.printStackTrace();
-            myLogger.info(new String(("Select commits fallito")));// definire un eccezione apposita con logger serio
+            myLogger.info("Select commits fallito");// definire un eccezione apposita con logger serio
         } finally {
             assert ps != null;
             ps.close();
@@ -196,7 +196,7 @@ public class CommitDbDao {
 
         } catch (SQLException e) {
             //e.printStackTrace();
-            myLogger.info(new String(("Select touched files fallito")));// definire un eccezione apposita con logger serio
+            myLogger.info("Select touched files fallito");// definire un eccezione apposita con logger serio
         } finally {
             assert ps != null;
             ps.close();
@@ -230,7 +230,7 @@ public class CommitDbDao {
             rs.close();
         } catch (SQLException e) {
             //e.printStackTrace();
-            myLogger.info(new String(("Select commits fallito")));// definire un eccezione apposita con logger serio
+            myLogger.info("Select commits fallito");// definire un eccezione apposita con logger serio
         } finally {
             assert ps != null;
             ps.close();
@@ -260,7 +260,7 @@ public class CommitDbDao {
 
         } catch (SQLException e) {
             //e.printStackTrace();
-            myLogger.info(new String(("Select touched files fallito")));// definire un eccezione apposita con logger serio
+            myLogger.info("Select touched files fallito");// definire un eccezione apposita con logger serio
         } finally {
             assert ps != null;
             ps.close();
