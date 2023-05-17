@@ -7,6 +7,7 @@ import com.isw2.util.CodeParser;
 import com.isw2.util.JsonParser;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,15 +52,16 @@ public class GitDao {
             String treeUrl = commitJson.getJSONObject("commit").getJSONObject("tree").getString("url");
             List<JavaFile> touchedFiles = new ArrayList<>();
             for (int i = 0; i < touchedFilesJson.length(); i++) {
-                JSONObject fileJson=touchedFilesJson.getJSONObject(i);
-                String filename = fileJson.getString("filename");
+                JSONObject fileJson = touchedFilesJson.getJSONObject(i);
+                String tmpName = fileJson.getString("filename");
+                String filename = tmpName.substring(tmpName.lastIndexOf("/") + 1);
                 if (filename.endsWith(".java")) {
                     String add = Integer.toString(fileJson.getInt("additions"));
                     String del = Integer.toString(fileJson.getInt("deletions"));
                     String status = fileJson.getString("status");
                     String prevName = "";
-                    if(status.equals("renamed")){
-                        prevName=fileJson.getString("previous_filename");
+                    if (status.equals("renamed")) {
+                        prevName = fileJson.getString("previous_filename");
                     }
                     //Se possibile evitare il seguente pezzo di codice perchè consuma troppi accessi all'api
                     /*String contentUrl = touchedFilesJson.getJSONObject(i).getString("contents_url");
@@ -122,7 +124,9 @@ public class GitDao {
         for (int i = 0; i < tree.length(); i++) {
             JSONObject treeElem = tree.getJSONObject(i);
             String filename = treeElem.getString("path");
+
             if ((filename.endsWith(".java")) && (!filename.contains("package-info")) && (!filename.contains("test")) && (!filename.contains("Test"))) {
+                String className = filename.substring(filename.lastIndexOf("/") + 1);
                 String fileUrl = treeElem.getString("url");
                 JSONObject fileJson = null;
                 try {
@@ -132,7 +136,7 @@ public class GitDao {
                 }
                 assert fileJson != null;
                 String fileContent = CodeParser.base64Decode(fileJson.getString("content"));
-                ret.add(new JavaFile(filename, fileContent));
+                ret.add(new JavaFile(className, fileContent));
             }
         }
         return ret;

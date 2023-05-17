@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 
 public class WekaAnalyzer {
     private static final Logger myLogger = Logger.getLogger("logger");
+
     public static void main(String[] args) throws Exception {
         //load datasets
         DataSource source1 = new DataSource("C:\\Users\\matte\\Documents\\GitHub\\isw2-jira-git-measurement\\src\\main\\java\\resource\\breast-cancer-train.arff");

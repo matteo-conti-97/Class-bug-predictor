@@ -14,7 +14,8 @@ import java.util.List;
 
 public class CsvHandler {
 
-    private CsvHandler() {}
+    private CsvHandler() {
+    }
 
     //takes a list of lists which containt all the filenames of a release for each release
     public static void writeDataLineByLine(List<List<JavaFile>> files, int numReleases) {
@@ -38,7 +39,7 @@ public class CsvHandler {
                     String nAuthorsInRel = files.get(i).get(j).getnAuthorInRelease();
                     String locInRel = files.get(i).get(j).getLocAtEndRelease();
                     String avgChurnInRel = files.get(i).get(j).getAvgChurnInRelease();
-                    String nRevInRel= files.get(i).get(j).getnRevInRelease();
+                    String nRevInRel = files.get(i).get(j).getnRevInRelease();
                     String avgAddInRel = files.get(i).get(j).getAvgLocAddedInRelease();
                     String avgAddFromStart = files.get(i).get(j).getAvgLocAddedFromStart();
                     String avgChurnFromStart = files.get(i).get(j).getAvgChurnFromStart();
