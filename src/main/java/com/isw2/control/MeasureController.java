@@ -28,20 +28,29 @@ public class MeasureController {
             List<JavaFile> relFiles= release.getFileTreeAtReleaseEnd();
             commits.add(relCommits);
             releaseFiles.add(relFiles);
-            measureAuthorsInRelease(relFiles, relCommits);
-            measureLocAtEndRelease(relFiles);
-            measureAvgChurnInRelease(relFiles, relCommits);
-            measureRevisionNumInRelease(relFiles, relCommits);
-            measureAvgLocAddedInRelease(relFiles, relCommits);
+
+            measureInReleaseFeatures(relFiles, relCommits);
             CsvHandler.writeDataLineByLine(releaseFiles, i + 1);
         }
 
     }
 
-    //Per ogni commit nella release che ha toccato il file si guarda l'autore e si aggiunge ad una lista senza duplicati
-    private void measureAuthorsInRelease(List<JavaFile> releaseFiles, List<Commit> commits) {
+    private void measureInReleaseFeatures(List<JavaFile> releaseFiles, List<Commit> commits){
         for (JavaFile srcFile : releaseFiles) {
+
+            int cnt=0;
+            int adds=0;
+            int dels=0;
+            int filteredAdds;
+            int filteredDels;
+            int realAdds=0;
+            int realDels=0;
             List<String> authors = new ArrayList<>();
+
+            String[] lines = srcFile.getContent().split("\r\n|\r|\n");
+            int nLines=lines.length;
+            int filteredLines=(int) Math.floor((double)(nLines*10)/100);
+
             for (Commit commit : commits) {
                 List<JavaFile> touchedFiles = commit.getTouchedFiles();
                 for (JavaFile file : touchedFiles) {
@@ -50,42 +59,6 @@ public class MeasureController {
                         if (!authors.contains(author)) {
                             authors.add(author);
                         }
-                    }
-                }
-            }
-            srcFile.setnAuthorInRelease(Integer.toString(authors.size()));
-        }
-    }
-
-    //Per ogni commit nella release che ha toccato il file si guarda loc e si fa la media
-    private void measureLocAtEndRelease(List<JavaFile> releaseFiles) {
-        String loc;
-        for(JavaFile srcFile : releaseFiles){
-            //Togliendo i newline ed i carriage return non ho blank lines
-            String[] lines = srcFile.getContent().split("\r\n|\r|\n");
-            //ASSUNZIONE i commenti sono il 10% delle righe di codice totale
-            int nLines=lines.length;
-            int filteredLines=(int) Math.floor((double)(nLines*10)/100);
-            loc = String.valueOf(nLines-filteredLines);
-            srcFile.setLocAtEndRelease(loc);
-        }
-    }
-
-    //Per ogni commit nella release che ha toccato il file si fa locAdded - locDeleted e si fa la media
-    private void measureAvgChurnInRelease(List<JavaFile> releaseFiles, List<Commit> commits) {
-        for (JavaFile srcFile : releaseFiles) {
-            int cnt=0;
-            int adds=0;
-            int dels=0;
-            int filteredAdds;
-            int filteredDels;
-            int realAdds=0;
-            int realDels=0;
-            int churn=0;
-            for (Commit commit : commits) {
-                List<JavaFile> touchedFiles = commit.getTouchedFiles();
-                for (JavaFile file : touchedFiles) {
-                    if (file.getName().equals(srcFile.getName())) {
                         cnt++;
                         adds=Integer.parseInt(file.getAdd());
                         filteredAdds=(int) Math.floor((double)(adds*10)/100);
@@ -97,10 +70,18 @@ public class MeasureController {
                 }
             }
 
-            churn=Math.abs((int) Math.floor((double)(realAdds-realDels)/cnt));
+            int nAuthors= authors.size();       //Per ogni commit nella release che ha toccato il file si guarda l'autore e si aggiunge ad una lista senza duplicati
+            srcFile.setnAuthorInRelease(Integer.toString(nAuthors));
+            int loc = nLines-filteredLines;     //Per ogni commit nella release che ha toccato il file si guarda loc e si fa la media
+            srcFile.setLocAtEndRelease(Integer.toString(loc));
+            srcFile.setnRevInRelease(Integer.toString(cnt));        //Per ogni file si contano le commit nella release che lo hanno toccato
+            int avgAdds=(int) Math.floor((double)realAdds/cnt);     //Per ogni commit nella release che ha toccato il file prende fa locAdded e si fa la media
+            srcFile.setAvgLocAddedInRelease(Integer.toString(avgAdds));
+            int churn=Math.abs((int) Math.floor((double)(realAdds-realDels)/cnt));      //Per ogni commit nella release che ha toccato il file si fa locAdded - locDeleted e si fa la media
             srcFile.setAvgChurnInRelease(Integer.toString(churn));
         }
     }
+
 
     //Per ogni commit che ha toccato il file si fa locAdded - locDeleted e si fa la media
     private String measureAvgChurnFromStart(String filename, int release) {
@@ -108,52 +89,11 @@ public class MeasureController {
         return ret;
     }
 
-    //Per ogni file si contano le commit nella release che lo hanno toccato
-    private void measureRevisionNumInRelease(List<JavaFile> releaseFiles, List<Commit> commits) {
-        for (JavaFile srcFile : releaseFiles) {
-            int cnt=0;
-            for (Commit commit : commits) {
-                List<JavaFile> touchedFiles = commit.getTouchedFiles();
-                for (JavaFile file : touchedFiles) {
-                    if (file.getName().equals(srcFile.getName())) {
-                        cnt++;
-                    }
-                }
-            }
-            srcFile.setnRevInRelease(Integer.toString(cnt));
-        }
-    }
 
     //Per ogni file si contano le commit nella release che lo hanno toccato
     private String measureRevisionNumFromStart(String filename, int release) {
         String ret = "";
         return ret;
-    }
-
-
-    //Per ogni commit nella release che ha toccato il file prende fa locAdded e si fa la media
-    private void measureAvgLocAddedInRelease(List<JavaFile> releaseFiles, List<Commit> commits) {
-        for (JavaFile srcFile : releaseFiles) {
-            int cnt=0;
-            int adds=0;;
-            int filteredAdds;
-            int realAdds=0;;
-            int avgAdds=0;
-            for (Commit commit : commits) {
-                List<JavaFile> touchedFiles = commit.getTouchedFiles();
-                for (JavaFile file : touchedFiles) {
-                    if (file.getName().equals(srcFile.getName())) {
-                        cnt++;
-                        adds=Integer.parseInt(file.getAdd());
-                        filteredAdds=(int) Math.floor((double)(adds*10)/100);
-                        realAdds+=adds-filteredAdds;
-                    }
-                }
-            }
-
-            avgAdds=(int) Math.floor((double)realAdds/cnt);
-            srcFile.setAvgLocAddedInRelease(Integer.toString(avgAdds));
-        }
     }
 
 
