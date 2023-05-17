@@ -20,3 +20,7 @@ parecchi dati in meno.
 -Nei touched files ho contato solamente file java
 
 -Le commit con data uguale alla fine di una release e quindi all'inizio della successiva le considero appartententi alla release che termina
+
+-I commenti sono il 10% delle righe di codice totale ho usato math.floor cosi per valori piccoli l'approssimazione sparisce perchè su poche righe è ragionevole pensare che non ci sono commenti
+-I commenti sono il 10% degli add/del della commit, lascio 10% perchè probabilmente l'api fornisce un valore che conta anche i blank, ho usato math.floor cosi per valori piccoli l'approssimazione sparisce perchè su poche righe è ragionevole pensare che non ci sono commenti
+tuttavia nelle dels potrebbero esserci molte blank line magari per code refactoring, ma non ho tempo per fare un'analisi più approfondita

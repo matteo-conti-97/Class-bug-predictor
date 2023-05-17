@@ -1,5 +1,6 @@
 package com.isw2.util;
 
+import com.isw2.entity.JavaFile;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.CSVWriter;
@@ -16,8 +17,7 @@ public class CsvHandler {
     private CsvHandler() {}
 
     //takes a list of lists which containt all the filenames of a release for each release
-    //TODO modificare la lista di liste di stringhe in lista di liste di file
-    public static void writeDataLineByLine(List<List<String>> files, List<List<String>> feature1, int numReleases) {
+    public static void writeDataLineByLine(List<List<JavaFile>> files, int numReleases) {
         // first create file object for file placed at location
         // specified by filepath
         String filePath = "src/main/java/resource/csv/dataset" + numReleases + ".csv";
@@ -30,13 +30,17 @@ public class CsvHandler {
             CSVWriter writer = new CSVWriter(outputfile);
 
             // adding header to csv
-            String[] header = {"Release", "File", "Authors", "Feature 2", "Feature 3", "Feature 4", "Feature 5", "Feature 6", "Feature 7", "Feature 8", "Feature 9", "Feature 10", "Buggy"};
+            String[] header = {"Release", "File", "# Authors in Release", "LOC", "Avg Churn in Release", "# Revision in Release", "Avg LOC Added in release", "Feature 6", "Feature 7", "Feature 8", "Feature 9", "Feature 10", "Buggy"};
             writer.writeNext(header);
             for (int i = 0; i < files.size(); i++) {
                 for (int j = 0; j < files.get(i).size(); j++) {
-                    String filename = files.get(i).get(j);
-                    String nAuthors = feature1.get(i).get(j);
-                    String[] data = {Integer.toString(i + 1), filename, nAuthors, "null", "null", "null", "null", "null", "null", "null", "null", "null", "null"};
+                    String filename = files.get(i).get(j).getName();
+                    String nAuthorsInRel = files.get(i).get(j).getnAuthorInRelease();
+                    String locInRel = files.get(i).get(j).getLocAtEndRelease();
+                    String avgChurnInRel = files.get(i).get(j).getAvgChurnInRelease();
+                    String nRevInRel= files.get(i).get(j).getnRevInRelease();
+                    String avgAddInRel = files.get(i).get(j).getAvgLocAddedInRelease();
+                    String[] data = {Integer.toString(i + 1), filename, nAuthorsInRel,locInRel, avgChurnInRel, nRevInRel, avgAddInRel, "null", "null", "null", "null", "null", "null"};
                     writer.writeNext(data);
                 }
             }

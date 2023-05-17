@@ -6,16 +6,17 @@ public class JavaFile {
     String add;
     String del;
     String content;
-    String feature1;
-    String feature2;
-    String feature3;
-    String feature4;
-    String feature5;
-    String feature6;
-    String feature7;
-    String feature8;
-    String feature9;
-    String feature10;
+    String nAuthorInRelease;
+    String locAtEndRelease;
+    String avgChurnInRelease;
+    String avgChurnFromStart;
+    String nRevInRelease;
+    String nRevFromStart;
+    String avgLocAddedInRelease;
+    String avgLocAddedFromStart;
+    String nFixCommitInRelease;
+    String nFixCommitFromStart;
+    String buggy;
 
 
     //Usato per riempire la tabella del file tree nel db
@@ -73,83 +74,91 @@ public class JavaFile {
     }
 
 
-    public String getFeature1() {
-        return feature1;
+    public String getnAuthorInRelease() {
+        return nAuthorInRelease;
     }
 
-    public void setFeature1(String feature1) {
-        this.feature1 = feature1;
+    public void setnAuthorInRelease(String nAuthorInRelease) {
+        this.nAuthorInRelease = nAuthorInRelease;
     }
 
-    public String getFeature2() {
-        return feature2;
+    public String getLocAtEndRelease() {
+        return locAtEndRelease;
     }
 
-    public void setFeature2(String feature2) {
-        this.feature2 = feature2;
+    public void setLocAtEndRelease(String locAtEndRelease) {
+        this.locAtEndRelease = locAtEndRelease;
     }
 
-    public String getFeature3() {
-        return feature3;
+    public String getAvgChurnInRelease() {
+        return avgChurnInRelease;
     }
 
-    public void setFeature3(String feature3) {
-        this.feature3 = feature3;
+    public void setAvgChurnInRelease(String avgChurnInRelease) {
+        this.avgChurnInRelease = avgChurnInRelease;
     }
 
-    public String getFeature4() {
-        return feature4;
+    public String getAvgChurnFromStart() {
+        return avgChurnFromStart;
     }
 
-    public void setFeature4(String feature4) {
-        this.feature4 = feature4;
+    public void setAvgChurnFromStart(String avgChurnFromStart) {
+        this.avgChurnFromStart = avgChurnFromStart;
     }
 
-    public String getFeature5() {
-        return feature5;
+    public String getnRevInRelease() {
+        return nRevInRelease;
     }
 
-    public void setFeature5(String feature5) {
-        this.feature5 = feature5;
+    public void setnRevInRelease(String nRevInRelease) {
+        this.nRevInRelease = nRevInRelease;
     }
 
-    public String getFeature6() {
-        return feature6;
+    public String getnRevFromStart() {
+        return nRevFromStart;
     }
 
-    public void setFeature6(String feature6) {
-        this.feature6 = feature6;
+    public void setnRevFromStart(String nRevFromStart) {
+        this.nRevFromStart = nRevFromStart;
     }
 
-    public String getFeature7() {
-        return feature7;
+    public String getAvgLocAddedInRelease() {
+        return avgLocAddedInRelease;
     }
 
-    public void setFeature7(String feature7) {
-        this.feature7 = feature7;
+    public void setAvgLocAddedInRelease(String avgLocAddedInRelease) {
+        this.avgLocAddedInRelease = avgLocAddedInRelease;
     }
 
-    public String getFeature8() {
-        return feature8;
+    public String getAvgLocAddedFromStart() {
+        return avgLocAddedFromStart;
     }
 
-    public void setFeature8(String feature8) {
-        this.feature8 = feature8;
+    public void setAvgLocAddedFromStart(String avgLocAddedFromStart) {
+        this.avgLocAddedFromStart = avgLocAddedFromStart;
     }
 
-    public String getFeature9() {
-        return feature9;
+    public String getnFixCommitInRelease() {
+        return nFixCommitInRelease;
     }
 
-    public void setFeature9(String feature9) {
-        this.feature9 = feature9;
+    public void setnFixCommitInRelease(String nFixCommitInRelease) {
+        this.nFixCommitInRelease = nFixCommitInRelease;
     }
 
-    public String getFeature10() {
-        return feature10;
+    public String getnFixCommitFromStart() {
+        return nFixCommitFromStart;
     }
 
-    public void setFeature10(String feature10) {
-        this.feature10 = feature10;
+    public void setnFixCommitFromStart(String nFixCommitFromStart) {
+        this.nFixCommitFromStart = nFixCommitFromStart;
+    }
+
+    public String getBuggy() {
+        return buggy;
+    }
+
+    public void setBuggy(String buggy) {
+        this.buggy = buggy;
     }
 }
