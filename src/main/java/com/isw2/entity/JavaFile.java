@@ -17,6 +17,10 @@ public class JavaFile {
     String nFixCommitInRelease;
     String nFixCommitFromStart;
     String buggy;
+    String relAdds;
+    String relDels;
+    String status;
+    String prevName;
 
 
     //Usato per riempire la tabella del file tree nel db
@@ -26,11 +30,13 @@ public class JavaFile {
     }
 
     //Usato per riempire la tabella delle commit nel db
-    public JavaFile(String name, String add, String del, String content) {
+    public JavaFile(String name, String add, String del, String content, String status, String prevName) {
         this.name = name;
         this.add = add;
         this.del = del;
         this.content = content;
+        this.status = status;
+        this.prevName = prevName;
     }
 
     public String getName() {
@@ -160,5 +166,37 @@ public class JavaFile {
 
     public void setBuggy(String buggy) {
         this.buggy = buggy;
+    }
+
+    public String getRelAdds() {
+        return relAdds;
+    }
+
+    public void setRelAdds(String relAdds) {
+        this.relAdds = relAdds;
+    }
+
+    public String getRelDels() {
+        return relDels;
+    }
+
+    public void setRelDels(String relDels) {
+        this.relDels = relDels;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getPrevName() {
+        return prevName;
+    }
+
+    public void setPrevName(String prevName) {
+        this.prevName = prevName;
     }
 }

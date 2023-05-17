@@ -30,7 +30,7 @@ public class CsvHandler {
             CSVWriter writer = new CSVWriter(outputfile);
 
             // adding header to csv
-            String[] header = {"Release", "File", "# Authors in Release", "LOC", "Avg Churn in Release", "# Revision in Release", "Avg LOC Added in release", "Feature 6", "Feature 7", "Feature 8", "Feature 9", "Feature 10", "Buggy"};
+            String[] header = {"Release", "File", "# Authors in Release", "LOC", "Avg Churn in Release", "Avg Churn from Start", "Avg LOC Added in Release", "Avg LOC Added from Start", "# Revision in Release", "# Revision from Start", "Feature 9", "Feature 10", "Buggy"};
             writer.writeNext(header);
             for (int i = 0; i < files.size(); i++) {
                 for (int j = 0; j < files.get(i).size(); j++) {
@@ -40,7 +40,10 @@ public class CsvHandler {
                     String avgChurnInRel = files.get(i).get(j).getAvgChurnInRelease();
                     String nRevInRel= files.get(i).get(j).getnRevInRelease();
                     String avgAddInRel = files.get(i).get(j).getAvgLocAddedInRelease();
-                    String[] data = {Integer.toString(i + 1), filename, nAuthorsInRel,locInRel, avgChurnInRel, nRevInRel, avgAddInRel, "null", "null", "null", "null", "null", "null"};
+                    String avgAddFromStart = files.get(i).get(j).getAvgLocAddedFromStart();
+                    String avgChurnFromStart = files.get(i).get(j).getAvgChurnFromStart();
+                    String nRevFromStart = files.get(i).get(j).getnRevFromStart();
+                    String[] data = {Integer.toString(i + 1), filename, nAuthorsInRel, locInRel, avgChurnInRel, avgChurnFromStart, avgAddInRel, avgAddFromStart, nRevInRel, nRevFromStart, "null", "null", "null"};
                     writer.writeNext(data);
                 }
             }

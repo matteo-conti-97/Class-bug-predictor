@@ -7,6 +7,7 @@ import com.isw2.entity.Release;
 import com.isw2.util.CsvHandler;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 public class MeasureController {
@@ -26,10 +27,10 @@ public class MeasureController {
             Release release = releases.get(i);
             List<Commit> relCommits= release.getCommits();
             List<JavaFile> relFiles= release.getFileTreeAtReleaseEnd();
+            measureInReleaseFeatures(relFiles, relCommits);
             commits.add(relCommits);
             releaseFiles.add(relFiles);
-
-            measureInReleaseFeatures(relFiles, relCommits);
+            measureFromStartFeatures(releaseFiles, i+1);
             CsvHandler.writeDataLineByLine(releaseFiles, i + 1);
         }
 
@@ -61,11 +62,12 @@ public class MeasureController {
                         }
                         cnt++;
                         adds=Integer.parseInt(file.getAdd());
-                        filteredAdds=(int) Math.floor((double)(adds*10)/100);
+                        filteredAdds=(int) Math.floor((double)(adds*10)/100); //ASSUNZIONE 9-10
                         realAdds+=adds-filteredAdds;
                         dels=Integer.parseInt(file.getDel());
-                        filteredDels=(int) Math.floor((double)(dels*10)/100);
+                        filteredDels=(int) Math.floor((double)(dels*10)/100); //ASSUNZIONE 9-10
                         realDels+=dels-filteredDels;
+
                     }
                 }
             }
@@ -79,29 +81,37 @@ public class MeasureController {
             srcFile.setAvgLocAddedInRelease(Integer.toString(avgAdds));
             int churn=Math.abs((int) Math.floor((double)(realAdds-realDels)/cnt));      //Per ogni commit nella release che ha toccato il file si fa locAdded - locDeleted e si fa la media
             srcFile.setAvgChurnInRelease(Integer.toString(churn));
+            srcFile.setRelDels(Integer.toString(realDels)); //Serve per le misure from start
+            srcFile.setRelAdds(Integer.toString(realAdds)); //Serve per le misure from start
+
         }
     }
 
-
-    //Per ogni commit che ha toccato il file si fa locAdded - locDeleted e si fa la media
-    private String measureAvgChurnFromStart(String filename, int release) {
-        String ret = "";
-        return ret;
+    private void measureFromStartFeatures(List<List<JavaFile>> releaseFiles, int numReleases){
+        //I valori dalla release 0 me li calcolo come somma/media dei singoli valori della release fino alla corrente
+        List<JavaFile> lastRelFiles=releaseFiles.get(numReleases-1);
+        for(JavaFile file: lastRelFiles){
+            int totCnt=Integer.parseInt(file.getnRevInRelease());
+            int totAdds=Integer.parseInt(file.getRelAdds());
+            int totDels=Integer.parseInt(file.getRelDels());
+            for(int i=numReleases-2; i>=0; i--){
+                List<JavaFile> relFiles=releaseFiles.get(i);
+                for(JavaFile relFile: relFiles){
+                    if(relFile.getName().equals(file.getName())){
+                        totCnt+=Integer.parseInt(relFile.getnRevInRelease());
+                        totAdds+=Integer.parseInt(relFile.getRelAdds()); //Nota qui non faccio ASSUNZIONE 9-10 perchè questi valori li setto in measureInReleaseFeatures e sono gia 'corretti'
+                        totDels+=Integer.parseInt(relFile.getRelDels());
+                    }
+                }
+            }
+            file.setnRevFromStart(Integer.toString(totCnt));        //Per ogni file si contano le commit nella release che lo hanno toccato
+            int avgLocAdded=(int) Math.floor((double)totAdds/totCnt);       //Per ogni commit nella release che ha toccato il file prende fa locAdded e si fa la media
+            file.setAvgLocAddedFromStart(Integer.toString(avgLocAdded));
+            int avgChurn=Math.abs((int) Math.floor((double)(totAdds-totDels)/totCnt));     //Per ogni commit che ha toccato il file si fa locAdded - locDeleted e si fa la media
+            file.setAvgChurnFromStart(Integer.toString(avgChurn));
+        }
     }
 
-
-    //Per ogni file si contano le commit nella release che lo hanno toccato
-    private String measureRevisionNumFromStart(String filename, int release) {
-        String ret = "";
-        return ret;
-    }
-
-
-    //Per ogni commit nella release che ha toccato il file prende fa locAdded e si fa la media
-    private String measureAvgLocAddedFromStart(String filename, int release) {
-        String ret = "";
-        return ret;
-    }
 
     //Per ogni commit nella release che ha toccato il file si conta quante sono afferenti ad un bugFix
     private String measureFixCommitsInRelease(String filename, int release) {
@@ -115,9 +125,4 @@ public class MeasureController {
         return ret;
     }
 
-    //
-    private String measureJolly(String filename, int release) {
-        String ret = "";
-        return ret;
-    }
 }

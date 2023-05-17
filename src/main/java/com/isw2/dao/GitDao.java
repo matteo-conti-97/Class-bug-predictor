@@ -51,16 +51,22 @@ public class GitDao {
             String treeUrl = commitJson.getJSONObject("commit").getJSONObject("tree").getString("url");
             List<JavaFile> touchedFiles = new ArrayList<>();
             for (int i = 0; i < touchedFilesJson.length(); i++) {
-                String filename = touchedFilesJson.getJSONObject(i).getString("filename");
+                JSONObject fileJson=touchedFilesJson.getJSONObject(i);
+                String filename = fileJson.getString("filename");
                 if (filename.endsWith(".java")) {
-                    String add = Integer.toString(touchedFilesJson.getJSONObject(i).getInt("additions"));
-                    String del = Integer.toString(touchedFilesJson.getJSONObject(i).getInt("deletions"));
+                    String add = Integer.toString(fileJson.getInt("additions"));
+                    String del = Integer.toString(fileJson.getInt("deletions"));
+                    String status = fileJson.getString("status");
+                    String prevName = "";
+                    if(status.equals("renamed")){
+                        prevName=fileJson.getString("previous_filename");
+                    }
                     //Se possibile evitare il seguente pezzo di codice perchè consuma troppi accessi all'api
                     /*String contentUrl = touchedFilesJson.getJSONObject(i).getString("contents_url");
                     //JSONObject contentJson = jsonParser.readJsonFromUrl(contentUrl);
                     String content = CodeParser.base64Decode(contentJson.getString("content"));*/
                     String content = "";
-                    JavaFile touchedFile = new JavaFile(filename, add, del, content);
+                    JavaFile touchedFile = new JavaFile(filename, add, del, content, status, prevName);
                     touchedFiles.add(touchedFile);
                 }
             }

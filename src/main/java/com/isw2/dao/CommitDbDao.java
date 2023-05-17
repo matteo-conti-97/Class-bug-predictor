@@ -93,9 +93,9 @@ public class CommitDbDao {
         }
     }
 
-    public void insertTouchedFile(String filename, String commitSha, String commitId, String add, String del, String content, String project) {
+    public void insertTouchedFile(String filename, String commitSha, String commitId, String add, String del, String content, String status, String prevName, String project) {
         try (PreparedStatement ps = conn.prepareStatement(
-                "INSERT INTO touchedfiles(commit_sha, commit_id, commit_project_name, filename, adds, dels, content) VALUES(?,?,?,?,?,?,?)" +
+                "INSERT INTO touchedfiles(commit_sha, commit_id, commit_project_name, filename, adds, dels, content, status, pname) VALUES(?,?,?,?,?,?,?,?,?)" +
                         "ON DUPLICATE KEY UPDATE adds = ?")) {
 
             ps.setString(1, commitSha);
@@ -105,7 +105,10 @@ public class CommitDbDao {
             ps.setString(5, add);
             ps.setString(6, del);
             ps.setString(7, content);
-            ps.setString(8, add);
+            ps.setString(8, status);
+            ps.setString(9, prevName);
+
+            ps.setString(10, add);
             ps.executeUpdate();
 
         } catch (SQLException | NumberFormatException e) {
@@ -179,7 +182,7 @@ public class CommitDbDao {
             ps.setString(3, commitId);
             rs = ps.executeQuery();
             while (rs.next()) {
-                ret.add(new JavaFile(rs.getString("filename"), rs.getString("adds"), rs.getString("dels"), rs.getString("content")));
+                ret.add(new JavaFile(rs.getString("filename"), rs.getString("adds"), rs.getString("dels"), rs.getString("content"), rs.getString("status"), rs.getString("pname")));
             }
             rs.close();
             return ret;

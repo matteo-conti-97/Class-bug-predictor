@@ -1,26 +1,31 @@
--Quando ho associato le commit alle release vi erano delle commit con data precedente a quella della prima release, ho scelto
+1-Quando ho associato le commit alle release vi erano delle commit con data precedente a quella della prima release, ho scelto
 di associarle alla prima release in quanto 1 è una cosa ragionevole 2 molte sono di configurazione e non associate a ticket e di conseguenza scartate
 in fasi di filtraggio successive.
 
--Release 4.1.0 ossia release numero 3 dura solamente 3 giorni ed ha 0 commit, la scarto in quanto non è significativa.
+2-Release 4.1.0 ossia release numero 3 dura solamente 3 giorni ed ha 0 commit, la scarto in quanto non è significativa.
 
--Ho tolto i test perchè se in fase di predizione mi dice che un test di una classe è buggy ma la classe testata ha passato il test che faccio?
+3-Ho tolto i test perchè se in fase di predizione mi dice che un test di una classe è buggy ma la classe testata ha passato il test che faccio?
 La considero buggy anche se non lo era? Mi darebbe "falsi positivi" o se la classe passa il test ma il test è buggy mi darebbe "falsi negativi".
 
--Ho tolto i package-info.java perchè penso siano poco significativi ai fine della predizione
+4-Ho tolto i package-info.java perchè penso siano poco significativi ai fine della predizione
 
--Nell'ultima release apache ha fatto la migrazione da jira a github issue pertanto alcuni ticket non sono presenti su jira
+5-Nell'ultima release apache ha fatto la migrazione da jira a github issue pertanto alcuni ticket non sono presenti su jira
 in particolare dal 16-06-2017 ci sono ticket su github issue, per questioni di tempo (SE NON HO TEMPO) ho deciso di non
 considerare questi ticket e per fare una scelta consistente ho fatto finta che la release termini il 16-06-2018
 invece del 10-08-2017, potevo anche scartare la release intera tuttavia la precedente termina l'anno precedente il che significa
 parecchi dati in meno.
 
--Sto misurando solo e soltanto il sorgente, cioè quello che sta in src
+6-Sto misurando solo e soltanto il sorgente, cioè quello che sta in src
 
--Nei touched files ho contato solamente file java
+7-Nei touched files ho contato solamente file java
 
--Le commit con data uguale alla fine di una release e quindi all'inizio della successiva le considero appartententi alla release che termina
+8-Le commit con data uguale alla fine di una release e quindi all'inizio della successiva le considero appartententi alla release che termina
 
--I commenti sono il 10% delle righe di codice totale ho usato math.floor cosi per valori piccoli l'approssimazione sparisce perchè su poche righe è ragionevole pensare che non ci sono commenti
--I commenti sono il 10% degli add/del della commit, lascio 10% perchè probabilmente l'api fornisce un valore che conta anche i blank, ho usato math.floor cosi per valori piccoli l'approssimazione sparisce perchè su poche righe è ragionevole pensare che non ci sono commenti
+9-I commenti sono il 10% delle righe di codice totale ho usato math.floor cosi per valori piccoli l'approssimazione sparisce perchè su poche righe è ragionevole pensare che non ci sono commenti
+
+10-I commenti sono il 10% degli add/del della commit, lascio 10% perchè probabilmente l'api fornisce un valore che conta anche i blank, ho usato math.floor cosi per valori piccoli l'approssimazione sparisce perchè su poche righe è ragionevole pensare che non ci sono commenti
 tuttavia nelle dels potrebbero esserci molte blank line magari per code refactoring, ma non ho tempo per fare un'analisi più approfondita
+
+11-Ci sono molti file che vengono rinominati, però per lo più sono dei mock, quindi considero il file rinominato come nuovo file
+tuttavia per mantenere consistenti le feature devo aggiustare questi casi e forzare il fatto che se è rev 1 from start allora
+devo avere churn=loc=locAdded
