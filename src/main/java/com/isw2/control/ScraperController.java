@@ -18,6 +18,7 @@ public class ScraperController {
     private JiraDao jiraDao;
     private GitDao gitDao;
     private final CommitDbDao commitDbDao;
+    private final String dateFormat = "yyyy-MM-dd";
     private static final Logger myLogger = Logger.getLogger("logger");
 
     public ScraperController(String projectName, String projectAuthor) {
@@ -142,7 +143,7 @@ public class ScraperController {
 
     //Get all tickets closed until the specified release so with the resolution date in the date range of the release
     public List<Ticket> getTicketsOfInterest(String relEndDate) throws ParseException {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
         List<Ticket> ret = new ArrayList<>();
         for (Ticket ticket : project.getFixedBugTickets()) {
             String ticketResDate = ticket.getResolutionDate();
@@ -234,7 +235,7 @@ public class ScraperController {
     }
 
     public void linkCommitsToReleases() throws ParseException {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
         for (int j = 0; j < this.project.getReleasesOfInterest().size(); j++) {
             Release release = this.project.getReleasesOfInterest().get(j);
             for (int i = 0; i < this.project.getCommits().size(); i++) {
@@ -334,8 +335,8 @@ public class ScraperController {
 
     public void linkTicketDatesToReleases() throws ParseException {
         List<Ticket> tickets=this.project.getFixedBugTicketsOfInterest();
-        List<Release> releases=this.project.getReleasesOfInterest();
-        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+        List<Release> releases = this.project.getReleasesOfInterest();
+        SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
         for(Ticket ticket:tickets){
             for(Release release:releases){
                 String ticketCreationDate=ticket.getCreationDate();
