@@ -17,7 +17,7 @@ public class ScraperController {
     private JiraDao jiraDao;
     private GitDao gitDao;
     private final CommitDbDao commitDbDao;
-    private static final String dateFormat = "yyyy-MM-dd";
+    private static final String DATE_FORMAT = "yyyy-MM-dd";
 
     public ScraperController(String projectName, String projectAuthor) {
         this.project = new Project(projectName, projectAuthor);
@@ -141,7 +141,7 @@ public class ScraperController {
 
     //Get all tickets closed until the specified release so with the resolution date in the date range of the release
     public List<Ticket> getTicketsOfInterest(String relEndDate) throws ParseException {
-        SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
+        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
         List<Ticket> ret = new ArrayList<>();
         for (Ticket ticket : project.getFixedBugTickets()) {
             String ticketResDate = ticket.getResolutionDate();
@@ -233,7 +233,7 @@ public class ScraperController {
     }
 
     public void linkCommitsToReleases() throws ParseException {
-        SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
+        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
         for (int j = 0; j < this.project.getReleasesOfInterest().size(); j++) {
             Release release = this.project.getReleasesOfInterest().get(j);
             for (int i = 0; i < this.project.getCommits().size(); i++) {
@@ -334,7 +334,7 @@ public class ScraperController {
     public void linkTicketDatesToReleases() throws ParseException {
         List<Ticket> tickets=this.project.getFixedBugTicketsOfInterest();
         List<Release> releases = this.project.getReleasesOfInterest();
-        SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
+        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
         for(Ticket ticket:tickets){
             for(Release release:releases){
                 String ticketCreationDate=ticket.getCreationDate();
@@ -346,16 +346,16 @@ public class ScraperController {
                     ticket.setFv(release.getName());
                     ticket.setFvNum(release.getNumber());
                 }
-                if((sdf.parse(ticketCreationDate).compareTo(sdf.parse(relCreationDate))==0)||((sdf.parse(ticketCreationDate).after(sdf.parse(relCreationDate)))&&(sdf.parse(ticketCreationDate).before(sdf.parse(relEndDate))))){
+                else if((sdf.parse(ticketCreationDate).compareTo(sdf.parse(relCreationDate))==0)||((sdf.parse(ticketCreationDate).after(sdf.parse(relCreationDate)))&&(sdf.parse(ticketCreationDate).before(sdf.parse(relEndDate))))){
                     ticket.setOv(release.getName());
                     ticket.setOvNum(release.getNumber());
                 }
                 //ASSUNZIONE 13
-                if((Objects.equals(release.getNumber(), "1"))&&(sdf.parse(ticketCreationDate).before(sdf.parse(relCreationDate)))){
+                else if((Objects.equals(release.getNumber(), "1"))&&(sdf.parse(ticketCreationDate).before(sdf.parse(relCreationDate)))){
                     ticket.setOv(release.getName());
                     ticket.setOvNum(release.getNumber());
                 }
-                if((Objects.equals(release.getNumber(), "1"))&&(sdf.parse(ticketResDate).before(sdf.parse(relCreationDate)))){
+                else if((Objects.equals(release.getNumber(), "1"))&&(sdf.parse(ticketResDate).before(sdf.parse(relCreationDate)))){
                     ticket.setFv(release.getName());
                     ticket.setFvNum(release.getNumber());
                 }

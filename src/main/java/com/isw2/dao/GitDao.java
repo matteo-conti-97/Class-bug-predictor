@@ -61,10 +61,6 @@ public class GitDao {
                     if (status.equals("renamed")) {
                         prevName = fileJson.getString("previous_filename");
                     }
-                    //Se possibile evitare il seguente pezzo di codice perchè consuma troppi accessi all'api
-                    /*String contentUrl = touchedFilesJson.getJSONObject(i).getString("contents_url");
-                    //JSONObject contentJson = jsonParser.readJsonFromUrl(contentUrl);
-                    String content = CodeParser.base64Decode(contentJson.getString("content"));*/
                     String content = "";
                     JavaFile touchedFile = new JavaFile(filename, add, del, content, status, prevName);
                     touchedFiles.add(touchedFile);
