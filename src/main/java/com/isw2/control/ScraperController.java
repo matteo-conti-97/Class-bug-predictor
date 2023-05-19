@@ -169,7 +169,7 @@ public class ScraperController {
 
     private void saveTouchedFilesDataOnDb(Commit commit) {
         for (JavaFile file : commit.getTouchedFiles()) {
-            commitDbDao.insertTouchedFile(file.getName(), commit.getSha(), commit.getId(), file.getAdd(), file.getDel(), file.getContent(), file.getStatus(), file.getPrevName(), this.project.getName());
+            commitDbDao.insertTouchedFile(file.getName(), commit.getSha(), commit.getId(), file.getAdd(), file.getDel(), file.getContent(), this.project.getName());
         }
     }
 
