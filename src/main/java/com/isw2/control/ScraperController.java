@@ -10,6 +10,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 public class ScraperController {
@@ -120,7 +121,7 @@ public class ScraperController {
     }
 
     public List<Release> getAllReleases() {
-        return jiraDao.getAllReleases();
+        return jiraDao.getAllReleases(this.project.getCreationDate());
     }
 
     public List<Ticket> getAllTickets() {
@@ -269,12 +270,10 @@ public class ScraperController {
         List<Release> releasesOfInterest = getReleasesOfInterestFromDb();
         setProjectReleasesOfInterest(releasesOfInterest);
         String lastInterestReleaseEndDate = getLastReleaseEndDateOfInterest();
-        //ASSUNZIONE la seguente istruzione è per troncare l'ultima release di interesse bookeeper alla data di migrazione a github issue
-        //scraperController.setLastReleaseEndDateOfInterest("2017-06-16");
         List<Commit> commits = getCommitsFromDb();
         setProjectCommits(commits);
         linkCommitsToReleases();
-        removeEmptyReleases(); //ASSUNZIONE le release senza commit le butto
+        removeEmptyReleases(); //ASSUNZIONE 2
         System.out.println("Project: " + getProjectName());
         System.out.println("Creation date: " + getProjectCreationDate());
         System.out.println("Last interest release end date: " + lastInterestReleaseEndDate);
@@ -304,13 +303,13 @@ public class ScraperController {
         setProjectCreationDate();
         List<Release> allReleases = getAllReleases();
         setProjectReleases(allReleases);
-        List<Release> releasesOfInterest = getReleasesOfInterest("4.4.0");
+        List<Release> releasesOfInterest = getReleasesOfInterest("4.5.0"); //Last release interest of bookeeper
         setProjectReleasesOfInterest(releasesOfInterest);
 
-        String lastInterestReleaseEndDate = getLastReleaseEndDateOfInterest();
-        /*ASSUNZIONE la seguente istruzione è per troncare l'ultima release di interesse bookeeper alla data di migrazione
-        a github issue*/
-        //scraperController.setLastReleaseEndDateOfInterest("2017-06-16");
+        //ASSUNZIONE 5
+        String lastInterestReleaseEndDate = "2017-06-16";
+        setLastReleaseEndDateOfInterest(lastInterestReleaseEndDate);
+
         System.out.println("Project: " + getProjectName());
         System.out.println("Creation date: " + getProjectCreationDate());
         System.out.println("Last interest release end date: " + lastInterestReleaseEndDate);
@@ -343,13 +342,23 @@ public class ScraperController {
                 String ticketResDate=ticket.getResolutionDate();
                 String relCreationDate=release.getStartDate();
                 String relEndDate=release.getEndDate();
-                if((sdf.parse(ticketResDate).after(sdf.parse(relCreationDate)))&&(sdf.parse(ticketResDate).before(sdf.parse(relEndDate)))){
+                //ASSUNZIONE 12
+                if((sdf.parse(ticketResDate).compareTo(sdf.parse(relCreationDate))==0)||((sdf.parse(ticketCreationDate).compareTo(sdf.parse(relCreationDate))==0)||((sdf.parse(ticketResDate).after(sdf.parse(relCreationDate)))&&(sdf.parse(ticketResDate).before(sdf.parse(relEndDate)))))){
                     ticket.setFv(release.getName());
                     ticket.setFvNum(release.getNumber());
                 }
-                if((sdf.parse(ticketCreationDate).after(sdf.parse(relCreationDate)))&&(sdf.parse(ticketResDate).before(sdf.parse(relEndDate)))){
+                if((sdf.parse(ticketCreationDate).compareTo(sdf.parse(relCreationDate))==0)||((sdf.parse(ticketCreationDate).after(sdf.parse(relCreationDate)))&&(sdf.parse(ticketCreationDate).before(sdf.parse(relEndDate))))){
                     ticket.setOv(release.getName());
                     ticket.setOvNum(release.getNumber());
+                }
+                //ASSUNZIONE 13
+                if((Objects.equals(release.getNumber(), "1"))&&(sdf.parse(ticketCreationDate).before(sdf.parse(relCreationDate)))){
+                    ticket.setOv(release.getName());
+                    ticket.setOvNum(release.getNumber());
+                }
+                if((Objects.equals(release.getNumber(), "1"))&&(sdf.parse(ticketResDate).before(sdf.parse(relCreationDate)))){
+                    ticket.setFv(release.getName());
+                    ticket.setFvNum(release.getNumber());
                 }
             }
         }

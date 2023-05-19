@@ -25,12 +25,12 @@ public class JiraDao {
     Get all releases until the specified release, the releaseName must follow the name convention of jira (e.g. 1.0.0)
     if an empty or non-existent name is specified, the method will return all releases
     */
-    public List<Release> getAllReleases() {
+    public List<Release> getAllReleases(String creationDate) {
         List<Release> ret = new ArrayList<>();
         JsonParser jsonParser = new JsonParser();
         JSONObject jsonReleases = null;
         String query = String.format(ALL_RELEASE_QUERY, this.projectName);
-        String lastReleaseEndDate;
+        String lastReleaseEndDate=creationDate;
         try {
             jsonReleases = jsonParser.readJsonFromUrl(query);
         } catch (IOException e) {
@@ -41,12 +41,11 @@ public class JiraDao {
         for (int i = 0; i < releases.length(); i++) {
             JSONObject releaseJson = releases.getJSONObject(i);
             String name = releaseJson.getString("name");
-            String startDate = releaseJson.getString("releaseDate");
-            Release release = new Release(name, i + 1, startDate, "Missing"); //+1 cause it start at 0, use the next release start date as end date of the current release, except for the last release which have missing
-            if (i > 0) {
-                lastReleaseEndDate = startDate;
-                ret.get(i - 1).setEndDate(lastReleaseEndDate);
-            }
+            String endDate = releaseJson.getString("releaseDate");
+            Release release;
+            release = new Release(name, i + 1, lastReleaseEndDate, endDate); //+1 cause it start at 0, use the next release start date as end date of the current release, except for the last release which have missing
+            lastReleaseEndDate = endDate;
+
             ret.add(release);
         }
         return ret;
