@@ -31,7 +31,7 @@ public class CsvHandler {
             CSVWriter writer = new CSVWriter(outputfile);
 
             // adding header to csv
-            String[] header = {"Release", "File", "# Authors in Release", "LOC", "Avg Churn in Release", "Avg Churn from Start", "Avg LOC Added in Release", "Avg LOC Added from Start", "# Revision in Release", "# Revision from Start", "Feature 9", "Feature 10", "Buggy"};
+            String[] header = {"Release", "File", "# Authors in Release", "LOC", "Avg Churn in Release", "Avg Churn from Start", "Avg LOC Added in Release", "Avg LOC Added from Start", "# Revision in Release", "# Revision from Start", "# Bug Fix in Release", "# Bug Fix from Start", "Buggy"};
             writer.writeNext(header);
             for (int i = 0; i < files.size(); i++) {
                 for (int j = 0; j < files.get(i).size(); j++) {
@@ -44,7 +44,9 @@ public class CsvHandler {
                     String avgAddFromStart = files.get(i).get(j).getAvgLocAddedFromStart();
                     String avgChurnFromStart = files.get(i).get(j).getAvgChurnFromStart();
                     String nRevFromStart = files.get(i).get(j).getnRevFromStart();
-                    String[] data = {Integer.toString(i + 1), filename, nAuthorsInRel, locInRel, avgChurnInRel, avgChurnFromStart, avgAddInRel, avgAddFromStart, nRevInRel, nRevFromStart, "null", "null", "null"};
+                    String nBugFixInRel = files.get(i).get(j).getnFixCommitInRelease();
+                    String nBugFixFromStart = files.get(i).get(j).getnFixCommitFromStart();
+                    String[] data = {Integer.toString(i + 1), filename, nAuthorsInRel, locInRel, avgChurnInRel, avgChurnFromStart, avgAddInRel, avgAddFromStart, nRevInRel, nRevFromStart, nBugFixInRel, nBugFixFromStart, "null"};
                     writer.writeNext(data);
                 }
             }

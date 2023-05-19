@@ -1,9 +1,6 @@
 package com.isw2.control;
 
-import com.isw2.entity.Commit;
-import com.isw2.entity.JavaFile;
-import com.isw2.entity.Project;
-import com.isw2.entity.Release;
+import com.isw2.entity.*;
 import com.isw2.util.CsvHandler;
 
 import java.util.ArrayList;
@@ -17,16 +14,16 @@ public class MeasureController {
         this.project = project;
     }
 
-    //TODO Implementare prendere le bugfix nella release e le bugfix da start
     public void createWalkForwardDatasets() {
         List<List<JavaFile>> releaseFiles = new ArrayList<>();
         List<List<Commit>> commits = new ArrayList<>();
+        List<Ticket> tickets= this.project.getFixedBugTicketsOfInterest();
         List<Release> releases = this.project.getReleasesOfInterest();
         for (int i = 0; i < releases.size(); i++) {
             Release release = releases.get(i);
             List<Commit> relCommits = release.getCommits();
             List<JavaFile> relFiles = release.getFileTreeAtReleaseEnd();
-            measureInReleaseFeatures(relFiles, relCommits);
+            measureInReleaseFeatures(relFiles, relCommits, tickets);
             commits.add(relCommits);
             releaseFiles.add(relFiles);
             measureFromStartFeatures(releaseFiles, i + 1);
@@ -54,9 +51,8 @@ public class MeasureController {
         }
     }
 
-    private void measureInReleaseFeatures(List<JavaFile> releaseFiles, List<Commit> commits) {
+    private void measureInReleaseFeatures(List<JavaFile> releaseFiles, List<Commit> commits, List<Ticket> tickets) {
         for (JavaFile srcFile : releaseFiles) {
-
             int cnt = 0;
             int adds = 0;
             int dels = 0;
@@ -64,6 +60,7 @@ public class MeasureController {
             int filteredDels;
             int realAdds = 0;
             int realDels = 0;
+            int fixCount = 0;
             List<String> authors = new ArrayList<>();
 
             String[] lines = srcFile.getContent().split("\r\n|\r|\n");
@@ -77,6 +74,11 @@ public class MeasureController {
                         String author = commit.getAuthor();
                         if (!authors.contains(author)) {
                             authors.add(author);
+                        }
+                        for(Ticket ticket: tickets){
+                            if(commit.getMessage().startsWith(ticket.getKey())){
+                                fixCount++;
+                            }
                         }
                         cnt++;
                         adds = Integer.parseInt(file.getAdd());
@@ -98,10 +100,11 @@ public class MeasureController {
             assert cnt != 0;
             int avgAdds = (int) Math.floor((double) realAdds / cnt);     //Per ogni commit nella release che ha toccato il file prende fa locAdded e si fa la media
             srcFile.setAvgLocAddedInRelease(Integer.toString(avgAdds));
-            int churn = Math.abs((int) Math.floor((double) (realAdds - realDels) / cnt));      //Per ogni commit nella release che ha toccato il file si fa locAdded - locDeleted e si fa la media
+            int churn = (int) Math.floor((double) (realAdds - realDels) / cnt);      //Per ogni commit nella release che ha toccato il file si fa locAdded - locDeleted e si fa la media
             srcFile.setAvgChurnInRelease(Integer.toString(churn));
             srcFile.setRelDels(Integer.toString(realDels)); //Serve per le misure from start
             srcFile.setRelAdds(Integer.toString(realAdds)); //Serve per le misure from start
+            srcFile.setnFixCommitInRelease(Integer.toString(fixCount));     //Per ogni commit nella release che ha toccato il file si conta quante sono afferenti ad un bugFix
 
         }
     }
@@ -110,6 +113,7 @@ public class MeasureController {
         //I valori dalla release 0 me li calcolo come somma/media dei singoli valori della release fino alla corrente
         List<JavaFile> lastRelFiles = releaseFiles.get(numReleases - 1);
         for (JavaFile file : lastRelFiles) {
+            int totBugFix = Integer.parseInt(file.getnFixCommitInRelease());
             int totCnt = Integer.parseInt(file.getnRevInRelease());
             int totAdds = Integer.parseInt(file.getRelAdds());
             int totDels = Integer.parseInt(file.getRelDels());
@@ -117,6 +121,7 @@ public class MeasureController {
                 List<JavaFile> relFiles = releaseFiles.get(i);
                 for (JavaFile relFile : relFiles) {
                     if (relFile.getName().equals(file.getName())) {
+                        totBugFix += Integer.parseInt(relFile.getnFixCommitInRelease());
                         totCnt += Integer.parseInt(relFile.getnRevInRelease());
                         totAdds += Integer.parseInt(relFile.getRelAdds()); //Nota qui non faccio ASSUNZIONE 9-10 perchè questi valori li setto in measureInReleaseFeatures e sono gia 'corretti'
                         totDels += Integer.parseInt(relFile.getRelDels());
@@ -126,22 +131,10 @@ public class MeasureController {
             file.setnRevFromStart(Integer.toString(totCnt));        //Per ogni file si contano le commit nella release che lo hanno toccato
             int avgLocAdded = (int) Math.floor((double) totAdds / totCnt);       //Per ogni commit nella release che ha toccato il file prende fa locAdded e si fa la media
             file.setAvgLocAddedFromStart(Integer.toString(avgLocAdded));
-            int avgChurn = Math.abs((int) Math.floor((double) (totAdds - totDels) / totCnt));     //Per ogni commit che ha toccato il file si fa locAdded - locDeleted e si fa la media
+            int avgChurn = (int) Math.floor((double) (totAdds - totDels) / totCnt);     //Per ogni commit che ha toccato il file si fa locAdded - locDeleted e si fa la media
             file.setAvgChurnFromStart(Integer.toString(avgChurn));
+            file.setnFixCommitFromStart(Integer.toString(totBugFix));     //Per ogni commit che ha toccato il file si conta quante sono afferenti ad un bugFix
         }
-    }
-
-
-    //Per ogni commit nella release che ha toccato il file si conta quante sono afferenti ad un bugFix
-    private String measureFixCommitsInRelease(String filename, int release) {
-        String ret = "";
-        return ret;
-    }
-
-    //Per ogni commit che ha toccato il file si conta quante sono afferenti ad un bugFix
-    private String measureFixCommitsFromStart(String filename, int release) {
-        String ret = "";
-        return ret;
     }
 
 }
