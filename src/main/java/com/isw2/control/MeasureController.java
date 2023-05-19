@@ -75,11 +75,7 @@ public class MeasureController {
                         if (!authors.contains(author)) {
                             authors.add(author);
                         }
-                        for(Ticket ticket: tickets){
-                            if(commit.getMessage().startsWith(ticket.getKey())){
-                                fixCount++;
-                            }
-                        }
+                        fixCount+=countFixCommit(commit,tickets);
                         cnt++;
                         adds = Integer.parseInt(file.getAdd());
                         filteredAdds = (int) Math.floor((double) (adds * 10) / 100); //ASSUNZIONE 9-10
@@ -135,6 +131,16 @@ public class MeasureController {
             file.setAvgChurnFromStart(Integer.toString(avgChurn));
             file.setnFixCommitFromStart(Integer.toString(totBugFix));     //Per ogni commit che ha toccato il file si conta quante sono afferenti ad un bugFix
         }
+    }
+
+    private int countFixCommit(Commit commit,List<Ticket> tickets){
+        int ret=0;
+        for(Ticket ticket: tickets){
+            if(commit.getMessage().startsWith(ticket.getKey())){
+                ret++;
+            }
+        }
+        return ret;
     }
 
 }
