@@ -5,11 +5,8 @@ import weka.classifiers.bayes.NaiveBayes;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
 
-import java.util.logging.Logger;
-
 
 public class WekaAnalyzer {
-    private static final Logger myLogger = Logger.getLogger("logger");
 
     public static void main(String[] args) throws Exception {
         //load datasets

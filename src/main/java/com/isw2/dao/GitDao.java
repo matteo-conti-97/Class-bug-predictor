@@ -11,13 +11,11 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 public class GitDao {
     private String projectName;
     private String author;
     private String repoUrl;
-    private static final Logger myLogger = Logger.getLogger("logger");
 
     public GitDao(String projectName, String author) {
         this.projectName = projectName.toLowerCase();

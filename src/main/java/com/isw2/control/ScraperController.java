@@ -11,15 +11,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.logging.Logger;
 
 public class ScraperController {
     private Project project;
     private JiraDao jiraDao;
     private GitDao gitDao;
     private final CommitDbDao commitDbDao;
-    private final String dateFormat = "yyyy-MM-dd";
-    private static final Logger myLogger = Logger.getLogger("logger");
+    private static final String dateFormat = "yyyy-MM-dd";
 
     public ScraperController(String projectName, String projectAuthor) {
         this.project = new Project(projectName, projectAuthor);

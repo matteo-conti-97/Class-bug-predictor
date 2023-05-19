@@ -9,11 +9,9 @@ import com.isw2.util.CsvHandler;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.logging.Logger;
 
 public class MeasureController {
     private final Project project;
-    private static final Logger myLogger = Logger.getLogger("logger");
 
     public MeasureController(Project project) {
         this.project = project;
