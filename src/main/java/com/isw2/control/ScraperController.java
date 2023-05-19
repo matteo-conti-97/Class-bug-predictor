@@ -341,23 +341,14 @@ public class ScraperController {
                 String ticketResDate=ticket.getResolutionDate();
                 String relCreationDate=release.getStartDate();
                 String relEndDate=release.getEndDate();
-                //ASSUNZIONE 12
-                if((sdf.parse(ticketResDate).compareTo(sdf.parse(relCreationDate))==0)||((sdf.parse(ticketCreationDate).compareTo(sdf.parse(relCreationDate))==0)||((sdf.parse(ticketResDate).after(sdf.parse(relCreationDate)))&&(sdf.parse(ticketResDate).before(sdf.parse(relEndDate)))))){
+                //ASSUNZIONE 12 condizione 2, ASSUNZIONE 13 condizione 1
+                if(((Objects.equals(release.getNumber(), "1"))&&(sdf.parse(ticketResDate).before(sdf.parse(relCreationDate))))||((sdf.parse(ticketResDate).compareTo(sdf.parse(relCreationDate))==0)||((sdf.parse(ticketCreationDate).compareTo(sdf.parse(relCreationDate))==0)||((sdf.parse(ticketResDate).after(sdf.parse(relCreationDate)))&&(sdf.parse(ticketResDate).before(sdf.parse(relEndDate))))))){
                     ticket.setFv(release.getName());
                     ticket.setFvNum(release.getNumber());
                 }
-                else if((sdf.parse(ticketCreationDate).compareTo(sdf.parse(relCreationDate))==0)||((sdf.parse(ticketCreationDate).after(sdf.parse(relCreationDate)))&&(sdf.parse(ticketCreationDate).before(sdf.parse(relEndDate))))){
+                else if(((Objects.equals(release.getNumber(), "1"))&&(sdf.parse(ticketCreationDate).before(sdf.parse(relCreationDate))))||((sdf.parse(ticketCreationDate).compareTo(sdf.parse(relCreationDate))==0)||((sdf.parse(ticketCreationDate).after(sdf.parse(relCreationDate)))&&(sdf.parse(ticketCreationDate).before(sdf.parse(relEndDate)))))){
                     ticket.setOv(release.getName());
                     ticket.setOvNum(release.getNumber());
-                }
-                //ASSUNZIONE 13
-                else if((Objects.equals(release.getNumber(), "1"))&&(sdf.parse(ticketCreationDate).before(sdf.parse(relCreationDate)))){
-                    ticket.setOv(release.getName());
-                    ticket.setOvNum(release.getNumber());
-                }
-                else if((Objects.equals(release.getNumber(), "1"))&&(sdf.parse(ticketResDate).before(sdf.parse(relCreationDate)))){
-                    ticket.setFv(release.getName());
-                    ticket.setFvNum(release.getNumber());
                 }
             }
         }

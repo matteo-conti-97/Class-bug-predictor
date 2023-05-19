@@ -47,7 +47,7 @@ public class CommitDbDao {
             ps.executeUpdate();
 
         } catch (SQLException | NumberFormatException e) {
-            //e.printStackTrace();
+            e.printStackTrace();
             System.out.println("Salvataggio progetto fallito");// definire un eccezione apposita con logger serio
         }
     }
@@ -91,9 +91,9 @@ public class CommitDbDao {
         }
     }
 
-    public void insertTouchedFile(String filename, String commitSha, String commitId, String add, String del, String content, String status, String prevName, String project) {
+    public void insertTouchedFile(String filename, String commitSha, String commitId, String add, String del, String content, String project) {
         try (PreparedStatement ps = conn.prepareStatement(
-                "INSERT INTO touchedfiles(commit_sha, commit_id, commit_project_name, filename, adds, dels, content, status, pname) VALUES(?,?,?,?,?,?,?,?,?)" +
+                "INSERT INTO touchedfiles(commit_sha, commit_id, commit_project_name, filename, adds, dels, content) VALUES(?,?,?,?,?,?,?)" +
                         "ON DUPLICATE KEY UPDATE adds = ?")) {
 
             ps.setString(1, commitSha);
@@ -103,10 +103,7 @@ public class CommitDbDao {
             ps.setString(5, add);
             ps.setString(6, del);
             ps.setString(7, content);
-            ps.setString(8, status);
-            ps.setString(9, prevName);
-
-            ps.setString(10, add);
+            ps.setString(8, add);
             ps.executeUpdate();
 
         } catch (SQLException | NumberFormatException e) {
@@ -155,7 +152,7 @@ public class CommitDbDao {
             }
             rs.close();
         } catch (SQLException e) {
-            //e.printStackTrace();
+            e.printStackTrace();
             System.out.println("Select commits fallito");// definire un eccezione apposita con logger serio
         } finally {
             assert ps != null;
@@ -186,7 +183,7 @@ public class CommitDbDao {
             return ret;
 
         } catch (SQLException e) {
-            //e.printStackTrace();
+            e.printStackTrace();
             System.out.println("Select touched files fallito");// definire un eccezione apposita con logger serio
         } finally {
             assert ps != null;
@@ -220,7 +217,7 @@ public class CommitDbDao {
             }
             rs.close();
         } catch (SQLException e) {
-            //e.printStackTrace();
+            e.printStackTrace();
             System.out.println("Select commits fallito");// definire un eccezione apposita con logger serio
         } finally {
             assert ps != null;
@@ -250,7 +247,7 @@ public class CommitDbDao {
             return ret;
 
         } catch (SQLException e) {
-            //e.printStackTrace();
+            e.printStackTrace();
             System.out.println("Select touched files fallito");// definire un eccezione apposita con logger serio
         } finally {
             assert ps != null;
