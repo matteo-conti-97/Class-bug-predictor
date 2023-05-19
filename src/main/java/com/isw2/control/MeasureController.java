@@ -19,7 +19,7 @@ public class MeasureController {
         this.project = project;
     }
 
-    //TODO MODIFICARLA PER ADATTARLA ALLA NUOVA IMPLEMENTAZIONE DEL RESTO
+    //TODO Implementare prendere le bugfix nella release e le bugfix da start
     public void createWalkForwardDatasets() {
         List<List<JavaFile>> releaseFiles = new ArrayList<>();
         List<List<Commit>> commits = new ArrayList<>();
@@ -32,27 +32,28 @@ public class MeasureController {
             commits.add(relCommits);
             releaseFiles.add(relFiles);
             measureFromStartFeatures(releaseFiles, i + 1);
-            int cnt = 0;
-            for (JavaFile file : relFiles) {
-                String nRevFromStart = file.getnRevFromStart();
-                String nRevInRelease = file.getnRevInRelease();
-                String nAuthorsInRelease = file.getnAuthorInRelease();
-                String locAtEndRelease = file.getLocAtEndRelease();
-                String avgChurnInRelease = file.getAvgChurnInRelease();
-                String avgChurnFromStart = file.getAvgChurnFromStart();
-                String avgLocAddedInRelease = file.getAvgLocAddedInRelease();
-                String avgLocAddedFromStart = file.getAvgLocAddedFromStart();
-                if ((Objects.equals(nRevFromStart, "1")) && (Objects.equals(nRevInRelease, "1")) && (!Objects.equals(locAtEndRelease, avgLocAddedInRelease))) {
-                    cnt++;
-                    System.out.println("Name: " + file.getName() + " nRevFromStart: " + file.getnRevFromStart() + " nRevInRelease: " + file.getnRevInRelease() + " nAuthorsInRelease: " + file.getnAuthorInRelease() + " locAtEndRelease: " + file.getLocAtEndRelease() + " avgChurnInRelease: " + file.getAvgChurnInRelease() + " avgChurnFromStart: " + file.getAvgChurnFromStart() + " avgLocAddedInRelease: " + file.getAvgLocAddedInRelease() + " avgLocAddedFromStart: " + file.getAvgLocAddedFromStart());
-                }
-
-            }
-            System.out.println(cnt);
+            adjustMeasure(releaseFiles);
             CsvHandler.writeDataLineByLine(releaseFiles, i + 1);
         }
 
 
+    }
+
+    private void adjustMeasure(List<List<JavaFile>> releaseFiles){
+        for(List<JavaFile> files : releaseFiles){
+            for(JavaFile file : files) {
+                String nRevFromStart = file.getnRevFromStart();
+                String nRevInRelease = file.getnRevInRelease();
+                String locAtEndRelease = file.getLocAtEndRelease();
+                String avgLocAddedInRelease = file.getAvgLocAddedInRelease();
+                if ((Objects.equals(nRevFromStart, "1")) && (Objects.equals(nRevInRelease, "1")) && (!Objects.equals(locAtEndRelease, avgLocAddedInRelease))) {
+                    file.setAvgLocAddedInRelease(locAtEndRelease);
+                    file.setAvgChurnInRelease(locAtEndRelease);
+                    file.setAvgChurnFromStart(locAtEndRelease);
+                    file.setAvgLocAddedFromStart(locAtEndRelease);
+                }
+            }
+        }
     }
 
     private void measureInReleaseFeatures(List<JavaFile> releaseFiles, List<Commit> commits) {

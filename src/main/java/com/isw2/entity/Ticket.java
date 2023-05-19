@@ -3,18 +3,15 @@ package com.isw2.entity;
 import java.util.List;
 
 public class Ticket {
-
     private String ticketId;
     private String key;
     private String ticketUrl;
-    private String type;
-    private String priority;
-    private String status;
-    private String creator;
     private String creationDate;
     private String resolutionDate;
     private String ov;
+    private String ovNum;
     private String fv; //Not the jira fix version, but the git fix commit using SZZ approach
+    private String fvNum;
     private List<String> jiraAv;
     private List<String> proportionAv; //Not always jira is trustable
     private List<Commit> gitCommits;
@@ -49,37 +46,6 @@ public class Ticket {
         this.ticketUrl = ticketUrl;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getPriority() {
-        return priority;
-    }
-
-    public void setPriority(String priority) {
-        this.priority = priority;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getCreator() {
-        return creator;
-    }
-
-    public void setCreator(String creator) {
-        this.creator = creator;
-    }
 
     public String getCreationDate() {
         return creationDate;
@@ -135,5 +101,21 @@ public class Ticket {
 
     public void setGitCommits(List<Commit> gitCommits) {
         this.gitCommits = gitCommits;
+    }
+
+    public String getOvNum() {
+        return ovNum;
+    }
+
+    public void setOvNum(String ovNum) {
+        this.ovNum = ovNum;
+    }
+
+    public String getFvNum() {
+        return fvNum;
+    }
+
+    public void setFvNum(String fvNum) {
+        this.fvNum = fvNum;
     }
 }

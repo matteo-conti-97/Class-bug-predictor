@@ -58,6 +58,7 @@ public class JiraDao {
         Ticket ret = new Ticket(key, ticketId, ticketUrl);
         JsonParser jsonParser = new JsonParser();
         JSONObject jsonTicket = null;
+        List<String> affectedVersions = new ArrayList<>();
         try {
             jsonTicket = jsonParser.readJsonFromUrl(ticketUrl);
         } catch (IOException e) {
@@ -65,16 +66,14 @@ public class JiraDao {
         }
         assert jsonTicket != null;
         JSONObject ticketFields = jsonTicket.getJSONObject("fields");
-        String type = ticketFields.getJSONObject("issuetype").getString("name");
-        String priority = ticketFields.getJSONObject("priority").getString("name");
-        String status = ticketFields.getJSONObject("status").getString("name");
-        String creator = ticketFields.getJSONObject("creator").getString("displayName");
         String creationDate = ticketFields.getString("created").substring(0, 10);
         String resolutionDate = ticketFields.getString("resolutiondate").substring(0, 10);
-        ret.setType(type);
-        ret.setPriority(priority);
-        ret.setStatus(status);
-        ret.setCreator(creator);
+        JSONArray affectedVersionsJson = ticketFields.getJSONArray("versions");
+        for(int i=0; i<affectedVersionsJson.length(); i++){
+            JSONObject avJson= affectedVersionsJson.getJSONObject(i);
+            affectedVersions.add(avJson.getString("name"));
+        }
+        ret.setJiraAv(affectedVersions);
         ret.setCreationDate(creationDate);
         ret.setResolutionDate(resolutionDate);
         return ret;

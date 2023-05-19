@@ -282,6 +282,22 @@ public class ScraperController {
         for (Release release : releasesOfInterest) {
             System.out.println("Release: " + release.getName() + " number " + release.getNumber() + " has " + release.getCommits().size() + " commits and " + release.getFileTreeAtReleaseEnd().size() + " non test java files, starts at " + release.getStartDate() + " and ends at " + release.getEndDate());
         }
+
+        List<Ticket> allTickets = getAllTickets();
+        setProjectFixedBugTickets(allTickets);
+        List<Ticket> ticketOfInterest =getTicketsOfInterest(lastInterestReleaseEndDate);
+        setProjectFixedBugTicketsOfInterest(ticketOfInterest);
+        linkTicketDatesToReleases();
+
+        System.out.println("\n" + ticketOfInterest.size() + " tickets of interest:");
+        for (Ticket tmp : ticketOfInterest) {
+            String stringa=tmp.getKey() + " Resolution Date: " + tmp.getResolutionDate()+ " Fix Version: " + tmp.getFv() + " Creation Date: " + tmp.getCreationDate() + " Opening Version:" + tmp.getOv();
+            System.out.println(stringa);
+            System.out.println("\tAffected Versions: ");
+            for(String av: tmp.getJiraAv()){
+                System.out.println("\t\tVersion: "+av);
+            }
+        }
     }
 
     public void saveProjectDataOnDb() {
@@ -316,4 +332,27 @@ public class ScraperController {
         //}
         saveFileTreeOnDb();
     }
+
+    public void linkTicketDatesToReleases() throws ParseException {
+        List<Ticket> tickets=this.project.getFixedBugTicketsOfInterest();
+        List<Release> releases=this.project.getReleasesOfInterest();
+        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+        for(Ticket ticket:tickets){
+            for(Release release:releases){
+                String ticketCreationDate=ticket.getCreationDate();
+                String ticketResDate=ticket.getResolutionDate();
+                String relCreationDate=release.getStartDate();
+                String relEndDate=release.getEndDate();
+                if((sdf.parse(ticketResDate).after(sdf.parse(relCreationDate)))&&(sdf.parse(ticketResDate).before(sdf.parse(relEndDate)))){
+                    ticket.setFv(release.getName());
+                    ticket.setFvNum(release.getNumber());
+                }
+                if((sdf.parse(ticketCreationDate).after(sdf.parse(relCreationDate)))&&(sdf.parse(ticketResDate).before(sdf.parse(relEndDate)))){
+                    ticket.setOv(release.getName());
+                    ticket.setOvNum(release.getNumber());
+                }
+            }
+        }
+    }
+
 }
