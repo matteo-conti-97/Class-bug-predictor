@@ -97,6 +97,7 @@ public class MeasureController {
             int loc = nLines - filteredLines;     //Per ogni commit nella release che ha toccato il file si guarda loc e si fa la media
             srcFile.setLocAtEndRelease(Integer.toString(loc));
             srcFile.setnRevInRelease(Integer.toString(cnt));        //Per ogni file si contano le commit nella release che lo hanno toccato
+            assert cnt != 0;
             int avgAdds = (int) Math.floor((double) realAdds / cnt);     //Per ogni commit nella release che ha toccato il file prende fa locAdded e si fa la media
             srcFile.setAvgLocAddedInRelease(Integer.toString(avgAdds));
             int churn = Math.abs((int) Math.floor((double) (realAdds - realDels) / cnt));      //Per ogni commit nella release che ha toccato il file si fa locAdded - locDeleted e si fa la media
