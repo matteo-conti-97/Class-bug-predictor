@@ -6,13 +6,10 @@ nel repository in quel momento, utilizzare questi dati per cominciare a fare una
 -Calcolare LOC utilizzando il CLOC, installare CLOC - DONE
 
 -Per ogni file java calcolare le varie feature, per quelle tipo "lines of code added" può aver senso prendere la versione
-del file della release di interesse e della versione precedente e vedere quante righe di codice sono state aggiunte
+del file della release di interesse e della versione precedente e vedere quante righe di codice sono state aggiunte - DONE
 
--Per ogni ticket jira di bug chiuso prendere le commit associate a quel ticket e vedere quali file sono toccati da tale
-commit e fare SZZ/proportion/vedere su jira l'AV per definire la buggyness di ogni file. Nel caso si faccia proportion
-occorre considerare la FV (vedendo in che release cade la data di chiusura del ticket o della commit che fa il fix)
-calcolare OV (vedendo in che release cade la data di creazione del ticket) e la IV, ricordare che AV è data da tutte le release
-che cadono tra OV e IV con IV=FV-(FV-OV)*P dove P è la proportion
+-Per ogni file del tree prendere tutte le commit di quella release e vedere se afferiscono a un ticket, in caso affermativo marcare il file come buggy in quella release e successivamente verificare
+se il ticket riporta le AV o meno, se si marchiare le versioni del file delle versioni indicate in AV come buggy, altrimenti fare proportion.
 
 -Probabilmente toccherà anche fare tracking degli ultimi ticket bug tramite github issue, però qui potrei anche dire
 che non ho avuto il tempo e prenderla come assunzione, magari troncando la release.

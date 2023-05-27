@@ -289,7 +289,7 @@ public class ScraperController {
 
         System.out.println("\n" + ticketOfInterest.size() + " tickets of interest:");
         for (Ticket tmp : ticketOfInterest) {
-            String stringa=tmp.getKey() + " Resolution Date: " + tmp.getResolutionDate()+ " Fix Version: " + tmp.getFv() + " Creation Date: " + tmp.getCreationDate() + " Opening Version:" + tmp.getOv();
+            String stringa=tmp.getKey() + " Resolution Date: " + tmp.getResolutionDate()+ " Fix Version: " + tmp.getFv() +" Num: " +tmp.getFvNum()+ " Creation Date: " + tmp.getCreationDate() + " Opening Version:" + tmp.getOv() +" Num: " +tmp.getOvNum();
             System.out.println(stringa);
             System.out.println("\tAffected Versions: ");
             for(String av: tmp.getJiraAv()){
@@ -336,19 +336,21 @@ public class ScraperController {
         List<Release> releases = this.project.getReleasesOfInterest();
         SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
         for(Ticket ticket:tickets){
+            String ticketCreationDate=ticket.getCreationDate();
+            String ticketResDate=ticket.getResolutionDate();
             for(Release release:releases){
-                String ticketCreationDate=ticket.getCreationDate();
-                String ticketResDate=ticket.getResolutionDate();
+                String releaseNumber=release.getNumber();
+                String releaseName=release.getName();
                 String relCreationDate=release.getStartDate();
                 String relEndDate=release.getEndDate();
                 //ASSUNZIONE 12 condizione 2, ASSUNZIONE 13 condizione 1
-                if(((Objects.equals(release.getNumber(), "1"))&&(sdf.parse(ticketResDate).before(sdf.parse(relCreationDate))))||((sdf.parse(ticketResDate).compareTo(sdf.parse(relCreationDate))==0)||((sdf.parse(ticketCreationDate).compareTo(sdf.parse(relCreationDate))==0)||((sdf.parse(ticketResDate).after(sdf.parse(relCreationDate)))&&(sdf.parse(ticketResDate).before(sdf.parse(relEndDate))))))){
-                    ticket.setFv(release.getName());
-                    ticket.setFvNum(release.getNumber());
+                if(((Objects.equals(releaseNumber, "1"))&&(sdf.parse(ticketResDate).before(sdf.parse(relCreationDate))))||(sdf.parse(ticketResDate).compareTo(sdf.parse(relCreationDate))==0)||((sdf.parse(ticketResDate).after(sdf.parse(relCreationDate)))&&(sdf.parse(ticketResDate).before(sdf.parse(relEndDate))))){
+                    ticket.setFv(releaseName);
+                    ticket.setFvNum(releaseNumber);
                 }
-                else if(((Objects.equals(release.getNumber(), "1"))&&(sdf.parse(ticketCreationDate).before(sdf.parse(relCreationDate))))||((sdf.parse(ticketCreationDate).compareTo(sdf.parse(relCreationDate))==0)||((sdf.parse(ticketCreationDate).after(sdf.parse(relCreationDate)))&&(sdf.parse(ticketCreationDate).before(sdf.parse(relEndDate)))))){
-                    ticket.setOv(release.getName());
-                    ticket.setOvNum(release.getNumber());
+                if(((Objects.equals(release.getNumber(), "1"))&&(sdf.parse(ticketCreationDate).before(sdf.parse(relCreationDate))))||(sdf.parse(ticketCreationDate).compareTo(sdf.parse(relCreationDate))==0)||((sdf.parse(ticketCreationDate).after(sdf.parse(relCreationDate)))&&(sdf.parse(ticketCreationDate).before(sdf.parse(relEndDate))))){
+                    ticket.setOv(releaseName);
+                    ticket.setOvNum(releaseNumber);
                 }
             }
         }
