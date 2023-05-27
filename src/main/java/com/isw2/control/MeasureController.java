@@ -30,8 +30,6 @@ public class MeasureController {
             adjustMeasure(releaseFiles);
             CsvHandler.writeDataLineByLine(releaseFiles, i + 1);
         }
-
-
     }
 
     private void adjustMeasure(List<List<JavaFile>> releaseFiles){
