@@ -369,7 +369,6 @@ public class ScraperController {
                 }
             }
         }
-        return;
     }
 
     public void saveColdStartDataOnDb(){

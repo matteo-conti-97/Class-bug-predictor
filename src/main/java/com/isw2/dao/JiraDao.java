@@ -60,8 +60,7 @@ public class JiraDao {
         JSONArray releases = jsonReleases.getJSONArray("values");
         for (int i = 0; i < releases.length(); i++) {
             JSONObject releaseJson = releases.getJSONObject(i);
-            if(!releaseJson.getBoolean("released")) continue; //skip unreleased versions
-            if(!releaseJson.has("releaseDate")) continue; //skip versions without release date
+            if((!releaseJson.getBoolean("released"))||(!releaseJson.has("releaseDate"))) continue; //skip unreleased versions
             String name = releaseJson.getString("name");
             String endDate = releaseJson.getString("releaseDate");
             Release release;

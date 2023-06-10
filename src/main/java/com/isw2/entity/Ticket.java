@@ -1,6 +1,5 @@
 package com.isw2.entity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Ticket {
