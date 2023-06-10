@@ -12,6 +12,14 @@ public class Release {
     private List<Ticket> tickets;
     private List<JavaFile> fileTreeAtReleaseEnd;
 
+    public Release(String name) {
+        this.name = name;
+    }
+
+    public Release(String name, int number) {
+        this.name = name;
+    }
+
     public Release(String name, int number, String startDate) {
         this.name = name;
         this.number = number;

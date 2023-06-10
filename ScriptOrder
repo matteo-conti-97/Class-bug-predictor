@@ -1,14 +1,4 @@
-package com.isw2;
-
-import com.isw2.control.MeasureController;
-import com.isw2.control.ScraperController;
-
-import java.sql.SQLException;
-import java.text.ParseException;
-
-
-public class Main {
-    private static final String AUTHOR = "apache";
+private static final String AUTHOR = "apache";
     private static final String[] COLD_START_PROJECTS = {
             "accumulo",
             "tajo",
@@ -35,4 +25,3 @@ public class Main {
         //bookkeeperMeasureController.createWalkForwardDatasets();
         //scraperController.saveColdStartInfoOnDb();
     }
-}

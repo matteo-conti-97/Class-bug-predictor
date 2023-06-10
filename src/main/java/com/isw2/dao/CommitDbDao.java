@@ -3,6 +3,7 @@ package com.isw2.dao;
 import com.isw2.entity.Commit;
 import com.isw2.entity.JavaFile;
 import com.isw2.entity.Release;
+import com.isw2.entity.Ticket;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -110,6 +111,25 @@ public class CommitDbDao {
             e.printStackTrace();
             System.out.println("Salvataggio touched files fallito");// definire un eccezione apposita con logger serio
             System.out.println("commitSha: " + commitSha + "commitId" + commitId + filename + " add: " + add + " del: " + del + " content: " + content + " project: " + project);
+        }
+    }
+
+    public void insertTicket(String key, String resDate, String creationDate, String projectName, String av){
+        try (PreparedStatement ps = conn.prepareStatement(
+                "INSERT INTO ticket(project, tkey, resDate, creationDate, av) VALUES(?,?,?,?,?)" +
+                        "ON DUPLICATE KEY UPDATE resDate = ?")) {
+
+            ps.setString(1, projectName);
+            ps.setString(2, key);
+            ps.setString(3, resDate);
+            ps.setString(4, creationDate);
+            ps.setString(5, av);
+            ps.setString(6, resDate);
+            ps.executeUpdate();
+
+        } catch (SQLException | NumberFormatException e) {
+            e.printStackTrace();
+            System.out.println("Salvataggio ticket fallito");// definire un eccezione apposita con logger serio
         }
     }
 
@@ -256,5 +276,69 @@ public class CommitDbDao {
             rs.close();
         }
         return ret;
+    }
+
+    private List<Ticket> getTicketSet(String project) throws SQLException {
+        ResultSet rs = null;
+        PreparedStatement ps = null;
+        List<Ticket> ret = new ArrayList<>();
+
+        try {
+            ps = conn.prepareStatement(
+                    "SELECT DISTINCT(tkey), resDate, creationDate FROM ticket WHERE ticket.project = ?");
+            ps.setString(1, project);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Ticket ticket = new Ticket(rs.getString("tkey"));
+                ticket.setCreationDate(rs.getString("creationDate"));
+                ticket.setResolutionDate(rs.getString("resDate"));
+                ret.add(ticket);
+            }
+            rs.close();
+            return ret;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Select ticket fallito");// definire un eccezione apposita con logger serio
+        } finally {
+            assert ps != null;
+            ps.close();
+            assert rs != null;
+            rs.close();
+        }
+        return ret;
+    }
+
+    public List<Ticket> getTickets(String project) throws SQLException {
+        ResultSet rs = null;
+        PreparedStatement ps = null;
+        List<Ticket> ticketSet= getTicketSet(project);
+
+        for(Ticket ticket: ticketSet) {
+            List<Release> av = new ArrayList<>();
+            try {
+                ps = conn.prepareStatement(
+                        "SELECT * FROM ticket AS t JOIN releases AS r ON t.av = r.rname " +
+                                "WHERE t.project = ? and r.project_name= ? and tkey= ?");
+                ps.setString(1, project);
+                ps.setString(2, project);
+                ps.setString(3, ticket.getKey());
+                rs = ps.executeQuery();
+                while (rs.next()) {
+                    av.add(new Release(rs.getString("rname"), Integer.parseInt(rs.getString("rnumber"))));
+                }
+                rs.close();
+                ticket.setJiraAv(av);
+            } catch (SQLException e) {
+                e.printStackTrace();
+                System.out.println("Select ticket "+ticket.getKey()+" fallito");// definire un eccezione apposita con logger serio
+            } finally {
+                assert ps != null;
+                ps.close();
+                assert rs != null;
+                rs.close();
+            }
+        }
+        return ticketSet;
     }
 }

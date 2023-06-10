@@ -173,9 +173,28 @@ public class ScraperController {
         }
     }
 
-    public void saveReleasesOnDb() {
+    public void saveReleasesOfInterestOnDb() {
         for (Release release : this.project.getReleasesOfInterest()) {
             commitDbDao.insertRelease(release.getName(), release.getNumber(), release.getStartDate(), release.getEndDate(), this.project.getName());
+        }
+    }
+
+    public void saveReleasesOnDb() {
+        for (Release release : this.project.getReleases()) {
+            commitDbDao.insertRelease(release.getName(), release.getNumber(), release.getStartDate(), release.getEndDate(), this.project.getName());
+        }
+    }
+
+    public void saveTicketsOnDb(){
+        for(Ticket ticket: this.project.getFixedBugTickets()){
+            if(ticket.getJiraAv().size()!=0){
+                for(Release av: ticket.getJiraAv()){
+                    commitDbDao.insertTicket(ticket.getKey(), ticket.getResolutionDate(), ticket.getCreationDate(), this.project.getName(), av.getName());
+                }
+            }
+            else {
+                commitDbDao.insertTicket(ticket.getKey(), ticket.getResolutionDate(), ticket.getCreationDate(), this.project.getName(), "");
+            }
         }
     }
 
@@ -201,6 +220,16 @@ public class ScraperController {
         List<Commit> ret = null;
         try {
             ret = commitDbDao.getCommits(this.project.getName());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return ret;
+    }
+
+    public List<Release> getReleasesFromDb(){
+        List<Release> ret = null;
+        try {
+            ret = commitDbDao.getReleases(this.project.getName());
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -285,15 +314,15 @@ public class ScraperController {
         setProjectFixedBugTickets(allTickets);
         List<Ticket> ticketOfInterest =getTicketsOfInterest(lastInterestReleaseEndDate);
         setProjectFixedBugTicketsOfInterest(ticketOfInterest);
-        linkTicketDatesToReleases();
+        linkTicketDatesToReleases(ticketOfInterest, releasesOfInterest);
 
         System.out.println("\n" + ticketOfInterest.size() + " tickets of interest:");
         for (Ticket tmp : ticketOfInterest) {
-            String stringa=tmp.getKey() + " Resolution Date: " + tmp.getResolutionDate()+ " Fix Version: " + tmp.getFv() +" Num: " +tmp.getFvNum()+ " Creation Date: " + tmp.getCreationDate() + " Opening Version:" + tmp.getOv() +" Num: " +tmp.getOvNum();
+            String stringa=tmp.getKey() + " Resolution Date: " + tmp.getResolutionDate()+ " Fix Version: " + tmp.getFv().getName() +" Num: " +tmp.getFv().getNumber()+ " Creation Date: " + tmp.getCreationDate() + " Opening Version:" + tmp.getOv().getName() +" Num: " +tmp.getOv().getNumber();
             System.out.println(stringa);
             System.out.println("\tAffected Versions: ");
-            for(String av: tmp.getJiraAv()){
-                System.out.println("\t\tVersion: "+av);
+            for(Release av: tmp.getJiraAv()){
+                System.out.println("\t\tVersion: "+av.getName());
             }
         }
     }
@@ -305,9 +334,10 @@ public class ScraperController {
         List<Release> releasesOfInterest = getReleasesOfInterest("4.5.0"); //Last release interest of bookeeper
         setProjectReleasesOfInterest(releasesOfInterest);
 
-        //ASSUNZIONE 5
+        //--ASSUNZIONE 5
         String lastInterestReleaseEndDate = "2017-06-16";
         setLastReleaseEndDateOfInterest(lastInterestReleaseEndDate);
+        //--ASSUNZIONE 5
 
         System.out.println("Project: " + getProjectName());
         System.out.println("Creation date: " + getProjectCreationDate());
@@ -316,7 +346,7 @@ public class ScraperController {
 
         saveProjectOnDb();
         saveCommitDataOnDb(lastInterestReleaseEndDate);
-        saveReleasesOnDb();
+        saveReleasesOfInterestOnDb();
 
         List<Commit> commits = getCommitsFromDb();
         setProjectCommits(commits);
@@ -325,35 +355,101 @@ public class ScraperController {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        //for (Release release : releasesOfInterest) {
-        //    System.out.println("Release: " + release.getName() + " number " + release.getNumber() + " has " + release.getCommits().size() + " commits and " + release.getFileTreeAtReleaseEnd().size() + " non test java files, starts at " + release.getStartDate() + " and ends at " + release.getEndDate());
-        //}
+        for (Release release : releasesOfInterest) {
+            System.out.println("Release: " + release.getName() + " number " + release.getNumber() + " has " + release.getCommits().size() + " commits and " + release.getFileTreeAtReleaseEnd().size() + " non test java files, starts at " + release.getStartDate() + " and ends at " + release.getEndDate());
+        }
         saveFileTreeOnDb();
     }
 
-    public void linkTicketDatesToReleases() throws ParseException {
-        List<Ticket> tickets=this.project.getFixedBugTicketsOfInterest();
-        List<Release> releases = this.project.getReleasesOfInterest();
+    public void linkTicketDatesToReleases(List<Ticket> tickets, List<Release> releases) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
         for(Ticket ticket:tickets){
             String ticketCreationDate=ticket.getCreationDate();
             String ticketResDate=ticket.getResolutionDate();
             for(Release release:releases){
                 String releaseNumber=release.getNumber();
-                String releaseName=release.getName();
                 String relCreationDate=release.getStartDate();
                 String relEndDate=release.getEndDate();
+                if(Objects.equals(ticket.getKey(), "ACCUMULO-4631")){
+                    System.out.println("ACCUMULO-4631 breakpoint");
+                }
                 //ASSUNZIONE 12 condizione 2, ASSUNZIONE 13 condizione 1
                 if(((Objects.equals(releaseNumber, "1"))&&(sdf.parse(ticketResDate).before(sdf.parse(relCreationDate))))||(sdf.parse(ticketResDate).compareTo(sdf.parse(relCreationDate))==0)||((sdf.parse(ticketResDate).after(sdf.parse(relCreationDate)))&&(sdf.parse(ticketResDate).before(sdf.parse(relEndDate))))){
-                    ticket.setFv(releaseName);
-                    ticket.setFvNum(releaseNumber);
+                    ticket.setFv(release);
                 }
                 if(((Objects.equals(release.getNumber(), "1"))&&(sdf.parse(ticketCreationDate).before(sdf.parse(relCreationDate))))||(sdf.parse(ticketCreationDate).compareTo(sdf.parse(relCreationDate))==0)||((sdf.parse(ticketCreationDate).after(sdf.parse(relCreationDate)))&&(sdf.parse(ticketCreationDate).before(sdf.parse(relEndDate))))){
-                    ticket.setOv(releaseName);
-                    ticket.setOvNum(releaseNumber);
+                    ticket.setOv(release);
                 }
             }
         }
+        return;
     }
+
+    public void saveColdStartDataOnDb(){
+        setProjectCreationDate();
+        List<Release> allReleases = getAllReleases();
+        setProjectReleases(allReleases);
+        List<Ticket> allTickets = getAllTickets();
+        setProjectFixedBugTickets(allTickets);
+
+        System.out.println("Project: " + getProjectName());
+        System.out.println("Creation date: " + getProjectCreationDate());
+        System.out.println("Releases: ");
+        for (Release release : allReleases) {
+            System.out.println("Release: " + release.getName() + " number " + release.getNumber() + " starts at " + release.getStartDate() + " and ends at " + release.getEndDate());
+        }
+        System.out.println("Tickets: ");
+        for (Ticket ticket : allTickets) {
+            String stringa=ticket.getKey() + " Resolution Date: " + ticket.getResolutionDate()+ " Creation Date: " + ticket.getCreationDate();
+            System.out.println(stringa);
+        }
+
+        saveProjectOnDb();
+        saveReleasesOnDb();
+        saveTicketsOnDb();
+    }
+
+    public void purgeTicketWithExceedingOvOrFv(List<Ticket> tickets){
+        List<Ticket> ticketToPurge=new ArrayList<>();
+        for(Ticket ticket:tickets){
+            if((ticket.getOv()==null)||(ticket.getFv()==null)){
+                ticketToPurge.add(ticket);
+            }
+        }
+        for(Ticket ticket:ticketToPurge){
+            tickets.remove(ticket);
+        }
+    }
+
+    public void getColdStartDataFromDb() throws ParseException, SQLException {
+        setProjectCreationDate();
+        List<Release> releases = getReleasesFromDb();
+        System.out.println("Project: " + getProjectName());
+        System.out.println("Creation date: " + getProjectCreationDate());
+        System.out.println("\nReleases: ");
+        for (Release release : releases) {
+            System.out.println("Release: " + release.getName() + " number " + release.getNumber() + " starts at " + release.getStartDate() + " and ends at " + release.getEndDate());
+        }
+        List<Ticket> allTickets = commitDbDao.getTickets(this.project.getName());
+
+        linkTicketDatesToReleases(allTickets, releases);
+        purgeTicketWithExceedingOvOrFv(allTickets);
+        setProjectFixedBugTickets(allTickets);
+        setProjectReleases(releases);
+
+        System.out.println("\n" + allTickets.size() + " tickets:");
+        for (Ticket ticket : allTickets) {
+            if(Objects.equals(ticket.getKey(), "ACCUMULO-4631")){
+                System.out.println("ACCUMULO-4631 breakpoint");
+            }
+            String stringa=ticket.getKey() + " Resolution Date: " + ticket.getResolutionDate()+ " Fix Version: " + ticket.getFv().getName() +" Num: " +ticket.getFv().getNumber()+ " Creation Date: " + ticket.getCreationDate() + " Opening Version:" + ticket.getOv().getName() +" Num: " +ticket.getOv().getNumber();
+            System.out.println(stringa);
+            System.out.println("\tAffected Versions: ");
+            for(Release av: ticket.getJiraAv()){
+                System.out.println("\t\tVersion: "+av.getName());
+            }
+        }
+    }
+
 
 }

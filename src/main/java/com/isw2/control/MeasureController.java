@@ -9,9 +9,23 @@ import java.util.Objects;
 
 public class MeasureController {
     private final Project project;
+    private List<Project> coldStartProportionProjects;
 
     public MeasureController(Project project) {
         this.project = project;
+        this.coldStartProportionProjects = new ArrayList<>();
+    }
+
+    public List<Project> getColdStartProportionProjects() {
+        return coldStartProportionProjects;
+    }
+
+    public void setColdStartProportionProjects(List<Project> coldStartProportionProjects) {
+        this.coldStartProportionProjects = coldStartProportionProjects;
+    }
+
+    public void addColdStartProportionProject(Project project) {
+        this.coldStartProportionProjects.add(project);
     }
 
     public void createWalkForwardDatasets() {
@@ -139,6 +153,11 @@ public class MeasureController {
             }
         }
         return ret;
+    }
+
+    public int computeColdStartProportion(){
+        //proportion formula p=(fv-iv)/(fv-ov) TODO
+        return 0;
     }
 
 }

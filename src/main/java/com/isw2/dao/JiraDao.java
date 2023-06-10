@@ -1,5 +1,6 @@
 package com.isw2.dao;
 
+import com.isw2.entity.Project;
 import com.isw2.entity.Release;
 import com.isw2.entity.Ticket;
 import com.isw2.util.JsonParser;
@@ -16,9 +17,28 @@ public class JiraDao {
     private final String projectName;
     private static final String FIXED_BUG_QUERY = "https://issues.apache.org/jira/rest/api/2/search?jql=project='%s'AND'issueType'='Bug'AND('status'='closed'OR'status'='resolved')AND'resolution'='fixed'&fields=key,resolutiondate,versions,created&startAt=%s&maxResults=%s";
     private static final String ALL_RELEASE_QUERY = "https://issues.apache.org/jira/rest/api/2/project/%s/version?maxResults=1000&orderBy=releaseDate&status=released";
+    private static final String ALL_PROJECTS_QUERY = "https://issues.apache.org/jira/rest/api/2/project/";
 
     public JiraDao(String projectName) {
         this.projectName = projectName.toUpperCase();
+    }
+
+    public List<Project> getAllProjects(){
+        List<Project> ret = new ArrayList<>();
+        JsonParser jsonParser = new JsonParser();
+        JSONArray projectJsonList=null;
+        try {
+            projectJsonList = jsonParser.readJsonArrayFromUrl(ALL_PROJECTS_QUERY);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assert projectJsonList != null;
+        for(int i=0;i<projectJsonList.length();i++){
+            JSONObject projectJson = projectJsonList.getJSONObject(i);
+            String name = projectJson.getString("key");
+            ret.add(new Project(name, "apache"));
+        }
+        return ret;
     }
 
     /*
@@ -40,6 +60,8 @@ public class JiraDao {
         JSONArray releases = jsonReleases.getJSONArray("values");
         for (int i = 0; i < releases.length(); i++) {
             JSONObject releaseJson = releases.getJSONObject(i);
+            if(!releaseJson.getBoolean("released")) continue; //skip unreleased versions
+            if(!releaseJson.has("releaseDate")) continue; //skip versions without release date
             String name = releaseJson.getString("name");
             String endDate = releaseJson.getString("releaseDate");
             Release release;
@@ -57,7 +79,7 @@ public class JiraDao {
         Ticket ret = new Ticket(key, ticketId, ticketUrl);
         JsonParser jsonParser = new JsonParser();
         JSONObject jsonTicket = null;
-        List<String> affectedVersions = new ArrayList<>();
+        List<Release> affectedVersions = new ArrayList<>();
         try {
             jsonTicket = jsonParser.readJsonFromUrl(ticketUrl);
         } catch (IOException e) {
@@ -67,10 +89,13 @@ public class JiraDao {
         JSONObject ticketFields = jsonTicket.getJSONObject("fields");
         String creationDate = ticketFields.getString("created").substring(0, 10);
         String resolutionDate = ticketFields.getString("resolutiondate").substring(0, 10);
-        JSONArray affectedVersionsJson = ticketFields.getJSONArray("versions");
-        for(int i=0; i<affectedVersionsJson.length(); i++){
-            JSONObject avJson= affectedVersionsJson.getJSONObject(i);
-            affectedVersions.add(avJson.getString("name"));
+        if(ticketFields.has("versions")) {
+            JSONArray affectedVersionsJson = ticketFields.getJSONArray("versions");
+
+            for (int i = 0; i < affectedVersionsJson.length(); i++) {
+                JSONObject avJson = affectedVersionsJson.getJSONObject(i);
+                affectedVersions.add(new Release(avJson.getString("name")));
+            }
         }
         ret.setJiraAv(affectedVersions);
         ret.setCreationDate(creationDate);

@@ -1,5 +1,6 @@
 package com.isw2.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Ticket {
@@ -8,18 +9,21 @@ public class Ticket {
     private String ticketUrl;
     private String creationDate;
     private String resolutionDate;
-    private String ov;
-    private String ovNum;
-    private String fv; //Not the jira fix version, but the git fix commit using SZZ approach
-    private String fvNum;
-    private List<String> jiraAv;
-    private List<String> proportionAv; //Not always jira is trustable
+    private Release ov;
+    private Release fv; //Not the jira fix version, but the git fix commit using SZZ approach
+    private List<Release> jiraAv;
+    private List<Release> proportionAv; //Not always jira is trustable
     private List<Commit> gitCommits;
 
     public Ticket(String key, String ticketId, String ticketUrl) {
         this.key = key;
         this.ticketId = ticketId;
         this.ticketUrl = ticketUrl;
+    }
+
+
+    public Ticket(String key) {
+        this.key = key;
     }
 
     public String getTicketId() {
@@ -63,35 +67,35 @@ public class Ticket {
         this.resolutionDate = resolutionDate;
     }
 
-    public String getOv() {
+    public Release getOv() {
         return ov;
     }
 
-    public void setOv(String ov) {
+    public void setOv(Release ov) {
         this.ov = ov;
     }
 
-    public String getFv() {
+    public Release getFv() {
         return fv;
     }
 
-    public void setFv(String fv) {
+    public void setFv(Release fv) {
         this.fv = fv;
     }
 
-    public List<String> getJiraAv() {
+    public List<Release> getJiraAv() {
         return jiraAv;
     }
 
-    public void setJiraAv(List<String> jiraAv) {
+    public void setJiraAv(List<Release> jiraAv) {
         this.jiraAv = jiraAv;
     }
 
-    public List<String> getProportionAv() {
+    public List<Release> getProportionAv() {
         return proportionAv;
     }
 
-    public void setProportionAv(List<String> proportionAv) {
+    public void setProportionAv(List<Release> proportionAv) {
         this.proportionAv = proportionAv;
     }
 
@@ -102,20 +106,5 @@ public class Ticket {
     public void setGitCommits(List<Commit> gitCommits) {
         this.gitCommits = gitCommits;
     }
-
-    public String getOvNum() {
-        return ovNum;
-    }
-
-    public void setOvNum(String ovNum) {
-        this.ovNum = ovNum;
-    }
-
-    public String getFvNum() {
-        return fvNum;
-    }
-
-    public void setFvNum(String fvNum) {
-        this.fvNum = fvNum;
-    }
 }
+
