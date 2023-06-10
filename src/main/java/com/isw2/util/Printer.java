@@ -1,5 +1,6 @@
 package com.isw2.util;
 
+import com.isw2.entity.Project;
 import com.isw2.entity.Release;
 import com.isw2.entity.Ticket;
 
@@ -7,7 +8,8 @@ import java.util.List;
 
 public class Printer {
 
-    public static void printTickets(List<Ticket> tickets){
+    public static void printTicketsDetailed(List<Ticket> tickets){
+        System.out.println("\n" + tickets.size() + " tickets:");
         for (Ticket tmp : tickets) {
             String stringa=tmp.getKey() + " Resolution Date: " + tmp.getResolutionDate()+ " Fix Version: " + tmp.getFv().getName() +" Num: " +tmp.getFv().getNumber()+ " Creation Date: " + tmp.getCreationDate() + " Opening Version:" + tmp.getOv().getName() +" Num: " +tmp.getOv().getNumber();
             System.out.println(stringa);
@@ -15,6 +17,26 @@ public class Printer {
             for(Release av: tmp.getJiraAv()){
                 System.out.println("\t\tVersion: "+av.getName());
             }
+        }
+    }
+
+    public static void printTicketsBasic(List<Ticket> tickets){
+        System.out.println("\n" + tickets.size() + " tickets:");
+        for (Ticket ticket : tickets) {
+            String stringa=ticket.getKey() + " Resolution Date: " + ticket.getResolutionDate()+ " Creation Date: " + ticket.getCreationDate();
+            System.out.println(stringa);
+        }
+    }
+
+    public static void printProjectInfo(Project project){
+        System.out.println("Project: " + project.getName());
+        System.out.println("Creation date: " + project.getCreationDate());
+    }
+
+    public static void printReleases(List<Release> releases){
+        System.out.println("Releases of interest: ");
+        for (Release release : releases) {
+            System.out.println("Release: " + release.getName() + " number " + release.getNumber() + " has " + release.getCommits().size() + " commits and " + release.getFileTreeAtReleaseEnd().size() + " non test java files, starts at " + release.getStartDate() + " and ends at " + release.getEndDate());
         }
     }
 }

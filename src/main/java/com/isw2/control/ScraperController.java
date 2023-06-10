@@ -317,8 +317,8 @@ public class ScraperController {
         setProjectFixedBugTicketsOfInterest(ticketOfInterest);
         linkTicketDatesToReleases(ticketOfInterest, releasesOfInterest);
 
-        System.out.println("\n" + ticketOfInterest.size() + " tickets of interest:");
-        Printer.printTickets(ticketOfInterest);
+
+        Printer.printTicketsDetailed(ticketOfInterest);
     }
 
     public void saveProjectDataOnDb() {
@@ -333,10 +333,7 @@ public class ScraperController {
         setLastReleaseEndDateOfInterest(lastInterestReleaseEndDate);
         //--ASSUNZIONE 5
 
-        System.out.println("Project: " + getProjectName());
-        System.out.println("Creation date: " + getProjectCreationDate());
-        System.out.println("Last interest release end date: " + lastInterestReleaseEndDate);
-        System.out.println("Releases of interest: ");
+        Printer.printProjectInfo(this.project);
 
         saveProjectOnDb();
         saveCommitDataOnDb(lastInterestReleaseEndDate);
@@ -349,9 +346,8 @@ public class ScraperController {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        for (Release release : releasesOfInterest) {
-            System.out.println("Release: " + release.getName() + " number " + release.getNumber() + " has " + release.getCommits().size() + " commits and " + release.getFileTreeAtReleaseEnd().size() + " non test java files, starts at " + release.getStartDate() + " and ends at " + release.getEndDate());
-        }
+
+        Printer.printReleases(releasesOfInterest);
         saveFileTreeOnDb();
     }
 
@@ -383,17 +379,9 @@ public class ScraperController {
         List<Ticket> allTickets = getAllTickets();
         setProjectFixedBugTickets(allTickets);
 
-        System.out.println("Project: " + getProjectName());
-        System.out.println("Creation date: " + getProjectCreationDate());
-        System.out.println("Releases: ");
-        for (Release release : allReleases) {
-            System.out.println("Release: " + release.getName() + " number " + release.getNumber() + " starts at " + release.getStartDate() + " and ends at " + release.getEndDate());
-        }
-        System.out.println("Tickets: ");
-        for (Ticket ticket : allTickets) {
-            String stringa=ticket.getKey() + " Resolution Date: " + ticket.getResolutionDate()+ " Creation Date: " + ticket.getCreationDate();
-            System.out.println(stringa);
-        }
+        Printer.printProjectInfo(this.project);
+        Printer.printReleases(allReleases);
+        Printer.printTicketsBasic(allTickets);
 
         saveProjectOnDb();
         saveReleasesOnDb();
@@ -428,8 +416,7 @@ public class ScraperController {
         setProjectFixedBugTickets(allTickets);
         setProjectReleases(releases);
 
-        System.out.println("\n" + allTickets.size() + " tickets:");
-        Printer.printTickets(allTickets);
+        Printer.printTicketsDetailed(allTickets);
     }
 
 
