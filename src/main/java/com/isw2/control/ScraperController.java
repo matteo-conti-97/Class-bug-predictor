@@ -4,6 +4,7 @@ import com.isw2.dao.CommitDbDao;
 import com.isw2.dao.GitDao;
 import com.isw2.dao.JiraDao;
 import com.isw2.entity.*;
+import com.isw2.util.Printer;
 
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -187,7 +188,7 @@ public class ScraperController {
 
     public void saveTicketsOnDb(){
         for(Ticket ticket: this.project.getFixedBugTickets()){
-            if(ticket.getJiraAv().size()!=0){
+            if(!ticket.getJiraAv().isEmpty()){
                 for(Release av: ticket.getJiraAv()){
                     commitDbDao.insertTicket(ticket.getKey(), ticket.getResolutionDate(), ticket.getCreationDate(), this.project.getName(), av.getName());
                 }
@@ -317,14 +318,7 @@ public class ScraperController {
         linkTicketDatesToReleases(ticketOfInterest, releasesOfInterest);
 
         System.out.println("\n" + ticketOfInterest.size() + " tickets of interest:");
-        for (Ticket tmp : ticketOfInterest) {
-            String stringa=tmp.getKey() + " Resolution Date: " + tmp.getResolutionDate()+ " Fix Version: " + tmp.getFv().getName() +" Num: " +tmp.getFv().getNumber()+ " Creation Date: " + tmp.getCreationDate() + " Opening Version:" + tmp.getOv().getName() +" Num: " +tmp.getOv().getNumber();
-            System.out.println(stringa);
-            System.out.println("\tAffected Versions: ");
-            for(Release av: tmp.getJiraAv()){
-                System.out.println("\t\tVersion: "+av.getName());
-            }
-        }
+        Printer.printTickets(ticketOfInterest);
     }
 
     public void saveProjectDataOnDb() {
@@ -370,9 +364,6 @@ public class ScraperController {
                 String releaseNumber=release.getNumber();
                 String relCreationDate=release.getStartDate();
                 String relEndDate=release.getEndDate();
-                if(Objects.equals(ticket.getKey(), "ACCUMULO-4631")){
-                    System.out.println("ACCUMULO-4631 breakpoint");
-                }
                 //ASSUNZIONE 12 condizione 2, ASSUNZIONE 13 condizione 1
                 if(((Objects.equals(releaseNumber, "1"))&&(sdf.parse(ticketResDate).before(sdf.parse(relCreationDate))))||(sdf.parse(ticketResDate).compareTo(sdf.parse(relCreationDate))==0)||((sdf.parse(ticketResDate).after(sdf.parse(relCreationDate)))&&(sdf.parse(ticketResDate).before(sdf.parse(relEndDate))))){
                     ticket.setFv(release);
@@ -438,17 +429,7 @@ public class ScraperController {
         setProjectReleases(releases);
 
         System.out.println("\n" + allTickets.size() + " tickets:");
-        for (Ticket ticket : allTickets) {
-            if(Objects.equals(ticket.getKey(), "ACCUMULO-4631")){
-                System.out.println("ACCUMULO-4631 breakpoint");
-            }
-            String stringa=ticket.getKey() + " Resolution Date: " + ticket.getResolutionDate()+ " Fix Version: " + ticket.getFv().getName() +" Num: " +ticket.getFv().getNumber()+ " Creation Date: " + ticket.getCreationDate() + " Opening Version:" + ticket.getOv().getName() +" Num: " +ticket.getOv().getNumber();
-            System.out.println(stringa);
-            System.out.println("\tAffected Versions: ");
-            for(Release av: ticket.getJiraAv()){
-                System.out.println("\t\tVersion: "+av.getName());
-            }
-        }
+        Printer.printTickets(allTickets);
     }
 
 
