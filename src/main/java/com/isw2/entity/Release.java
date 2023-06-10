@@ -18,6 +18,7 @@ public class Release {
 
     public Release(String name, int number) {
         this.name = name;
+        this.number = number;
     }
 
     public Release(String name, int number, String startDate) {
