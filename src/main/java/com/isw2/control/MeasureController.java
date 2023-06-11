@@ -156,32 +156,37 @@ public class MeasureController {
         return ret;
     }
 
+    private double computeProjectColdStartProportion(Project project){
+        System.out.println("Computing proportion for "+project.getName());
+        double projPropSum=0;
+        double projPropCnt=0;
+
+        for(Ticket ticket: project.getFixedBugTickets()){
+            if(!ticket.getJiraAv().isEmpty()){
+                int fv=ticket.getFv().getNumber();
+                int ov=ticket.getOv().getNumber();
+                List<Integer> avs=new ArrayList<>();
+                for(Release rel: ticket.getJiraAv()){
+                    avs.add(rel.getNumber());
+                }
+                int iv = Collections.min(avs);
+                if((fv==ov)||(fv==iv)||(fv<ov)||(fv<iv)||(ov<iv)){ //Casi inconsistenti
+                    continue;
+                }
+                projPropCnt++;
+                double prop = (double) (fv - iv) /(fv-ov);
+                projPropSum+= prop;
+            }
+        }
+        return projPropSum/projPropCnt;
+    }
+
     public double computeColdStartProportion(){
-        //proportion formula p=(fv-iv)/(fv-ov) TODO: Aggiustare il calcolo in modo da scartare i casi con FV=OV o FV=IV
         double allPropSum=0;
         int allPropCnt=this.coldStartProportionProjects.size();
-        System.out.println("There are "+allPropCnt+" projects");
         for(Project project: this.coldStartProportionProjects){
-            System.out.println("Computing proportion for "+project.getName());
-            double projPropSum=0;
-            double projPropCnt=0;
-
-            for(Ticket ticket: project.getFixedBugTickets()){
-                if(!ticket.getJiraAv().isEmpty()){
-                    projPropCnt++;
-                    int iv=ticket.getFv().getNumber();
-                    int ov=ticket.getOv().getNumber();
-                    List<Integer> avs=new ArrayList<>();
-                    for(Release rel: ticket.getJiraAv()){
-                        avs.add(rel.getNumber());
-                    }
-                    int av = Collections.min(avs);
-                    projPropSum+= (double) (iv - av) /(iv-ov);
-                    System.out.println("Ticket " + ticket.getKey()+ " has fv= "+iv+" ov= "+ov+" av= "+av+" and proportion="+ (double) (iv - av) /(iv-ov));
-
-                }
-            }
-            allPropSum+=projPropSum/projPropCnt;
+            double projProp=computeProjectColdStartProportion(project);
+            allPropSum+=projProp;
         }
 
         return allPropSum/allPropCnt;

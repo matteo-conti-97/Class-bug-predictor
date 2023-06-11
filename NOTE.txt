@@ -1,1 +1,1 @@
--Su db salvo solo le release di interesse
+-Proportion cold start è 1.847895778301325

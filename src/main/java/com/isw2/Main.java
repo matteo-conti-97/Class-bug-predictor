@@ -15,7 +15,6 @@ public class Main {
             {"pig", "0.13.0"},
             {"syncope", "2.0.4"},
             {"avro", "1.7.0"},
-            {"cassandra", "2.2.1"},
             {"hadoop", "2.6.4"},
             {"kafka", "2.6.2"}
     };
@@ -32,7 +31,7 @@ public class Main {
             scraperController.getColdStartDataFromDb();
             bookkeeperMeasureController.addColdStartProportionProject(scraperController.getProject());
         }
-        System.out.println("Proportion: " + bookkeeperMeasureController.computeColdStartProportion());
+        System.out.println("Cold start proportion: " + bookkeeperMeasureController.computeColdStartProportion());
         //bookkeeperMeasureController.createWalkForwardDatasets();
         //scraperController.saveColdStartInfoOnDb();
     }
