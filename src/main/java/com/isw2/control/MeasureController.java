@@ -170,7 +170,7 @@ public class MeasureController {
                     avs.add(rel.getNumber());
                 }
                 int iv = Collections.min(avs);
-                if((fv==ov)||(fv==iv)||(fv<ov)||(fv<iv)||(ov<iv)){ //Casi inconsistenti
+                if((fv==ov)||(fv==iv)||(fv<ov)||(fv<iv)||(ov<iv)){ //ASSUNZIONE 14
                     continue;
                 }
                 projPropCnt++;
@@ -178,6 +178,7 @@ public class MeasureController {
                 projPropSum+= prop;
             }
         }
+        assert projPropCnt!=0;
         return projPropSum/projPropCnt;
     }
 

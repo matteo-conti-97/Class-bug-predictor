@@ -33,3 +33,6 @@ devo avere churn=loc=locAdded
 12-Se il ticket viene creato o risolto nella data di inizio di una release o di fine della precedente lo considero appartenente alla nuova release
 
 13-Se il ticket viene creato o risolto prima della data di inizio della prima release, lo accorpo alla prima release
+
+14-I casi in cui il calcolo di proportion è inconsistente o inutile sono stati ignorati, in particolare si è ignorato quand
+fv=iv, fv=ov, fv<iv, fv<ov ed ov<iv
