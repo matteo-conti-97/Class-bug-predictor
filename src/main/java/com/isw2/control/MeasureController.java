@@ -4,6 +4,7 @@ import com.isw2.entity.*;
 import com.isw2.util.CsvHandler;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -155,9 +156,35 @@ public class MeasureController {
         return ret;
     }
 
-    public int computeColdStartProportion(){
-        //proportion formula p=(fv-iv)/(fv-ov) TODO
-        return 0;
+    public double computeColdStartProportion(){
+        //proportion formula p=(fv-iv)/(fv-ov) TODO: Aggiustare il calcolo in modo da scartare i casi con FV=OV o FV=IV
+        double allPropSum=0;
+        int allPropCnt=this.coldStartProportionProjects.size();
+        System.out.println("There are "+allPropCnt+" projects");
+        for(Project project: this.coldStartProportionProjects){
+            System.out.println("Computing proportion for "+project.getName());
+            double projPropSum=0;
+            double projPropCnt=0;
+
+            for(Ticket ticket: project.getFixedBugTickets()){
+                if(!ticket.getJiraAv().isEmpty()){
+                    projPropCnt++;
+                    int iv=ticket.getFv().getNumber();
+                    int ov=ticket.getOv().getNumber();
+                    List<Integer> avs=new ArrayList<>();
+                    for(Release rel: ticket.getJiraAv()){
+                        avs.add(rel.getNumber());
+                    }
+                    int av = Collections.min(avs);
+                    projPropSum+= (double) (iv - av) /(iv-ov);
+                    System.out.println("Ticket " + ticket.getKey()+ " has fv= "+iv+" ov= "+ov+" av= "+av+" and proportion="+ (double) (iv - av) /(iv-ov));
+
+                }
+            }
+            allPropSum+=projPropSum/projPropCnt;
+        }
+
+        return allPropSum/allPropCnt;
     }
 
 }

@@ -46,8 +46,12 @@ public class Release {
         this.name = name;
     }
 
-    public String getNumber() {
+    public String getNumberStr() {
         return Integer.toString(number);
+    }
+
+    public int getNumber() {
+        return number;
     }
 
     public void setNumber(int number) {

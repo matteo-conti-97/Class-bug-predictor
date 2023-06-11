@@ -11,7 +11,7 @@ public class Printer {
     public static void printTicketsDetailed(List<Ticket> tickets){
         System.out.println("\n" + tickets.size() + " tickets:");
         for (Ticket tmp : tickets) {
-            String stringa=tmp.getKey() + " Resolution Date: " + tmp.getResolutionDate()+ " Fix Version: " + tmp.getFv().getName() +" Num: " +tmp.getFv().getNumber()+ " Creation Date: " + tmp.getCreationDate() + " Opening Version:" + tmp.getOv().getName() +" Num: " +tmp.getOv().getNumber();
+            String stringa=tmp.getKey() + " Resolution Date: " + tmp.getResolutionDate()+ " Fix Version: " + tmp.getFv().getName() +" Num: " +tmp.getFv().getNumberStr()+ " Creation Date: " + tmp.getCreationDate() + " Opening Version:" + tmp.getOv().getName() +" Num: " +tmp.getOv().getNumberStr();
             System.out.println(stringa);
             System.out.println("\tAffected Versions: ");
             for(Release av: tmp.getJiraAv()){
@@ -33,10 +33,17 @@ public class Printer {
         System.out.println("Creation date: " + project.getCreationDate());
     }
 
-    public static void printReleases(List<Release> releases){
+    public static void printReleasesDetailed(List<Release> releases){
         System.out.println("Releases of interest: ");
         for (Release release : releases) {
-            System.out.println("Release: " + release.getName() + " number " + release.getNumber() + " has " + release.getCommits().size() + " commits and " + release.getFileTreeAtReleaseEnd().size() + " non test java files, starts at " + release.getStartDate() + " and ends at " + release.getEndDate());
+            System.out.println("Release: " + release.getName() + " number " + release.getNumberStr() + " has " + release.getCommits().size() + " commits and " + release.getFileTreeAtReleaseEnd().size() + " non test java files, starts at " + release.getStartDate() + " and ends at " + release.getEndDate());
+        }
+    }
+
+    public static void printReleasesBasic(List<Release> releases){
+        System.out.println("Releases of interest: ");
+        for (Release release : releases) {
+            System.out.println("Release: " + release.getName() + " number " + release.getNumberStr() + " starts at " + release.getStartDate() + " and ends at " + release.getEndDate());
         }
     }
 }
