@@ -185,8 +185,8 @@ public class MeasureController {
     public double computeColdStartProportion(){
         double allPropSum=0;
         int allPropCnt=this.coldStartProportionProjects.size();
-        for(Project project: this.coldStartProportionProjects){
-            double projProp=computeProjectColdStartProportion(project);
+        for(Project proj: this.coldStartProportionProjects){
+            double projProp=computeProjectColdStartProportion(proj);
             allPropSum+=projProp;
         }
 

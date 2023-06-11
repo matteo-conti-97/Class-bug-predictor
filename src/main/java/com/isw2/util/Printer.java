@@ -8,6 +8,8 @@ import java.util.List;
 
 public class Printer {
 
+    private Printer(){}
+
     public static void printTicketsDetailed(List<Ticket> tickets){
         System.out.println("\n" + tickets.size() + " tickets:");
         for (Ticket tmp : tickets) {
