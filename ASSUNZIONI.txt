@@ -34,5 +34,8 @@ devo avere churn=loc=locAdded
 
 13-Se il ticket viene creato o risolto prima della data di inizio della prima release, lo accorpo alla prima release
 
-14-I casi in cui il calcolo di proportion è inconsistente o inutile sono stati ignorati, in particolare si è ignorato quand
+14-I casi in cui il calcolo di proportion è inconsistente o inutile sono stati ignorati, in particolare si è ignorato quando
 fv=iv, fv=ov, fv<iv, fv<ov ed ov<iv
+
+15-Nel calcolo dell'IV version con proportion se parto da FV<=OV considero IV=FV quindi essenzialmente marchio come buggy
+solo la versione corrente, perchè anche calcolare proportion a mano non avrebbe senso

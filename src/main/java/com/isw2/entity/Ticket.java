@@ -8,6 +8,7 @@ public class Ticket {
     private String ticketUrl;
     private String creationDate;
     private String resolutionDate;
+    private int iv;
     private Release ov;
     private Release fv; //Not the jira fix version, but the git fix commit using SZZ approach
     private List<Release> jiraAv;
@@ -24,6 +25,10 @@ public class Ticket {
     public Ticket(String key) {
         this.key = key;
     }
+
+    public int getIv(){return iv;}
+
+    public void setIv(int iv){this.iv = iv;}
 
     public String getTicketId() {
         return ticketId;

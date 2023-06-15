@@ -24,14 +24,17 @@ public class Main {
         bookkeeperScraperController.getProjectDataFromDb();
         //bookkeeperScraperController.saveProjectDataOnDb("4.5.0", "2017-06-16");
         MeasureController bookkeeperMeasureController = new MeasureController(bookkeeperScraperController.getProject());
-        /*for(String[] project: COLD_START_PROJECTS) {
+        for(String[] project: COLD_START_PROJECTS) {
             System.out.println("Processing cold start data of project: " + project[0] +" until release "+ project[1]);
             ScraperController scraperController = new ScraperController(project[0], AUTHOR);
             //scraperController.saveColdStartDataOnDb(project[1]);
             scraperController.getColdStartDataFromDb();
             bookkeeperMeasureController.addColdStartProportionProject(scraperController.getProject());
         }
-        System.out.println("Cold start proportion: " + bookkeeperMeasureController.computeColdStartProportion());*/
+        double coldStartProportion=bookkeeperMeasureController.computeColdStartProportion();
+        System.out.println("Cold start proportion: " + coldStartProportion);
+        bookkeeperMeasureController.setColdStartProportion(coldStartProportion);
+
         bookkeeperMeasureController.createWalkForwardDatasets();
     }
 }

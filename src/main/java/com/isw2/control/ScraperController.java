@@ -316,8 +316,7 @@ public class ScraperController {
         List<Ticket> ticketOfInterest =getTicketsOfInterest(lastInterestReleaseEndDate);
         setProjectFixedBugTicketsOfInterest(ticketOfInterest);
         linkTicketDatesToReleases(ticketOfInterest, releasesOfInterest);
-
-
+        purgeTicketWithExceedingOvOrFv(ticketOfInterest);
         Printer.printTicketsBasic(ticketOfInterest);
     }
 

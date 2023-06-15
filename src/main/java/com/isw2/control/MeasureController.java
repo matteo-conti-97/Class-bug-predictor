@@ -11,10 +11,19 @@ import java.util.Objects;
 public class MeasureController {
     private final Project project;
     private List<Project> coldStartProportionProjects;
+    private double coldStartProportion;
 
     public MeasureController(Project project) {
         this.project = project;
         this.coldStartProportionProjects = new ArrayList<>();
+    }
+
+    public double getColdStartProportion() {
+        return coldStartProportion;
+    }
+
+    public void setColdStartProportion(double coldStartProportion) {
+        this.coldStartProportion = coldStartProportion;
     }
 
     public List<Project> getColdStartProportionProjects() {
@@ -48,8 +57,9 @@ public class MeasureController {
         }
     }
 
-    private void szzFile(JavaFile file, List<Commit> releaseCommit, List<Ticket> tickets){
+    private void computeFileBuggyness(JavaFile file, List<Commit> releaseCommit, List<Ticket> tickets, List<List<JavaFile>> releaseFiles, double proportion){
         List<JavaFile> processedFiles=new ArrayList<>();
+        computeTicketsIv(tickets, proportion);
         for(Commit commit:releaseCommit){
             for(JavaFile touchedFile:commit.getTouchedFiles()){
                 if((touchedFile.getName().equals(file.getName()))&&(Collections.frequency(processedFiles,file)<1) ){
@@ -57,6 +67,8 @@ public class MeasureController {
                     int fixCount=countFixCommit(commit,tickets);
                     if (fixCount > 0) {
                         file.setBuggy("1");
+                        //TODO prendere i ticket relativi a ticket bug della classe e a seconda dell'iv
+                        // di quel ticket marchiare il file nelle release precedenti
                     } else {
                         file.setBuggy("0");
                     }
@@ -65,24 +77,54 @@ public class MeasureController {
             }
         }
     }
-    //TODO: da implementare
-    private void measureBuggy(List<List<JavaFile>> releasesFiles, List<List<Commit>> commits, List<Ticket> tickets){
-        int relNum= releasesFiles.size();
-        List<JavaFile> lastRelFiles= releasesFiles.get(relNum-1);
-        List<Commit> lastRelCommits= commits.get(relNum-1);
-        for(JavaFile file:lastRelFiles){
-            szzFile(file,lastRelCommits,tickets);
-        }
 
-        /*TODO ad ogni giro mi faccio szz sull'ultima release e proportion sui ticket dell'ultima release
-        * nelle passate successive in cui faccio solo proportion?
-        */
-        /*if((relNum>1)&&(relNum<5)){ //SZZ + Cold Start Proportion
-            return;//TODO
+
+    private void computeTicketsIv(List<Ticket> tickets, double proportion) {
+        for(Ticket ticket:tickets){
+            int fv=ticket.getFv().getNumber();
+            int ov=ticket.getOv().getNumber();
+            if(fv<=ov){ //ASSUNZIONE 15
+                //System.out.println("Ticket " + ticket.getKey() + " ha IV=FV perche fv è " + ticket.getFv().getName()+" num "+fv + " e ov è " + ticket.getOv().getName()+" num "+ ov);
+                ticket.setIv(fv);
+            }else{
+                if(!ticket.getJiraAv().isEmpty()){
+                    List<Integer> avsNum=new ArrayList<>();
+                    for(Release av:ticket.getJiraAv()){
+                        avsNum.add(av.getNumber());
+                    }
+                    int iv= Collections.min(avsNum)+1; //Perche la prima release deve essere 1 ma quando ho popolato ho omesso il +1
+                    if(fv >= iv && ov >= iv) { //ASSUNZIONE 14
+                        //System.out.println("Ticket aveva jira AV non vuote" + ticket.getKey() + " ha IV " + ticket.getIv() + " perche fv è " + ticket.getFv().getName()+" num "+fv + " e ov è " + ticket.getOv().getName()+" num "+ ov);
+                        ticket.setIv(iv);
+                    }
+                }
+                else{
+                    int iv=(int) (fv-(proportion*(fv-ov)));
+                    if(iv==0){
+                        iv=1;
+                    }
+                    ticket.setIv(iv);
+                    System.out.println("Ticket aveva jira AV vuote " + ticket.getKey() + " ha IV " + ticket.getIv() + " perche fv è " + ticket.getFv().getName()+" num "+fv + " e ov è " + ticket.getOv().getName()+" num "+ ov + " con proportion "+proportion);
+                }
+            }
         }
-        else if(relNum>=5){ //SZZ + Incremental Proportion
-            return;//TODO
-        }*/
+    }
+
+        //TODO: da implementare
+    private void measureBuggy(List<List<JavaFile>> releasesFiles, List<List<Commit>> commits, List<Ticket> tickets){
+        int lastRelNum= releasesFiles.size();
+        List<JavaFile> lastRelFiles= releasesFiles.get(lastRelNum-1);
+        List<Commit> lastRelCommits= commits.get(lastRelNum-1);
+        //SZZ per tutti i file della nuova release, le altre le ho gia processate in iterazioni precedenti
+        for(JavaFile file:lastRelFiles){
+            if((lastRelNum>1)&&(lastRelNum<5)){ //Cold Start Proportion
+                computeFileBuggyness(file,lastRelCommits, tickets, releasesFiles, this.coldStartProportion);
+            }
+            else if(lastRelNum>=5){ //Incremental Proportion
+                double proportion=0;//TODO da implementare incremental proportion
+                //computeFileBuggyness(file,lastRelCommits,tickets, releasesFiles, proportion);
+            }
+        }
     }
 
     private void adjustMeasure(List<List<JavaFile>> releaseFiles){
@@ -207,7 +249,7 @@ public class MeasureController {
                 for(Release rel: ticket.getJiraAv()){
                     avs.add(rel.getNumber());
                 }
-                int iv = Collections.min(avs);
+                int iv = Collections.min(avs)+1; //Perche la prima release deve essere 1 ma quando ho popolato ho omesso il +1
                 if((fv==ov)||(fv==iv)||(fv<ov)||(fv<iv)||(ov<iv)){ //ASSUNZIONE 14
                     continue;
                 }

@@ -1,1 +1,1 @@
--Proportion cold start è 1.847895778301325
+-Proportion cold start è 1.5293569797101456
