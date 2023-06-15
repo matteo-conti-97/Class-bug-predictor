@@ -43,8 +43,48 @@ public class MeasureController {
             releaseFiles.add(relFiles);
             measureFromStartFeatures(releaseFiles, i + 1);
             adjustMeasure(releaseFiles);
+            measureBuggy(releaseFiles, commits, tickets);
             CsvHandler.writeDataLineByLine(releaseFiles, i + 1);
         }
+    }
+
+    private void szz(List<JavaFile> releaseFiles, List<Commit> releaseCommit, List<Ticket> tickets){
+        List<JavaFile> processedFiles=new ArrayList<>();
+        for(JavaFile file:releaseFiles){
+            for(Commit commit:releaseCommit){
+                for(JavaFile touchedFile:commit.getTouchedFiles()){
+                    if(touchedFile.getName().equals(file.getName())){
+                        if(Collections.frequency(processedFiles,file)<1) {
+                            processedFiles.add(file);
+                            int fixCount=countFixCommit(commit,tickets);
+                            if (fixCount > 0) {
+                                file.setBuggy("1");
+                            } else {
+                                file.setBuggy("0");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    //TODO: da implementare
+    private void measureBuggy(List<List<JavaFile>> releasesFiles, List<List<Commit>> commits, List<Ticket> tickets){
+        int relNum= releasesFiles.size();
+        List<JavaFile> lastRelFiles= releasesFiles.get(relNum-1);
+        List<Commit> lastRelCommits= commits.get(relNum-1);
+        szz(lastRelFiles, lastRelCommits, tickets);
+
+
+        /*TODO ad ogni giro mi faccio szz sull'ultima release e proportion sui ticket dell'ultima release
+        * nelle passate successive in cui faccio solo proportion?
+        */
+        /*if((relNum>1)&&(relNum<5)){ //SZZ + Cold Start Proportion
+            return;//TODO
+        }
+        else if(relNum>=5){ //SZZ + Incremental Proportion
+            return;//TODO
+        }*/
     }
 
     private void adjustMeasure(List<List<JavaFile>> releaseFiles){
@@ -119,7 +159,7 @@ public class MeasureController {
     }
 
     private void measureFromStartFeatures(List<List<JavaFile>> releaseFiles, int numReleases) {
-        //I valori dalla release 0 me li calcolo come somma/media dei singoli valori della release fino alla corrente
+        //I valori dalla release corrente (cioè l'ultima nella lista attuale) me li calcolo come somma/media dei singoli valori della release fino alla corrente
         List<JavaFile> lastRelFiles = releaseFiles.get(numReleases - 1);
         for (JavaFile file : lastRelFiles) {
             int totBugFix = Integer.parseInt(file.getnFixCommitInRelease());

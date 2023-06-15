@@ -1,0 +1,6 @@
+Come fare proportion con cold start? Quanto segue per ogni file
+-Prendo tutte le commit della release, se una commit relativa al file è afferente a un ticket di bug, il file
+nella release corrente è marchiato come bug (SZZ) inoltre mi prendo il ticket e mi guardo AV, FV, e OV, se l'AV è presente
+ed è consistente prendo l'AV più piccola e marchio bug il file fino  a quella release, se non è presente o consistente
+faccio proportion, prendo FV e OV come IV=FV-P(FV-OV) e marchio bug il file fino a quella release, se FV e OV non sono
+consistenti, non faccio proportion.

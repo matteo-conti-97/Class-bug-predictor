@@ -46,7 +46,8 @@ public class CsvHandler {
                     String nRevFromStart = files.get(i).get(j).getnRevFromStart();
                     String nBugFixInRel = files.get(i).get(j).getnFixCommitInRelease();
                     String nBugFixFromStart = files.get(i).get(j).getnFixCommitFromStart();
-                    String[] data = {Integer.toString(i + 1), filename, nAuthorsInRel, locInRel, avgChurnInRel, avgChurnFromStart, avgAddInRel, avgAddFromStart, nRevInRel, nRevFromStart, nBugFixInRel, nBugFixFromStart, "null"};
+                    String buggy= files.get(i).get(j).getBuggy();
+                    String[] data = {Integer.toString(i + 1), filename, nAuthorsInRel, locInRel, avgChurnInRel, avgChurnFromStart, avgAddInRel, avgAddFromStart, nRevInRel, nRevFromStart, nBugFixInRel, nBugFixFromStart, buggy};
                     writer.writeNext(data);
                 }
             }

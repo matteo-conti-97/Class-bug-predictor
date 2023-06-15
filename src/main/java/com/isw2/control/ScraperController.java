@@ -318,7 +318,7 @@ public class ScraperController {
         linkTicketDatesToReleases(ticketOfInterest, releasesOfInterest);
 
 
-        Printer.printTicketsDetailed(ticketOfInterest);
+        Printer.printTicketsBasic(ticketOfInterest);
     }
 
     public void saveProjectDataOnDb(String lastReleaseOfInterest, String lastInterestReleaseEndDate) {

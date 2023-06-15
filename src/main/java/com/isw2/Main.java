@@ -21,18 +21,17 @@ public class Main {
 
     public static void main(String[] args) throws ParseException, SQLException {
         ScraperController bookkeeperScraperController = new ScraperController("bookkeeper", AUTHOR);
-        //bookkeeperScraperController.getProjectDataFromDb();
+        bookkeeperScraperController.getProjectDataFromDb();
         //bookkeeperScraperController.saveProjectDataOnDb("4.5.0", "2017-06-16");
         MeasureController bookkeeperMeasureController = new MeasureController(bookkeeperScraperController.getProject());
-        for(String[] project: COLD_START_PROJECTS) {
+        /*for(String[] project: COLD_START_PROJECTS) {
             System.out.println("Processing cold start data of project: " + project[0] +" until release "+ project[1]);
             ScraperController scraperController = new ScraperController(project[0], AUTHOR);
             //scraperController.saveColdStartDataOnDb(project[1]);
             scraperController.getColdStartDataFromDb();
             bookkeeperMeasureController.addColdStartProportionProject(scraperController.getProject());
         }
-        System.out.println("Cold start proportion: " + bookkeeperMeasureController.computeColdStartProportion());
-        //bookkeeperMeasureController.createWalkForwardDatasets();
-        //scraperController.saveColdStartInfoOnDb();
+        System.out.println("Cold start proportion: " + bookkeeperMeasureController.computeColdStartProportion());*/
+        bookkeeperMeasureController.createWalkForwardDatasets();
     }
 }
