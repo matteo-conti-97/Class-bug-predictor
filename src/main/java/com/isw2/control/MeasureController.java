@@ -105,9 +105,7 @@ public class MeasureController {
                 }
                 else{
                     int iv=(int) (fv-(proportion*(fv-ov)));
-                    if(iv==0){
-                        iv=1;
-                    }
+                    iv = (iv == 0) ? 1 : iv;
                     ticket.setIv(iv);
                     System.out.println("Ticket aveva jira AV vuote " + ticket.getKey() + " ha IV " + ticket.getIv() + " perche fv è " + ticket.getFv().getName()+" num "+fv + " e ov è " + ticket.getOv().getName()+" num "+ ov + " con proportion "+proportion);
                 }
