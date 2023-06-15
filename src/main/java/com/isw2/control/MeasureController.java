@@ -60,6 +60,7 @@ public class MeasureController {
     private void computeFileBuggyness(JavaFile file, List<Commit> releaseCommit, List<Ticket> tickets, List<List<JavaFile>> releaseFiles, double proportion){
         List<JavaFile> processedFiles=new ArrayList<>();
         computeTicketsIv(tickets, proportion);
+        adjustIv(tickets);
         for(Commit commit:releaseCommit){
             for(JavaFile touchedFile:commit.getTouchedFiles()){
                 if((touchedFile.getName().equals(file.getName()))&&(Collections.frequency(processedFiles,file)<1) ){
@@ -105,10 +106,17 @@ public class MeasureController {
                 }
                 else{
                     int iv=(int) (fv-(proportion*(fv-ov)));
-                    iv = (iv == 0) ? 1 : iv;
                     ticket.setIv(iv);
                     System.out.println("Ticket aveva jira AV vuote " + ticket.getKey() + " ha IV " + ticket.getIv() + " perche fv è " + ticket.getFv().getName()+" num "+fv + " e ov è " + ticket.getOv().getName()+" num "+ ov + " con proportion "+proportion);
                 }
+            }
+        }
+    }
+
+    private void adjustIv(List<Ticket> tickets){
+        for(Ticket ticket:tickets){
+            if(ticket.getIv()==0){
+                ticket.setIv(1);
             }
         }
     }
