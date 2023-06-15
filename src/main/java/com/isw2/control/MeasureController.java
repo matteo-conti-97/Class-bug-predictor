@@ -78,6 +78,14 @@ public class MeasureController {
         }
     }
 
+    private List<Integer> convertReleaseToNumber(List<Release> releases){
+        List<Integer> avsNum=new ArrayList<>();
+        for(Release av:releases){
+            avsNum.add(av.getNumber());
+        }
+        return avsNum;
+    }
+
 
     private void computeTicketsIv(List<Ticket> tickets, double proportion) {
         for(Ticket ticket:tickets){
@@ -88,10 +96,7 @@ public class MeasureController {
                 ticket.setIv(fv);
             }else{
                 if(!ticket.getJiraAv().isEmpty()){
-                    List<Integer> avsNum=new ArrayList<>();
-                    for(Release av:ticket.getJiraAv()){
-                        avsNum.add(av.getNumber());
-                    }
+                    List<Integer> avsNum=convertReleaseToNumber(ticket.getJiraAv());
                     int iv= Collections.min(avsNum)+1; //Perche la prima release deve essere 1 ma quando ho popolato ho omesso il +1
                     if(fv >= iv && ov >= iv) { //ASSUNZIONE 14
                         //System.out.println("Ticket aveva jira AV non vuote" + ticket.getKey() + " ha IV " + ticket.getIv() + " perche fv è " + ticket.getFv().getName()+" num "+fv + " e ov è " + ticket.getOv().getName()+" num "+ ov);
@@ -245,10 +250,7 @@ public class MeasureController {
             if(!ticket.getJiraAv().isEmpty()){
                 int fv=ticket.getFv().getNumber();
                 int ov=ticket.getOv().getNumber();
-                List<Integer> avs=new ArrayList<>();
-                for(Release rel: ticket.getJiraAv()){
-                    avs.add(rel.getNumber());
-                }
+                List<Integer> avs=convertReleaseToNumber(ticket.getJiraAv());
                 int iv = Collections.min(avs)+1; //Perche la prima release deve essere 1 ma quando ho popolato ho omesso il +1
                 if((fv==ov)||(fv==iv)||(fv<ov)||(fv<iv)||(ov<iv)){ //ASSUNZIONE 14
                     continue;
