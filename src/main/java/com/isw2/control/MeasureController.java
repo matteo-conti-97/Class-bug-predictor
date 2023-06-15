@@ -53,16 +53,15 @@ public class MeasureController {
         for(JavaFile file:releaseFiles){
             for(Commit commit:releaseCommit){
                 for(JavaFile touchedFile:commit.getTouchedFiles()){
-                    if(touchedFile.getName().equals(file.getName())){
-                        if(Collections.frequency(processedFiles,file)<1) {
-                            processedFiles.add(file);
-                            int fixCount=countFixCommit(commit,tickets);
-                            if (fixCount > 0) {
-                                file.setBuggy("1");
-                            } else {
-                                file.setBuggy("0");
-                            }
+                    if((touchedFile.getName().equals(file.getName()))&&(Collections.frequency(processedFiles,file)<1) ){
+                        processedFiles.add(file);
+                        int fixCount=countFixCommit(commit,tickets);
+                        if (fixCount > 0) {
+                            file.setBuggy("1");
+                        } else {
+                            file.setBuggy("0");
                         }
+
                     }
                 }
             }
