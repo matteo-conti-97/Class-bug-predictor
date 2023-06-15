@@ -48,21 +48,19 @@ public class MeasureController {
         }
     }
 
-    private void szz(List<JavaFile> releaseFiles, List<Commit> releaseCommit, List<Ticket> tickets){
+    private void szzFile(JavaFile file, List<Commit> releaseCommit, List<Ticket> tickets){
         List<JavaFile> processedFiles=new ArrayList<>();
-        for(JavaFile file:releaseFiles){
-            for(Commit commit:releaseCommit){
-                for(JavaFile touchedFile:commit.getTouchedFiles()){
-                    if((touchedFile.getName().equals(file.getName()))&&(Collections.frequency(processedFiles,file)<1) ){
-                        processedFiles.add(file);
-                        int fixCount=countFixCommit(commit,tickets);
-                        if (fixCount > 0) {
-                            file.setBuggy("1");
-                        } else {
-                            file.setBuggy("0");
-                        }
-
+        for(Commit commit:releaseCommit){
+            for(JavaFile touchedFile:commit.getTouchedFiles()){
+                if((touchedFile.getName().equals(file.getName()))&&(Collections.frequency(processedFiles,file)<1) ){
+                    processedFiles.add(file);
+                    int fixCount=countFixCommit(commit,tickets);
+                    if (fixCount > 0) {
+                        file.setBuggy("1");
+                    } else {
+                        file.setBuggy("0");
                     }
+
                 }
             }
         }
@@ -72,8 +70,9 @@ public class MeasureController {
         int relNum= releasesFiles.size();
         List<JavaFile> lastRelFiles= releasesFiles.get(relNum-1);
         List<Commit> lastRelCommits= commits.get(relNum-1);
-        szz(lastRelFiles, lastRelCommits, tickets);
-
+        for(JavaFile file:lastRelFiles){
+            szzFile(file,lastRelCommits,tickets);
+        }
 
         /*TODO ad ogni giro mi faccio szz sull'ultima release e proportion sui ticket dell'ultima release
         * nelle passate successive in cui faccio solo proportion?
