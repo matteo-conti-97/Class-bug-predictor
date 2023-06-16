@@ -5,10 +5,7 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.CSVWriter;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,5 +70,57 @@ public class CsvHandler {
             e.printStackTrace();
         }
         return ret;
+    }
+
+    public static void convertDataset(int numReleases){
+        for(int i=1;i<=numReleases;i++){
+            csvToArff(i);
+        }
+    }
+
+    private static List<String> stripCsvLine(String[] line){
+        List<String> ret=new ArrayList<>();
+        for(int i=0;i<line.length;i++){
+            if(i==1) continue;
+            ret.add(line[i]);
+        }
+        return ret;
+    }
+
+    private static void csvToArff(int release){
+        String csvFilePath = "src/main/java/resource/csv/dataset" + release + ".csv";
+        String arffFilePath = "src/main/java/resource/csv/dataset" + release + ".arff";
+        List<String[]> csvData = readCsv(csvFilePath);
+        File file = new File(arffFilePath);
+
+        FileWriter outputfile = null;
+        try {
+            outputfile = new FileWriter(file, false);
+            BufferedWriter bufferedWriter = new BufferedWriter(outputfile);
+            writeHeader(bufferedWriter,"dataset"+release);
+            for(String[] line:csvData){
+                List<String> tmp=stripCsvLine(line);
+                for(int i=0;i<tmp.size()-1;i++){
+                    bufferedWriter.write(Integer.parseInt(tmp.get(i))+",");
+                }
+                bufferedWriter.write(tmp.get(tmp.size()-1));
+                bufferedWriter.newLine();
+            }
+            bufferedWriter.close();
+        }catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void writeHeader(BufferedWriter bufferedWriter, String title) throws IOException {
+        String[] header = {"@relation "+title,"@attribute Release numeric", "@attribute #AuthorsInRelease numeric", "@attribute LOC numeric",
+                "@attribute AvgChurnInRelease numeric", "@attribute AvgChurnFromStart numeric",
+                "@attribute AvgLOCAddedInRelease numeric", "@attribute AvgLOCAddedFromStart numeric",
+                "@attribute #RevisionInRelease numeric", "@attribute #RevisionFromStart numeric",
+                "@attribute #BugFixInRelease numeric", "@attribute #BugFixFromStart numeric", "@attribute Buggy {1,0}", "@data"};
+        for (String line : header) {
+            bufferedWriter.write(line);
+            bufferedWriter.newLine();
+        }
     }
 }

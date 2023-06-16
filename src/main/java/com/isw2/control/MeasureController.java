@@ -54,12 +54,13 @@ public class MeasureController {
             adjustMeasure(releaseFiles);
             measureBuggy(releaseFiles, commits, tickets);
             CsvHandler.writeDataLineByLine(releaseFiles, i + 1);
+            CsvHandler.convertDataset(i+1);
         }
     }
 
     private void computeFileBuggyness(JavaFile file, List<Commit> releaseCommit, List<Ticket> tickets, List<List<JavaFile>> releaseFiles, double proportion){
         List<JavaFile> processedFiles=new ArrayList<>();
-        computeTicketsIv(tickets, proportion);
+        computeTicketsIv(tickets, proportion); //Calcolo le IV per i ticket
         adjustIv(tickets);
         for(Commit commit:releaseCommit){
             for(JavaFile touchedFile:commit.getTouchedFiles()){
@@ -121,7 +122,7 @@ public class MeasureController {
         }
     }
 
-        //TODO: da implementare
+
     private void measureBuggy(List<List<JavaFile>> releasesFiles, List<List<Commit>> commits, List<Ticket> tickets){
         int lastRelNum= releasesFiles.size();
         List<JavaFile> lastRelFiles= releasesFiles.get(lastRelNum-1);
@@ -132,7 +133,7 @@ public class MeasureController {
                 computeFileBuggyness(file,lastRelCommits, tickets, releasesFiles, this.coldStartProportion);
             }
             else if(lastRelNum>=5){ //Incremental Proportion
-                double proportion=0;//TODO da implementare incremental proportion
+                double proportion=0;//TODO da implementare calcolo di incremental proportion
                 //computeFileBuggyness(file,lastRelCommits,tickets, releasesFiles, proportion);
             }
         }
