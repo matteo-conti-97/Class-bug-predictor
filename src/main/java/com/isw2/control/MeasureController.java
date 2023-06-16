@@ -58,10 +58,27 @@ public class MeasureController {
         }
     }
 
+    public void affectPreviousVersion(JavaFile file, List<List<JavaFile>> releaseFiles, List<Ticket> tickets, Commit commit){
+        int iv=-1;
+        for(Ticket ticket: tickets){
+            if(commit.getMessage().startsWith(ticket.getKey())){
+               iv=ticket.getIv();
+            }
+        }
+        if(iv==-1) return;
+        for(int i=iv-1;i<releaseFiles.size()-1;i++){
+            List<JavaFile> release=releaseFiles.get(i);
+            for(JavaFile releaseFile:release){
+                if(releaseFile.getName().equals(file.getName())){
+                    releaseFile.setBuggy("1");
+                }
+            }
+        }
+    }
+
     private void computeFileBuggyness(JavaFile file, List<Commit> releaseCommit, List<Ticket> tickets, List<List<JavaFile>> releaseFiles, double proportion){
         List<JavaFile> processedFiles=new ArrayList<>();
         computeTicketsIv(tickets, proportion); //Calcolo le IV per i ticket
-        adjustIv(tickets);
         for(Commit commit:releaseCommit){
             for(JavaFile touchedFile:commit.getTouchedFiles()){
                 if((touchedFile.getName().equals(file.getName()))&&(Collections.frequency(processedFiles,file)<1) ){
@@ -69,8 +86,7 @@ public class MeasureController {
                     int fixCount=countFixCommit(commit,tickets);
                     if (fixCount > 0) {
                         file.setBuggy("1");
-                        //TODO prendere i ticket relativi a ticket bug della classe e a seconda dell'iv
-                        // di quel ticket marchiare il file nelle release precedenti
+                        affectPreviousVersion(file, releaseFiles, tickets, commit); //Setto buggy quelle release il cui ticket ha iv vecchie
                     } else {
                         file.setBuggy("0");
                     }
@@ -96,6 +112,7 @@ public class MeasureController {
             if(fv<=ov){ //ASSUNZIONE 15
                 //System.out.println("Ticket " + ticket.getKey() + " ha IV=FV perche fv è " + ticket.getFv().getName()+" num "+fv + " e ov è " + ticket.getOv().getName()+" num "+ ov);
                 ticket.setIv(fv);
+                adjustIv(ticket);
             }else{
                 if(!ticket.getJiraAv().isEmpty()){
                     List<Integer> avsNum=convertReleaseToNumber(ticket.getJiraAv());
@@ -103,23 +120,23 @@ public class MeasureController {
                     if(fv >= iv && ov >= iv) { //ASSUNZIONE 14
                         //System.out.println("Ticket aveva jira AV non vuote" + ticket.getKey() + " ha IV " + ticket.getIv() + " perche fv è " + ticket.getFv().getName()+" num "+fv + " e ov è " + ticket.getOv().getName()+" num "+ ov);
                         ticket.setIv(iv);
+                        adjustIv(ticket);
                     }
                 }
                 else{
                     int iv=(int) (fv-(proportion*(fv-ov)));
                     ticket.setIv(iv);
+                    adjustIv(ticket);
                     System.out.println("Ticket aveva jira AV vuote " + ticket.getKey() + " ha IV " + ticket.getIv() + " perche fv è " + ticket.getFv().getName()+" num "+fv + " e ov è " + ticket.getOv().getName()+" num "+ ov + " con proportion "+proportion);
                 }
             }
         }
     }
 
-    private void adjustIv(List<Ticket> tickets){
-        for(Ticket ticket:tickets){
+    private void adjustIv(Ticket ticket){
             if(ticket.getIv()==0){
                 ticket.setIv(1);
             }
-        }
     }
 
 
