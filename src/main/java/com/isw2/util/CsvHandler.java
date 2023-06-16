@@ -11,6 +11,8 @@ import java.util.List;
 
 public class CsvHandler {
 
+    private static final String OUTPUT_PATH = "src/main/java/resource/csv/dataset";
+
     private CsvHandler() {
     }
 
@@ -18,7 +20,7 @@ public class CsvHandler {
     public static void writeDataLineByLine(List<List<JavaFile>> files, int numReleases) {
         // first create file object for file placed at location
         // specified by filepath
-        String filePath = "src/main/java/resource/csv/dataset" + numReleases + ".csv";
+        String filePath = OUTPUT_PATH + numReleases + ".csv";
         File file = new File(filePath);
         try {
             // create FileWriter object with file as parameter
@@ -88,8 +90,8 @@ public class CsvHandler {
     }
 
     private static void csvToArff(int release){
-        String csvFilePath = "src/main/java/resource/csv/dataset" + release + ".csv";
-        String arffFilePath = "src/main/java/resource/csv/dataset" + release + ".arff";
+        String csvFilePath = OUTPUT_PATH + release + ".csv";
+        String arffFilePath = OUTPUT_PATH + release + ".arff";
         List<String[]> csvData = readCsv(csvFilePath);
         File file = new File(arffFilePath);
 
@@ -108,7 +110,7 @@ public class CsvHandler {
             }
             bufferedWriter.close();
         }catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
     }
 
