@@ -68,19 +68,16 @@ public class MeasureController {
             }
         }
         if(iv==-1) return;
-        for(int i=iv-1;i<releaseFiles.size()-1;i++){ //Setto buggy a 1 il file nelle release successive all'IV
+        setBuggy(file, releaseFiles, iv-1, releaseFiles.size()-1, "1"); //Setto buggy a 1 il file nelle release successive all'IV
+        setBuggy(file,releaseFiles,0,iv-1,"0"); //Setto buggy a 0 il file nelle release precedenti all'IV
+    }
+
+    private void setBuggy(JavaFile file, List<List<JavaFile>> releaseFiles, int start, int end, String value){
+        for(int i=start;i<end;i++){
             List<JavaFile> release=releaseFiles.get(i);
             for(JavaFile releaseFile:release){
                 if(releaseFile.getName().equals(file.getName())){
-                    releaseFile.setBuggy("1");
-                }
-            }
-        }
-        for(int i=0;i<iv-1;i++){//Setto buggy a 0 il file nelle release precedenti all'IV
-            List<JavaFile> release=releaseFiles.get(i);
-            for(JavaFile releaseFile:release){
-                if(releaseFile.getName().equals(file.getName())){
-                    releaseFile.setBuggy("0");
+                    releaseFile.setBuggy(value);
                 }
             }
         }
@@ -166,21 +163,11 @@ public class MeasureController {
 
     private List<Ticket> filterProportionTickets(List<Ticket> tickets, int currRelNum){
         List<Ticket> ret=new ArrayList<>();
-        int count1=0;
-        int count2=0;
         for(Ticket ticket:tickets){
-            //System.out.println("Incremental proportion - Ticket "+ticket.getKey()+" ha IV "+ticket.getIv()+" fv "+ticket.getFv().getNumber()+" ov "+ticket.getOv().getNumber());
-            if(ticket.getFv().getNumber()>=ticket.getIv()){
-                count1++;
-            }
-            if(ticket.getFv().getNumber()>=ticket.getOv().getNumber()){
-                count2++;
-            }
             if(ticket.getFv().getNumber()<currRelNum){
                 ret.add(ticket);
             }
         }
-        //System.out.println("Incremental proportion - "+count1+" tickets with fv >=iv and "+count2+" with fv>ov");
         return ret;
     }
 
@@ -199,9 +186,9 @@ public class MeasureController {
             int iv=ticket.getIv();
             //System.out.println("Incremental proportion - Ticket "+ticket.getKey()+" ha IV "+iv+" perche fv è "+ticket.getFv().getName()+" num "+fv+" e ov è "+ticket.getOv().getName()+" num "+ ov);
             if((fv>=iv)&&(fv>ov)){
-
                 prop=((double) (fv - iv) /(fv-ov));
                 propSum+=prop;
+                tot++;
             }
 
 
