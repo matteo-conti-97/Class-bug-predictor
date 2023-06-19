@@ -70,6 +70,7 @@ public class MeasureController {
         if(iv==-1) return;
         setBuggy(file, releaseFiles, iv-1, releaseFiles.size()-1, "1"); //Setto buggy a 1 il file nelle release successive all'IV
         setBuggy(file,releaseFiles,0,iv-1,"0"); //Setto buggy a 0 il file nelle release precedenti all'IV
+
     }
 
     private void setBuggy(JavaFile file, List<List<JavaFile>> releaseFiles, int start, int end, String value){
