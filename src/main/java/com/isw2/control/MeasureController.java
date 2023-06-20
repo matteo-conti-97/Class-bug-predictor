@@ -183,6 +183,7 @@ public class MeasureController {
                 tot++;
             }
         }
+        assert tot != 0;
         double ret=(double) propSum /tot;
         System.out.println("Incremental Proportion per " + currRelNum+" release è "+ret+" propSum "+propSum+" tot "+tot);
         return ret;
