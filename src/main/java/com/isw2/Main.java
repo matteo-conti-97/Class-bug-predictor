@@ -34,7 +34,7 @@ public class Main {
         double coldStartProportion=bookkeeperMeasureController.computeColdStartProportion();
         System.out.println("Cold start proportion: " + coldStartProportion);
         bookkeeperMeasureController.setColdStartProportion(coldStartProportion);
-
+        //bookkeeperMeasureController.setColdStartProportion(1.5293569797101456);
         bookkeeperMeasureController.createWalkForwardDatasets();
     }
 }

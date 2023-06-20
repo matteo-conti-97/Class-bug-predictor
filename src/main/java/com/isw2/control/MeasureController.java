@@ -45,6 +45,7 @@ public class MeasureController {
         List<Release> releases = this.project.getReleasesOfInterest();
         for (int i = 0; i < releases.size(); i++) {
             Release release = releases.get(i);
+            int lastRelNum=release.getNumber();
             List<Commit> relCommits = release.getCommits();
             List<JavaFile> relFiles = release.getFileTreeAtReleaseEnd();
             measureInReleaseFeatures(relFiles, relCommits, tickets);
@@ -52,25 +53,22 @@ public class MeasureController {
             releaseFiles.add(relFiles);
             measureFromStartFeatures(releaseFiles, i + 1);
             adjustMeasure(releaseFiles);
-            measureBuggy(releaseFiles, commits, tickets);
-            CsvHandler.writeDataLineByLine(releaseFiles, i + 1);
-            CsvHandler.convertDataset(i+1);
+            List<Ticket> currRelFixTicket=getRelTickets(tickets,lastRelNum);
+            List<Ticket> prevTickets=filterProportionTickets(tickets, lastRelNum);
+            double proportion=computeIncrementalProportion(prevTickets, lastRelNum);
+            computeTicketsIv(currRelFixTicket, proportion);
+            measureBuggy(releaseFiles, commits, currRelFixTicket);
+            CsvHandler.writeDataLineByLine(releaseFiles, i+1, this.project.getName());
+            CsvHandler.convertDataset(i+1, this.project.getName());
         }
     }
 
-    /*TODO risolvere bug, ok che setto buggy a 1 le release affected in base a proportion ma devo anche settare
-    *  buggy a 0 per le release che prima erano buggy ma ora non sono piu tra le AV*/
     public void affectPreviousVersion(JavaFile file, List<List<JavaFile>> releaseFiles, List<Ticket> tickets, Commit commit){
-        int iv=-1;
         for(Ticket ticket: tickets){
-            if(commit.getMessage().startsWith(ticket.getKey())){
-               iv=ticket.getIv();
-            }
+            int iv=ticket.getIv();
+            setBuggy(file, releaseFiles, iv-1, releaseFiles.size()-1, "1"); //Setto buggy a 1 il file nelle release successive all'IV
+            setBuggy(file,releaseFiles,0,iv-1,"0"); //Setto buggy a 0 il file nelle release precedenti all'IV, iv-2
         }
-        if(iv==-1) return;
-        setBuggy(file, releaseFiles, iv-1, releaseFiles.size()-1, "1"); //Setto buggy a 1 il file nelle release successive all'IV
-        setBuggy(file,releaseFiles,0,iv-1,"0"); //Setto buggy a 0 il file nelle release precedenti all'IV
-
     }
 
     private void setBuggy(JavaFile file, List<List<JavaFile>> releaseFiles, int start, int end, String value){
@@ -84,21 +82,15 @@ public class MeasureController {
         }
     }
 
-    private void computeFileBuggyness(JavaFile file, List<Commit> releaseCommit, List<Ticket> tickets, List<List<JavaFile>> releaseFiles, double proportion){
+    private void computeFileBuggyness(JavaFile file, List<Commit> releaseCommit, List<Ticket> tickets, List<List<JavaFile>> releaseFiles){
         List<JavaFile> processedFiles=new ArrayList<>();
-        computeTicketsIv(tickets, proportion); //Calcolo le IV per i ticket
-        for(Commit commit:releaseCommit){
-            for(JavaFile touchedFile:commit.getTouchedFiles()){
+        for(Commit commit: releaseCommit){
+            for(JavaFile touchedFile: commit.getTouchedFiles()){
                 if((touchedFile.getName().equals(file.getName()))&&(Collections.frequency(processedFiles,file)<1) ){
                     processedFiles.add(file);
-                    int fixCount=countFixCommit(commit,tickets);
-                    if (fixCount > 0) {
-                        file.setBuggy("1");
-                        affectPreviousVersion(file, releaseFiles, tickets, commit); //Setto buggy quelle release il cui ticket ha iv vecchie
-                    } else {
-                        file.setBuggy("0");
-                    }
-
+                    List<Ticket> commitLinkedTickets= getCommitFixTickets(commit,tickets);
+                    file.setBuggy("0"); //Nella current release o non è buggy o è stato fixato
+                    if (commitLinkedTickets.size() > 0) affectPreviousVersion(file, releaseFiles, commitLinkedTickets, commit);
                 }
             }
         }
@@ -107,35 +99,42 @@ public class MeasureController {
     private List<Integer> convertReleaseToNumber(List<Release> releases){
         List<Integer> avsNum=new ArrayList<>();
         for(Release av:releases){
-            avsNum.add(av.getNumber());
+            avsNum.add(av.getNumber()+1); //Perche quando popolo le AV le ho messe che partono da 0
         }
         return avsNum;
     }
 
+    private List<Ticket> getRelTickets(List<Ticket> tickets, int relNum){
+        List<Ticket> ret = new ArrayList<>();
+        for(Ticket ticket:tickets){
+            if(ticket.getFv().getNumber()==relNum){
+                ret.add(ticket);
+            }
+        }
+        return ret;
+    }
 
     private void computeTicketsIv(List<Ticket> tickets, double proportion) {
-        for(Ticket ticket:tickets){
+        for(Ticket ticket: tickets){
             int fv=ticket.getFv().getNumber();
             int ov=ticket.getOv().getNumber();
-            if(fv<=ov){ //ASSUNZIONE 15
-                ticket.setIv(fv);
-                adjustIv(ticket);
-            }else{
                 if(!ticket.getJiraAv().isEmpty()){
                     List<Integer> avsNum=convertReleaseToNumber(ticket.getJiraAv());
-                    int iv= Collections.min(avsNum)+1; //Perche la prima release deve essere 1 ma quando ho popolato ho omesso il +1
+                    int iv= Collections.min(avsNum); //Perche la prima release deve essere 1 ma quando ho popolato ho omesso il +1
                     if(fv >= iv && ov >= iv) { //ASSUNZIONE 14
                         ticket.setIv(iv);
-                        adjustIv(ticket);
+                        adjustIv(ticket); //Se iv è 0 lo setto a 1 perche le release le numero a partire da 1
                     }
                 }
                 else{
-                    int iv=(int) (fv-(proportion*(fv-ov)));
+                    int iv;
+                    if(fv<=ov) iv=(int) (fv-proportion);  //ASSUNZIONE 15
+                    else  iv=(int) (fv-(proportion*(fv-ov)));
                     ticket.setIv(iv);
-                    adjustIv(ticket);
+                    adjustIv(ticket); //Se iv è 0 lo setto a 1 perche le release le numero a partire da 1
                     //System.out.println("Ticket aveva jira AV vuote " + ticket.getKey() + " ha IV " + ticket.getIv() + " perche fv è " + ticket.getFv().getName()+" num "+fv + " e ov è " + ticket.getOv().getName()+" num "+ ov + " con proportion "+proportion);
                 }
-            }
+
         }
     }
 
@@ -151,51 +150,41 @@ public class MeasureController {
         List<JavaFile> lastRelFiles= releasesFiles.get(lastRelNum-1);
         List<Commit> lastRelCommits= commits.get(lastRelNum-1);
         //SZZ per tutti i file della nuova release, le altre le ho gia processate in iterazioni precedenti
-        for(JavaFile file:lastRelFiles){//ASSUNZIONE 16
-            if((lastRelNum>1)&&(lastRelNum<5)){ //Cold Start Proportion
-                computeFileBuggyness(file,lastRelCommits, tickets, releasesFiles, this.coldStartProportion);
-            }
-            else if(lastRelNum>=5){ //Incremental Proportion
-                double incrProp=computeIncrementalProportion(tickets,lastRelNum);
-                computeFileBuggyness(file,lastRelCommits,tickets, releasesFiles, incrProp);
-            }
+        for(JavaFile file:lastRelFiles){
+            computeFileBuggyness(file,lastRelCommits, tickets, releasesFiles);
         }
     }
 
     private List<Ticket> filterProportionTickets(List<Ticket> tickets, int currRelNum){
         List<Ticket> ret=new ArrayList<>();
         for(Ticket ticket:tickets){
-            if(ticket.getFv().getNumber()<currRelNum){
+            if((ticket.getFv().getNumber()<currRelNum)&&(ticket.getFv().getNumber()!=1)){
                 ret.add(ticket);
             }
         }
         return ret;
     }
 
-
-    /*TODO Controllare che sia corretta, no non lo è manca il pezzo in cui cambio le iv dei ticket, in measureFileBuggy
-    *  devo andare a differenziare quando faccio compute ticketIV con coldstart e con incremental perche con incremental
-    * devo calcolare l'iv solo dei ticket della release n-esima usando proportion calcolata dalle n-1 precedenti*/
     private double computeIncrementalProportion(List<Ticket> tickets , int currRelNum){
         int tot=0;
         int propSum=0;
-        List<Ticket> prevTickets=filterProportionTickets(tickets, currRelNum);
-        for(Ticket ticket:prevTickets){
+        if((tickets.size()<5)||(currRelNum<4)){
+            return this.coldStartProportion;//ASSUNZIONE 16/18
+        }
+        for(Ticket ticket: tickets){
             double prop;
             int fv=ticket.getFv().getNumber();
             int ov=ticket.getOv().getNumber();
             int iv=ticket.getIv();
             //System.out.println("Incremental proportion - Ticket "+ticket.getKey()+" ha IV "+iv+" perche fv è "+ticket.getFv().getName()+" num "+fv+" e ov è "+ticket.getOv().getName()+" num "+ ov);
-            if((fv>=iv)&&(fv>ov)){
-                prop=((double) (fv - iv) /(fv-ov));
+            if((fv>ov)&&(fv>iv)&&(ov>=iv)){
+                prop=((double)(fv - iv) /(fv-ov)); //ASSUNZIONE 14
                 propSum+=prop;
                 tot++;
             }
-
-
         }
         double ret=(double) propSum /tot;
-        System.out.println("Incremental Proportion per " + currRelNum+" release è "+ret+" utilizzati "+prevTickets.size()+" ticket su "+tickets.size()+" propSum "+propSum+" tot "+tot);
+        System.out.println("Incremental Proportion per " + currRelNum+" release è "+ret+" propSum "+propSum+" tot "+tot);
         return ret;
     }
 
@@ -240,7 +229,7 @@ public class MeasureController {
                         if (!authors.contains(author)) {
                             authors.add(author);
                         }
-                        fixCount+=countFixCommit(commit,tickets);
+                        fixCount+= getCommitFixTickets(commit,tickets).size();
                         cnt++;
                         adds = Integer.parseInt(file.getAdd());
                         filteredAdds = (int) Math.floor((double) (adds * 10) / 100); //ASSUNZIONE 9-10
@@ -298,11 +287,11 @@ public class MeasureController {
         }
     }
 
-    private int countFixCommit(Commit commit,List<Ticket> tickets){
-        int ret=0;
+    private List<Ticket> getCommitFixTickets(Commit commit, List<Ticket> tickets){
+        List<Ticket> ret=new ArrayList<>();
         for(Ticket ticket: tickets){
             if(commit.getMessage().startsWith(ticket.getKey())){
-                ret++;
+                ret.add(ticket);
             }
         }
         return ret;
@@ -318,8 +307,8 @@ public class MeasureController {
                 int fv=ticket.getFv().getNumber();
                 int ov=ticket.getOv().getNumber();
                 List<Integer> avs=convertReleaseToNumber(ticket.getJiraAv());
-                int iv = Collections.min(avs)+1; //Perche la prima release deve essere 1 ma quando ho popolato ho omesso il +1
-                if((fv==ov)||(fv==iv)||(fv<ov)||(fv<iv)||(ov<iv)){ //ASSUNZIONE 14
+                int iv = Collections.min(avs); //Perche la prima release deve essere 1 ma quando ho popolato ho omesso il +1
+                if((fv<=ov)||(fv<=iv)||(ov<iv)){ //ASSUNZIONE 14
                     continue;
                 }
                 projPropCnt++;

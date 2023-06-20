@@ -19,6 +19,7 @@ public class Ticket {
         this.key = key;
         this.ticketId = ticketId;
         this.ticketUrl = ticketUrl;
+        this.iv=-1;
     }
 
 

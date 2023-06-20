@@ -9,9 +9,9 @@ nel repository in quel momento, utilizzare questi dati per cominciare a fare una
 del file della release di interesse e della versione precedente e vedere quante righe di codice sono state aggiunte - DONE
 
 -Per ogni file del tree prendere tutte le commit di quella release e vedere se afferiscono a un ticket, in caso affermativo marcare il file come buggy in quella release e successivamente verificare
-se il ticket riporta le AV o meno, se si marchiare le versioni del file delle versioni indicate in AV come buggy, altrimenti fare proportion.
+se il ticket riporta le AV o meno, se si marchiare le versioni del file delle versioni indicate in AV come buggy, altrimenti fare proportion. - DONE
 
 -Probabilmente toccherà anche fare tracking degli ultimi ticket bug tramite github issue, però qui potrei anche dire
-che non ho avuto il tempo e prenderla come assunzione, magari troncando la release.
+che non ho avuto il tempo e prenderla come assunzione, magari troncando la release. - GETTATA LA SPUGNA
 
 -Calcolo linkage

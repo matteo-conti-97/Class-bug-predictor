@@ -11,16 +11,16 @@ import java.util.List;
 
 public class CsvHandler {
 
-    private static final String OUTPUT_PATH = "src/main/java/resource/csv/dataset";
+    private static final String OUTPUT_PATH = "src/main/java/resource/csv/dataset_";
 
     private CsvHandler() {
     }
 
     //takes a list of lists which containt all the filenames of a release for each release
-    public static void writeDataLineByLine(List<List<JavaFile>> files, int numReleases) {
+    public static void writeDataLineByLine(List<List<JavaFile>> files, int numReleases, String projectName) {
         // first create file object for file placed at location
         // specified by filepath
-        String filePath = OUTPUT_PATH + numReleases + ".csv";
+        String filePath = OUTPUT_PATH + projectName + "_"+numReleases + ".csv";
         File file = new File(filePath);
         try {
             // create FileWriter object with file as parameter
@@ -74,9 +74,9 @@ public class CsvHandler {
         return ret;
     }
 
-    public static void convertDataset(int numReleases){
+    public static void convertDataset(int numReleases, String projectName){
         for(int i=1;i<=numReleases;i++){
-            csvToArff(i);
+            csvToArff(i,projectName);
         }
     }
 
@@ -89,9 +89,9 @@ public class CsvHandler {
         return ret;
     }
 
-    private static void csvToArff(int release){
-        String csvFilePath = OUTPUT_PATH + release + ".csv";
-        String arffFilePath = OUTPUT_PATH + release + ".arff";
+    private static void csvToArff(int release, String projectName){
+        String csvFilePath = OUTPUT_PATH +projectName+"_"+ release + ".csv";
+        String arffFilePath = OUTPUT_PATH+projectName+"_"+ release +  ".arff";
         List<String[]> csvData = readCsv(csvFilePath);
         File file = new File(arffFilePath);
 

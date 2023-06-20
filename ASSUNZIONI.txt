@@ -2,7 +2,7 @@
 di associarle alla prima release in quanto 1 è una cosa ragionevole 2 molte sono di configurazione e non associate a ticket e di conseguenza scartate
 in fasi di filtraggio successive.
 
-2-Release 4.1.0 ossia release numero 3 dura solamente 3 giorni ed ha 0 commit, la scarto in quanto non è significativa.
+2-Release 4.1.0 di bookeeper ossia release numero 3 dura solamente 3 giorni ed ha 0 commit, la scarto in quanto non è significativa, lo faccio anche per altre release di questo tipo.
 
 3-Ho tolto i test perchè se in fase di predizione mi dice che un test di una classe è buggy ma la classe testata ha passato il test che faccio?
 La considero buggy anche se non lo era? Mi darebbe "falsi positivi" o se la classe passa il test ma il test è buggy mi darebbe "falsi negativi".
@@ -34,10 +34,17 @@ devo avere churn=loc=locAdded
 
 13-Se il ticket viene creato o risolto prima della data di inizio della prima release, lo accorpo alla prima release
 
-14-I casi in cui il calcolo di proportion è inconsistente o inutile sono stati ignorati, in particolare si è ignorato quando
-fv=iv, fv=ov, fv<iv, fv<ov ed ov<iv
+14-I casi in cui il calcolo di proportion è inconsistente o inutile sono stati ignorati,
+in particolare si è ignorato quando fv<=iv, fv<=ov, ed ov<iv
 
-15-Nel calcolo dell'IV version con proportion se parto da FV<=OV considero IV=FV quindi essenzialmente marchio come buggy
-solo la versione corrente, perchè anche calcolare proportion a mano non avrebbe senso
+15-Nel calcolo dell'IV con proportion se parto da FV<=OV non lo considero pongo FV-OV=1 per non avere FV=IV
 
-16-Uso coldstart per 4 release in bookkeper cioè per 1/3 delle release, poi vedo (TODO) se fare cosi anche per zookeeper
+16-Se ci sono meno di 5 ticket passati uso coldStart
+
+17-La release 1 non la uso per fare proportion perchè FV=IV=OV=1
+
+18-Fino a release 3 uso coldstart, 1 e 2 perche incremental non lo posso fare in quanto in 1 non ho IV!=FV e in 2 non ho info sulle IV di 1
+e la 3 mi viene sempre proportion=1 sia su bookeeper che su zookeeper TODO VERIFICARE
+
+19-Bookeeper dal 2017-06-16 passa a github issue, ho simulato che la release 4.5.0 cioè l'ultima che prendo finisca in quella data
+cosi da rimanere su jira e prendere poi commit solo fino a quella data
