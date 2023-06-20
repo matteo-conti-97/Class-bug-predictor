@@ -90,7 +90,7 @@ public class MeasureController {
                     processedFiles.add(file);
                     List<Ticket> commitLinkedTickets= getCommitFixTickets(commit,tickets);
                     file.setBuggy("0"); //Nella current release o non è buggy o è stato fixato
-                    if (commitLinkedTickets.size() > 0) affectPreviousVersion(file, releaseFiles, commitLinkedTickets, commit);
+                    if (!commitLinkedTickets.isEmpty()) affectPreviousVersion(file, releaseFiles, commitLinkedTickets, commit);
                 }
             }
         }
