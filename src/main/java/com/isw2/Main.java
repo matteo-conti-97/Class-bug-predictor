@@ -9,6 +9,11 @@ import java.text.ParseException;
 
 public class Main {
     private static final String AUTHOR = "apache";
+    private static final String ZOOKEEPER = "zookeeper";
+    private static final String BOOKKEEPER = "bookkeeper";
+    private static final String LAST_BOOKKEEPER_RELEASE = "4.5.0";
+    private static final String LAST_BOOKKEEPER_RELEASE_END = "2017-06-16";
+    private static final String LAST_ZOOKEEPER_RELEASE = "3.5.3";
     private static final String[][] COLD_START_PROJECTS = { //Prese la meta delle release su jira
             {"accumulo", "1.7.0"},
             {"tajo", "0.11.0"},
@@ -20,21 +25,20 @@ public class Main {
     };
 
     public static void main(String[] args) throws ParseException, SQLException {
-        ScraperController bookkeeperScraperController = new ScraperController("bookkeeper", AUTHOR);
-        bookkeeperScraperController.getProjectDataFromDb();
-        //bookkeeperScraperController.saveProjectDataOnDb("4.5.0", "2017-06-16");
-        MeasureController bookkeeperMeasureController = new MeasureController(bookkeeperScraperController.getProject());
-        for(String[] project: COLD_START_PROJECTS) {
-            System.out.println("Processing cold start data of project: " + project[0] +" until release "+ project[1]);
-            ScraperController scraperController = new ScraperController(project[0], AUTHOR);
-            //scraperController.saveColdStartDataOnDb(project[1]);
-            scraperController.getColdStartDataFromDb();
-            bookkeeperMeasureController.addColdStartProportionProject(scraperController.getProject());
+        ScraperController scraperController = new ScraperController(ZOOKEEPER, AUTHOR);
+        //scraperController.saveProjectDataOnDb(LAST_ZOOKEEPER_RELEASE,null);
+        scraperController.getProjectDataFromDb();
+        MeasureController measureController = new MeasureController(scraperController.getProject());
+        for (String[] project : COLD_START_PROJECTS) {
+            System.out.println("Processing cold start data of project: " + project[0] + " until release " + project[1]);
+            ScraperController coldStartScraperController = new ScraperController(project[0], AUTHOR);
+            //coldStartScraperController.saveColdStartDataOnDb(project[1]);
+            coldStartScraperController.getColdStartDataFromDb();
+            measureController.addColdStartProportionProject(coldStartScraperController.getProject());
         }
-        double coldStartProportion=bookkeeperMeasureController.computeColdStartProportion();
+        double coldStartProportion = measureController.computeColdStartProportion();
         System.out.println("Cold start proportion: " + coldStartProportion);
-        bookkeeperMeasureController.setColdStartProportion(coldStartProportion);
-        //bookkeeperMeasureController.setColdStartProportion(1.5293569797101456);
-        bookkeeperMeasureController.createWalkForwardDatasets();
+        measureController.setColdStartProportion(coldStartProportion);
+        measureController.createWalkForwardDatasets();
     }
 }

@@ -4,14 +4,17 @@ import com.isw2.dao.CommitDbDao;
 import com.isw2.dao.GitDao;
 import com.isw2.dao.JiraDao;
 import com.isw2.entity.*;
+import com.isw2.util.AuthJsonParser;
 import com.isw2.util.Printer;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Logger;
 
 public class ScraperController {
     private Project project;
@@ -19,6 +22,8 @@ public class ScraperController {
     private GitDao gitDao;
     private final CommitDbDao commitDbDao;
     private static final String DATE_FORMAT = "yyyy-MM-dd";
+    private static final Logger LOGGER = Logger.getLogger(GitDao.class.getName());
+
 
     public ScraperController(String projectName, String projectAuthor) {
         this.project = new Project(projectName, projectAuthor);
@@ -208,7 +213,15 @@ public class ScraperController {
             System.out.println("Processing release " + release.getName() + " - " + release.getNumberStr() + " tree");
             if (!commits.isEmpty()) { //Questo check è necessario per evitare eccezioni in caso la release non abbia commit
                 Commit lastCommit = commits.get(0);
-                List<JavaFile> treeFiles = gitDao.getRepoFileAtReleaseEnd(lastCommit.getTreeUrl());
+                List<JavaFile> treeFiles = null;
+                try {
+                    treeFiles = gitDao.getRepoFileAtReleaseEnd(lastCommit.getTreeUrl());
+                } catch (IOException e) {
+                    AuthJsonParser.setFlag_token_onibaku(true);
+                    LOGGER.info("Token scaduto, swappo il token");
+                    i--;
+                    continue;
+                }
                 for (JavaFile file : treeFiles) {
                     commitDbDao.insertRealeaseFileTree(file.getName(), file.getContent(), this.project.getName(), release.getNumberStr());
                 }
@@ -348,8 +361,9 @@ public class ScraperController {
             e.printStackTrace();
         }
 
-        Printer.printReleasesDetailed(releasesOfInterest);
+
         saveFileTreeOnDb();
+
     }
 
     public void linkTicketDatesToReleases(List<Ticket> tickets, List<Release> releases) throws ParseException {

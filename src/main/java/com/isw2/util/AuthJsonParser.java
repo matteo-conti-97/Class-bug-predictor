@@ -16,16 +16,29 @@ import java.util.Base64;
 public class AuthJsonParser extends JsonParser {
     private static final String USERNAME = "matteo-conti-97";
     private static final String USERNAME2 = "OniBaku972";
+    private static boolean flag_token_onibaku = false;
+
+    public static void setFlag_token_onibaku(boolean flag_token_onibaku) {
+        AuthJsonParser.flag_token_onibaku = flag_token_onibaku;
+    }
 
     private InputStreamReader getAuthStream(URL url) throws IOException {
-        String token;
         URLConnection uc = url.openConnection();
         uc.setRequestProperty("X-Requested-With", "Curl");
-
-        try (BufferedReader oauthReader = new BufferedReader(new FileReader("src/main/java/resource/token/git_token"))) {
-            token = oauthReader.readLine();
+        String token;
+        String user;
+        if (flag_token_onibaku) {
+            user = USERNAME2;
+            try (BufferedReader oauthReader = new BufferedReader(new FileReader("src/main/java/resource/token/git_token_onibaku"))) {
+                token = oauthReader.readLine();
+            }
+        } else {
+            user = USERNAME;
+            try (BufferedReader oauthReader = new BufferedReader(new FileReader("src/main/java/resource/token/git_token_matteo"))) {
+                token = oauthReader.readLine();
+            }
         }
-        String userPass = USERNAME2 + ":" + token;
+        String userPass = user + ":" + token;
         byte[] encodedBytes = Base64.getEncoder().encode(userPass.getBytes());
         String basicAuth = "Basic " + new String(encodedBytes);
         uc.setRequestProperty("Authorization", basicAuth);

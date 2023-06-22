@@ -105,15 +105,11 @@ public class GitDao {
     }
 
     //Prende una copia di tutti i file al termine della release
-    public List<JavaFile> getRepoFileAtReleaseEnd(String treeUrl) {
+    public List<JavaFile> getRepoFileAtReleaseEnd(String treeUrl) throws IOException {
         List<JavaFile> ret = new ArrayList<>();
-        JsonParser jsonParser = new AuthJsonParser();
+        AuthJsonParser jsonParser = new AuthJsonParser();
         JSONObject treeJson = null;
-        try {
-            treeJson = jsonParser.readJsonFromUrl(treeUrl + "?recursive=1");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        treeJson = jsonParser.readJsonFromUrl(treeUrl + "?recursive=1");
         assert treeJson != null;
         JSONArray tree = treeJson.getJSONArray("tree");
         for (int i = 0; i < tree.length(); i++) {
@@ -124,11 +120,7 @@ public class GitDao {
                 String className = filename.substring(filename.lastIndexOf("/") + 1);
                 String fileUrl = treeElem.getString("url");
                 JSONObject fileJson = null;
-                try {
-                    fileJson = jsonParser.readJsonFromUrl(fileUrl);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                fileJson = jsonParser.readJsonFromUrl(fileUrl);
                 assert fileJson != null;
                 String fileContent = CodeParser.base64Decode(fileJson.getString("content"));
                 ret.add(new JavaFile(className, fileContent));
