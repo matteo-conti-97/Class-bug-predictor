@@ -139,7 +139,7 @@ public class MeasureController {
     }
 
     private void adjustIv(Ticket ticket){
-            if(ticket.getIv()==0){
+            if(ticket.getIv()<=0){
                 ticket.setIv(1);
             }
     }
