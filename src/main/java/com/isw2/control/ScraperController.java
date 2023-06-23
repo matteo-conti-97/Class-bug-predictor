@@ -163,7 +163,8 @@ public class ScraperController {
         List<Commit> commits;
         commits = gitDao.getAllCommitsUntil(lastRelOfInterestEndDate);
         assert commits != null;
-        LOGGER.info("commit list size: " + commits.size());
+        int commitSize = commits.size();
+        LOGGER.info("commit list size: " + commitSize);
         for (Commit commit : commits) {
             commitDbDao.insertCommit(commit.getSha(), commit.getId(), commit.getMessage(), commit.getAuthor(), commit.getDate(), commit.getTreeUrl(), this.project.getName());
             saveTouchedFilesDataOnDb(commit);
@@ -317,7 +318,13 @@ public class ScraperController {
         LOGGER.info("Last interest release end date: " + lastInterestReleaseEndDate);
         LOGGER.info("\nReleases of interest: ");
         for (Release release : releasesOfInterest) {
-            LOGGER.info("Release: " + release.getName() + " number " + release.getNumberStr() + " has " + release.getCommits().size() + " commits and " + release.getFileTreeAtReleaseEnd().size() + " non test java files, starts at " + release.getStartDate() + " and ends at " + release.getEndDate());
+            String releaseName = release.getName();
+            String releaseNumber = release.getNumberStr();
+            int releaseCommitSize = release.getCommits().size();
+            int releaseFileTreeSize = release.getFileTreeAtReleaseEnd().size();
+            String releaseStartDate = release.getStartDate();
+            String releaseEndDate = release.getEndDate();
+            LOGGER.info("Release: " + releaseName + " number " + releaseNumber + " has " + releaseCommitSize + " commits and " + releaseFileTreeSize + " non test java files, starts at " + releaseStartDate + " and ends at " + releaseEndDate);
         }
 
         List<Ticket> allTickets = getAllTickets();
