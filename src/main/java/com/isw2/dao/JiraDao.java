@@ -23,23 +23,6 @@ public class JiraDao {
         this.projectName = projectName.toUpperCase();
     }
 
-    public List<Project> getAllProjects(){
-        List<Project> ret = new ArrayList<>();
-        JsonParser jsonParser = new JsonParser();
-        JSONArray projectJsonList=null;
-        try {
-            projectJsonList = jsonParser.readJsonArrayFromUrl(ALL_PROJECTS_QUERY);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        assert projectJsonList != null;
-        for(int i=0;i<projectJsonList.length();i++){
-            JSONObject projectJson = projectJsonList.getJSONObject(i);
-            String name = projectJson.getString("key");
-            ret.add(new Project(name, "apache"));
-        }
-        return ret;
-    }
 
     /*
     Get all releases until the specified release, the releaseName must follow the name convention of jira (e.g. 1.0.0)

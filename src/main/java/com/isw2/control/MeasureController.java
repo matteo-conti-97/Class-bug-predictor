@@ -169,6 +169,7 @@ public class MeasureController {
         int tot=0;
         int propSum=0;
         if((tickets.size()<5)||(currRelNum<4)){
+            System.out.println("Per release "+currRelNum+" ho usato cold start");
             return this.coldStartProportion;//ASSUNZIONE 16/18
         }
         for(Ticket ticket: tickets){

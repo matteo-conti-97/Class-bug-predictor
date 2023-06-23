@@ -25,8 +25,8 @@ public class ScraperController {
     private static final Logger LOGGER = Logger.getLogger(GitDao.class.getName());
 
 
-    public ScraperController(String projectName, String projectAuthor) {
-        this.project = new Project(projectName, projectAuthor);
+    public ScraperController(String projectName, String projectAuthor, String projectCreationDate) {
+        this.project = new Project(projectName, projectAuthor, projectCreationDate);
         this.jiraDao = new JiraDao(project.getName());
         this.gitDao = new GitDao(project.getName(), project.getAuthor());
         this.commitDbDao = new CommitDbDao();
@@ -45,9 +45,6 @@ public class ScraperController {
         return project.getCreationDate();
     }
 
-    public void setProjectCreationDate() {
-        this.project.setCreationDate(gitDao.getProjectCreationDate());
-    }
 
     public void setProjectCreationDate(String creationDate) {
         this.project.setCreationDate(creationDate);
@@ -308,7 +305,6 @@ public class ScraperController {
     }
 
     public void getProjectDataFromDb() throws ParseException {
-        setProjectCreationDate();
         List<Release> releasesOfInterest = getReleasesOfInterestFromDb();
         setProjectReleasesOfInterest(releasesOfInterest);
         String lastInterestReleaseEndDate = getLastReleaseEndDateOfInterest();
@@ -334,7 +330,6 @@ public class ScraperController {
     }
 
     public void saveProjectDataOnDb(String lastReleaseOfInterest, String lastInterestReleaseEndDate) {
-        setProjectCreationDate();
         List<Release> allReleases = getAllReleases();
         setProjectReleases(allReleases);
         List<Release> releasesOfInterest = getReleasesOfInterest(lastReleaseOfInterest);
@@ -352,6 +347,7 @@ public class ScraperController {
         saveProjectOnDb();
         saveCommitDataOnDb(lastInterestReleaseEndDate);
         saveReleasesOfInterestOnDb();
+        System.out.println("Saved releases of interest on db");
 
         List<Commit> commits = getCommitsFromDb();
         setProjectCommits(commits);
@@ -387,7 +383,6 @@ public class ScraperController {
     }
 
     public void saveColdStartDataOnDb(String lastReleaseOfInterest) throws ParseException {
-        setProjectCreationDate();
         List<Release> allReleases = getAllReleases();
         setProjectReleases(allReleases);
         List<Release> releasesOfInterest = getReleasesOfInterest(lastReleaseOfInterest);
@@ -424,7 +419,6 @@ public class ScraperController {
     }
 
     public void getColdStartDataFromDb() throws ParseException, SQLException {
-        setProjectCreationDate();
         List<Release> releases = getReleasesFromDb();
         System.out.println("Project: " + getProjectName());
         System.out.println("Creation date: " + getProjectCreationDate());
