@@ -22,7 +22,7 @@ public class ScraperController {
     private GitDao gitDao;
     private final CommitDbDao commitDbDao;
     private static final String DATE_FORMAT = "yyyy-MM-dd";
-    private static final Logger LOGGER = Logger.getLogger(GitDao.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(ScraperController.class.getName());
 
 
     public ScraperController(String projectName, String projectAuthor, String projectCreationDate) {
@@ -216,7 +216,7 @@ public class ScraperController {
                 } catch (IOException e) {
                     AuthJsonParser.setFlag_token_onibaku(true);
                     LOGGER.info("Token scaduto, swappo il token");
-                    i--;
+                    //Mettere un i-- per ripetere la chiamata con il nuovo token
                     continue;
                 }
                 for (JavaFile file : treeFiles) {

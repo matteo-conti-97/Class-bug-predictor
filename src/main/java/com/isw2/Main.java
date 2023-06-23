@@ -2,7 +2,6 @@ package com.isw2;
 
 import com.isw2.control.MeasureController;
 import com.isw2.control.ScraperController;
-import com.isw2.util.AuthJsonParser;
 
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -27,14 +26,17 @@ public class Main {
     };
 
     public static void main(String[] args) throws ParseException, SQLException {
-        ScraperController scraperController = new ScraperController(BOOKKEEPER, AUTHOR, BOOKKEEPER_CREATION);
-        //scraperController.saveProjectDataOnDb(LAST_ZOOKEEPER_RELEASE,null);
+        createDataset(BOOKKEEPER, BOOKKEEPER_CREATION);
+        createDataset(ZOOKEEPER, ZOOKEEPER_CREATION);
+    }
+
+    public static void createDataset(String project, String projectCreationDate) throws ParseException, SQLException {
+        ScraperController scraperController = new ScraperController(project, AUTHOR, projectCreationDate);
         scraperController.getProjectDataFromDb();
         MeasureController measureController = new MeasureController(scraperController.getProject());
-        for (String[] project : COLD_START_PROJECTS) {
-            System.out.println("Processing cold start data of project: " + project[0] + " until release " + project[1]);
-            ScraperController coldStartScraperController = new ScraperController(project[0], AUTHOR, project[2]);
-            //coldStartScraperController.saveColdStartDataOnDb(project[1]);
+        for (String[] coldStartProject : COLD_START_PROJECTS) {
+            System.out.println("Processing cold start data of project: " + coldStartProject[0] + " until release " + coldStartProject[1]);
+            ScraperController coldStartScraperController = new ScraperController(coldStartProject[0], AUTHOR, coldStartProject[2]);
             coldStartScraperController.getColdStartDataFromDb();
             measureController.addColdStartProportionProject(coldStartScraperController.getProject());
         }
@@ -42,5 +44,17 @@ public class Main {
         System.out.println("Cold start proportion: " + coldStartProportion);
         measureController.setColdStartProportion(coldStartProportion);
         measureController.createWalkForwardDatasets();
+    }
+
+    public void scrapeDatasetData() throws ParseException {
+        ScraperController scraperController1 = new ScraperController(BOOKKEEPER, AUTHOR, BOOKKEEPER_CREATION);
+        scraperController1.saveProjectDataOnDb(LAST_BOOKKEEPER_RELEASE, LAST_BOOKKEEPER_RELEASE_END);
+        ScraperController scraperController2 = new ScraperController(ZOOKEEPER, AUTHOR, ZOOKEEPER_CREATION);
+        scraperController2.saveProjectDataOnDb(LAST_ZOOKEEPER_RELEASE, null);
+        for (String[] coldStartProject : COLD_START_PROJECTS) {
+            System.out.println("Scraping cold start data of project: " + coldStartProject[0] + " until release " + coldStartProject[1]);
+            ScraperController coldStartScraperController = new ScraperController(coldStartProject[0], AUTHOR, coldStartProject[2]);
+            coldStartScraperController.saveColdStartDataOnDb(coldStartProject[1]);
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.isw2.dao;
 
+import com.isw2.control.ScraperController;
 import com.isw2.entity.Commit;
 import com.isw2.entity.JavaFile;
 import com.isw2.util.AuthJsonParser;
@@ -11,11 +12,13 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class GitDao {
     private String projectName;
     private String author;
     private String repoUrl;
+    private static final Logger LOGGER = Logger.getLogger(GitDao.class.getName());
 
     public GitDao(String projectName, String author) {
         this.projectName = projectName.toLowerCase();
@@ -83,9 +86,8 @@ public class GitDao {
         long commitId = 0;
         while (true) {
             JSONArray tmp;
-            System.out.println("page: " + page);
             String query = repoUrl + "/commits?until=" + relEndDate + "&per_page=100&page=" + page;
-            System.out.println(query);
+            LOGGER.info(query);
             try {
                 tmp = jsonParser.readJsonArrayFromUrl(query);
                 if (tmp.length() == 0) break;

@@ -63,7 +63,7 @@ public class MeasureController {
         }
     }
 
-    public void affectPreviousVersion(JavaFile file, List<List<JavaFile>> releaseFiles, List<Ticket> tickets, Commit commit){
+    public void affectPreviousVersion(JavaFile file, List<List<JavaFile>> releaseFiles, List<Ticket> tickets){
         for(Ticket ticket: tickets){
             int iv=ticket.getIv();
             setBuggy(file, releaseFiles, iv-1, releaseFiles.size()-1, "1"); //Setto buggy a 1 il file nelle release successive all'IV
@@ -90,7 +90,7 @@ public class MeasureController {
                     processedFiles.add(file);
                     List<Ticket> commitLinkedTickets= getCommitFixTickets(commit,tickets);
                     file.setBuggy("0"); //Nella current release o non è buggy o è stato fixato
-                    if (!commitLinkedTickets.isEmpty()) affectPreviousVersion(file, releaseFiles, commitLinkedTickets, commit);
+                    if (!commitLinkedTickets.isEmpty()) affectPreviousVersion(file, releaseFiles, commitLinkedTickets);
                 }
             }
         }
@@ -132,9 +132,7 @@ public class MeasureController {
                     else  iv=(int) (fv-(proportion*(fv-ov)));
                     ticket.setIv(iv);
                     adjustIv(ticket); //Se iv è 0 lo setto a 1 perche le release le numero a partire da 1
-                    //System.out.println("Ticket aveva jira AV vuote " + ticket.getKey() + " ha IV " + ticket.getIv() + " perche fv è " + ticket.getFv().getName()+" num "+fv + " e ov è " + ticket.getOv().getName()+" num "+ ov + " con proportion "+proportion);
                 }
-
         }
     }
 
@@ -177,7 +175,6 @@ public class MeasureController {
             int fv=ticket.getFv().getNumber();
             int ov=ticket.getOv().getNumber();
             int iv=ticket.getIv();
-            //System.out.println("Incremental proportion - Ticket "+ticket.getKey()+" ha IV "+iv+" perche fv è "+ticket.getFv().getName()+" num "+fv+" e ov è "+ticket.getOv().getName()+" num "+ ov);
             if((fv>ov)&&(fv>iv)&&(ov>=iv)){
                 prop=((double)(fv - iv) /(fv-ov)); //ASSUNZIONE 14
                 propSum+=prop;
@@ -329,7 +326,6 @@ public class MeasureController {
             double projProp=computeProjectColdStartProportion(proj);
             allPropSum+=projProp;
         }
-
         return allPropSum/allPropCnt;
     }
 
