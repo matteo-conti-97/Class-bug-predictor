@@ -2,18 +2,20 @@ package com.isw2.control;
 
 import com.isw2.entity.*;
 import com.isw2.util.CsvHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.logging.Logger;
+
 
 public class MeasureController {
     private final Project project;
     private List<Project> coldStartProportionProjects;
     private double coldStartProportion;
-    private static final Logger LOGGER = Logger.getLogger(MeasureController.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MeasureController.class);
 
     public MeasureController(Project project) {
         this.project = project;
@@ -169,7 +171,7 @@ public class MeasureController {
         int tot=0;
         int propSum=0;
         if((tickets.size()<5)||(currRelNum<4)){
-            LOGGER.info("Per release "+currRelNum+" ho usato cold start");
+            LOGGER.debug("Per release {} ho usato cold start", currRelNum);
             return this.coldStartProportion;//ASSUNZIONE 16/18
         }
         for(Ticket ticket: tickets){
@@ -185,7 +187,7 @@ public class MeasureController {
         }
         assert tot != 0;
         double ret=(double) propSum /tot;
-        LOGGER.info("Incremental Proportion per " + currRelNum+" release è "+ret+" propSum "+propSum+" tot "+tot);
+        LOGGER.debug("Incremental Proportion per release {} è {} propSum {} e tot {}", currRelNum, ret, propSum, tot);
         return ret;
     }
 
@@ -298,18 +300,19 @@ public class MeasureController {
         return ret;
     }
 
-    private double computeProjectColdStartProportion(Project project){
-        LOGGER.info("Computing proportion for "+project.getName());
-        double projPropSum=0;
-        double projPropCnt=0;
+    private double computeProjectColdStartProportion(Project project) {
+        String projectName = project.getName();
+        LOGGER.debug("Computing proportion for {}", projectName);
+        double projPropSum = 0;
+        double projPropCnt = 0;
 
-        for(Ticket ticket: project.getFixedBugTickets()){
-            if(!ticket.getJiraAv().isEmpty()){
-                int fv=ticket.getFv().getNumber();
-                int ov=ticket.getOv().getNumber();
-                List<Integer> avs=convertReleaseToNumber(ticket.getJiraAv());
+        for (Ticket ticket : project.getFixedBugTickets()) {
+            if (!ticket.getJiraAv().isEmpty()) {
+                int fv = ticket.getFv().getNumber();
+                int ov = ticket.getOv().getNumber();
+                List<Integer> avs = convertReleaseToNumber(ticket.getJiraAv());
                 int iv = Collections.min(avs); //Perche la prima release deve essere 1 ma quando ho popolato ho omesso il +1
-                if((fv<=ov)||(fv<=iv)||(ov<iv)){ //ASSUNZIONE 14
+                if ((fv <= ov) || (fv <= iv) || (ov < iv)) { //ASSUNZIONE 14
                     continue;
                 }
                 projPropCnt++;

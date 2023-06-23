@@ -7,17 +7,19 @@ import com.isw2.util.CodeParser;
 import com.isw2.util.JsonParser;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
+
 
 public class GitDao {
     private String projectName;
     private String author;
     private String repoUrl;
-    private static final Logger LOGGER = Logger.getLogger(GitDao.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(GitDao.class);
 
     public GitDao(String projectName, String author) {
         this.projectName = projectName.toLowerCase();

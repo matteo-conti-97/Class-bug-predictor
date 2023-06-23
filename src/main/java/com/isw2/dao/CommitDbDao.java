@@ -4,18 +4,20 @@ import com.isw2.entity.Commit;
 import com.isw2.entity.JavaFile;
 import com.isw2.entity.Release;
 import com.isw2.entity.Ticket;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
+
 
 public class CommitDbDao {
     private Connection conn;
     private static final String DB_URL = "jdbc:mysql://localhost:3306/isw2_scraping_db?allowPublicKeyRetrieval=true&useSSL=false";
     private static final String DB_USERNAME = "root";
     private static final String DB_PASSWORD = "root";
-    private static final Logger LOGGER = Logger.getLogger(CommitDbDao.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommitDbDao.class);
 
     public CommitDbDao() {
         try {
@@ -332,7 +334,7 @@ public class CommitDbDao {
                 ticket.setJiraAv(av);
             } catch (SQLException e) {
                 e.printStackTrace();
-                LOGGER.info("Select ticket "+ticket.getKey()+" fallito");
+                LOGGER.debug("Select ticket {} fallito ", ticket.getKey());
             } finally {
                 assert ps != null;
                 ps.close();
