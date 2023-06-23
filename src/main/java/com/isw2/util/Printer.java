@@ -14,7 +14,7 @@ public class Printer {
 
     public static void printTicketsDetailed(List<Ticket> tickets) {
         int ticketSize = tickets.size();
-        LOGGER.debug("\n{} tickets:", ticketSize);
+        LOGGER.info("\n{} tickets:", ticketSize);
         for (Ticket ticket : tickets) {
             String ticketKey = ticket.getKey();
             String ticketCreationDate = ticket.getCreationDate();
@@ -23,31 +23,31 @@ public class Printer {
             String fvNumber = ticket.getFv().getNumberStr();
             String ovName = ticket.getOv().getName();
             String ovNumber = ticket.getOv().getNumberStr();
-            LOGGER.debug("{} Creation Date: {} Resolution Date: {} Fix Version: {} Num: {} Creation Date: {} Opening Version: {} Num: {}", ticketKey, ticketCreationDate, ticketResolutionDate, fvName, fvNumber, ticket.getCreationDate(), ovName, ovNumber);
+            LOGGER.info("{} Creation Date: {} Resolution Date: {} Fix Version: {} Num: {} Creation Date: {} Opening Version: {} Num: {}", ticketKey, ticketCreationDate, ticketResolutionDate, fvName, fvNumber, ticket.getCreationDate(), ovName, ovNumber);
             LOGGER.info("\tAffected Versions: ");
             for (Release av : ticket.getJiraAv()) {
                 String avName = av.getName();
-                LOGGER.debug("\t\tVersion: {}", avName);
+                LOGGER.info("\t\tVersion: {}", avName);
             }
         }
     }
 
     public static void printTicketsBasic(List<Ticket> tickets){
         int ticketSize = tickets.size();
-        LOGGER.debug("\n{} tickets", ticketSize);
+        LOGGER.info("\n{} tickets", ticketSize);
         for (Ticket ticket : tickets) {
             String ticketKey = ticket.getKey();
             String ticketCreationDate = ticket.getCreationDate();
             String ticketResolutionDate = ticket.getResolutionDate();
-            LOGGER.debug("{} Creation Date: {} Resolution Date: {}", ticketKey, ticketCreationDate, ticketResolutionDate);
+            LOGGER.info("{} Creation Date: {} Resolution Date: {}", ticketKey, ticketCreationDate, ticketResolutionDate);
         }
     }
 
     public static void printProjectInfo(Project project) {
         String projectName = project.getName();
         String projectCreationDate = project.getCreationDate();
-        LOGGER.debug("Project: {}", projectName);
-        LOGGER.debug("Creation date: {}", projectCreationDate);
+        LOGGER.info("Project: {}", projectName);
+        LOGGER.info("Creation date: {}", projectCreationDate);
     }
 
     public static void printReleasesDetailed(List<Release> releases){
@@ -59,7 +59,7 @@ public class Printer {
             String releaseEndDate = release.getEndDate();
             int releaseNumCommits = release.getCommits().size();
             int releaseNumFiles = release.getFileTreeAtReleaseEnd().size();
-            LOGGER.debug("Release: {} number {} has {} commits and {} non test java files, starts at {} and ends at {}", releaseName, releaseNumber, releaseNumCommits, releaseNumFiles, releaseStartDate, releaseEndDate);
+            LOGGER.info("Release: {} number {} has {} commits and {} non test java files, starts at {} and ends at {}", releaseName, releaseNumber, releaseNumCommits, releaseNumFiles, releaseStartDate, releaseEndDate);
         }
     }
 
@@ -70,7 +70,7 @@ public class Printer {
             String releaseNumber = release.getNumberStr();
             String releaseStartDate = release.getStartDate();
             String releaseEndDate = release.getEndDate();
-            LOGGER.debug("Release: {} number {} starts at {} and ends at {}", releaseName, releaseNumber, releaseStartDate, releaseEndDate);
+            LOGGER.info("Release: {} number {} starts at {} and ends at {}", releaseName, releaseNumber, releaseStartDate, releaseEndDate);
         }
     }
 }

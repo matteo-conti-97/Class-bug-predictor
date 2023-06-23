@@ -166,7 +166,7 @@ public class ScraperController {
         commits = gitDao.getAllCommitsUntil(lastRelOfInterestEndDate);
         assert commits != null;
         int commitSize = commits.size();
-        LOGGER.debug("commit list size: {}", commitSize);
+        LOGGER.info("commit list size: {}", commitSize);
         for (Commit commit : commits) {
             commitDbDao.insertCommit(commit.getSha(), commit.getId(), commit.getMessage(), commit.getAuthor(), commit.getDate(), commit.getTreeUrl(), this.project.getName());
             saveTouchedFilesDataOnDb(commit);
@@ -212,7 +212,7 @@ public class ScraperController {
             List<Commit> commits = release.getCommits();
             String releaseName = release.getName();
             String releaseNumber = release.getNumberStr();
-            LOGGER.debug("Processing release {} - {} tree", releaseName, releaseNumber);
+            LOGGER.info("Processing release {} - {} tree", releaseName, releaseNumber);
             if (!commits.isEmpty()) { //Questo check è necessario per evitare eccezioni in caso la release non abbia commit
                 Commit lastCommit = commits.get(0);
                 List<JavaFile> treeFiles = null;
@@ -317,9 +317,9 @@ public class ScraperController {
         setProjectCommits(commits);
         linkCommitsToReleases();
         removeEmptyReleases(); //ASSUNZIONE 2
-        LOGGER.debug("Project: {}", getProjectName());
-        LOGGER.debug("Creation date: {}", getProjectCreationDate());
-        LOGGER.debug("Last interest release end date: {}", lastInterestReleaseEndDate);
+        LOGGER.info("Project: {}", getProjectName());
+        LOGGER.info("Creation date: {}", getProjectCreationDate());
+        LOGGER.info("Last interest release end date: {}", lastInterestReleaseEndDate);
         LOGGER.info("\nReleases of interest: ");
         for (Release release : releasesOfInterest) {
             String releaseName = release.getName();
@@ -328,7 +328,7 @@ public class ScraperController {
             int releaseFileTreeSize = release.getFileTreeAtReleaseEnd().size();
             String releaseStartDate = release.getStartDate();
             String releaseEndDate = release.getEndDate();
-            LOGGER.debug("Release: {} number {} has {} commits and {} non test java files, starts at {} and ends at {}", releaseName, releaseNumber, releaseCommitSize, releaseFileTreeSize, releaseStartDate, releaseEndDate);
+            LOGGER.info("Release: {} number {} has {} commits and {} non test java files, starts at {} and ends at {}", releaseName, releaseNumber, releaseCommitSize, releaseFileTreeSize, releaseStartDate, releaseEndDate);
         }
 
         List<Ticket> allTickets = getAllTickets();
@@ -433,15 +433,15 @@ public class ScraperController {
         List<Release> releases = getReleasesFromDb();
         String projectName = getProjectName();
         String projectCreationDate = getProjectCreationDate();
-        LOGGER.debug("Project: {}", projectName);
-        LOGGER.debug("Creation date: {}", projectCreationDate);
-        LOGGER.debug("\nReleases: ");
+        LOGGER.info("Project: {}", projectName);
+        LOGGER.info("Creation date: {}", projectCreationDate);
+        LOGGER.info("\nReleases: ");
         for (Release release : releases) {
             String releaseName = release.getName();
             String releaseNumber = release.getNumberStr();
             String releaseStartDate = release.getStartDate();
             String releaseEndDate = release.getEndDate();
-            LOGGER.debug("Release: {} number {} starts at {} and ends at {}", releaseName, releaseNumber, releaseStartDate, releaseEndDate);
+            LOGGER.info("Release: {} number {} starts at {} and ends at {}", releaseName, releaseNumber, releaseStartDate, releaseEndDate);
         }
         List<Ticket> allTickets = commitDbDao.getTickets(this.project.getName());
 

@@ -171,7 +171,7 @@ public class MeasureController {
         int tot=0;
         int propSum=0;
         if((tickets.size()<5)||(currRelNum<4)){
-            LOGGER.debug("Per release {} ho usato cold start", currRelNum);
+            LOGGER.info("Per release {} ho usato cold start", currRelNum);
             return this.coldStartProportion;//ASSUNZIONE 16/18
         }
         for(Ticket ticket: tickets){
@@ -187,7 +187,7 @@ public class MeasureController {
         }
         assert tot != 0;
         double ret=(double) propSum /tot;
-        LOGGER.debug("Incremental Proportion per release {} è {} propSum {} e tot {}", currRelNum, ret, propSum, tot);
+        LOGGER.info("Incremental Proportion per release {} è {} propSum {} e tot {}", currRelNum, ret, propSum, tot);
         return ret;
     }
 
@@ -302,7 +302,7 @@ public class MeasureController {
 
     private double computeProjectColdStartProportion(Project project) {
         String projectName = project.getName();
-        LOGGER.debug("Computing proportion for {}", projectName);
+        LOGGER.info("Computing proportion for {}", projectName);
         double projPropSum = 0;
         double projPropCnt = 0;
 

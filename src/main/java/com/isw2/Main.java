@@ -38,13 +38,13 @@ public class Main {
         scraperController.getProjectDataFromDb();
         MeasureController measureController = new MeasureController(scraperController.getProject());
         for (String[] coldStartProject : COLD_START_PROJECTS) {
-            LOGGER.debug("Processing cold start data of project: {} until release {}", coldStartProject[0], coldStartProject[1]);
+            LOGGER.info("Processing cold start data of project: {} until release {}", coldStartProject[0], coldStartProject[1]);
             ScraperController coldStartScraperController = new ScraperController(coldStartProject[0], AUTHOR, coldStartProject[2]);
             coldStartScraperController.getColdStartDataFromDb();
             measureController.addColdStartProportionProject(coldStartScraperController.getProject());
         }
         double coldStartProportion = measureController.computeColdStartProportion();
-        LOGGER.debug("Cold start proportion: {}", coldStartProportion);
+        LOGGER.info("Cold start proportion: {}", coldStartProportion);
         measureController.setColdStartProportion(coldStartProportion);
         measureController.createWalkForwardDatasets();
     }
@@ -55,7 +55,7 @@ public class Main {
         ScraperController scraperController2 = new ScraperController(ZOOKEEPER, AUTHOR, ZOOKEEPER_CREATION);
         scraperController2.saveProjectDataOnDb(LAST_ZOOKEEPER_RELEASE, null);
         for (String[] coldStartProject : COLD_START_PROJECTS) {
-            LOGGER.debug("Scraping cold start data of project: {} until release {}", coldStartProject[0], coldStartProject[1]);
+            LOGGER.info("Scraping cold start data of project: {} until release {}", coldStartProject[0], coldStartProject[1]);
             ScraperController coldStartScraperController = new ScraperController(coldStartProject[0], AUTHOR, coldStartProject[2]);
             coldStartScraperController.saveColdStartDataOnDb(coldStartProject[1]);
         }

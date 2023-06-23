@@ -334,7 +334,7 @@ public class CommitDbDao {
                 ticket.setJiraAv(av);
             } catch (SQLException e) {
                 e.printStackTrace();
-                LOGGER.debug("Select ticket {} fallito ", ticket.getKey());
+                LOGGER.info("Select ticket {} fallito ", ticket.getKey());
             } finally {
                 assert ps != null;
                 ps.close();

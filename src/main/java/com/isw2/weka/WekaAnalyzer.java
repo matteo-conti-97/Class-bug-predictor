@@ -30,9 +30,9 @@ public class WekaAnalyzer {
 
         eval.evaluateModel(classifier, testing);
         double auc = eval.areaUnderROC(1);
-        LOGGER.debug("AUC = {}", auc);
+        LOGGER.info("AUC = {}", auc);
         double kappa = eval.kappa();
-        LOGGER.debug("Kappa = {}", kappa);
+        LOGGER.info("Kappa = {}", kappa);
 
 
     }
