@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 public class Printer {
-    private final static Logger LOGGER = LoggerFactory.getLogger(Printer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Printer.class);
     private Printer(){}
 
     public static void printTicketsDetailed(List<Ticket> tickets) {
@@ -38,7 +38,7 @@ public class Printer {
             String ticketKey = ticket.getKey();
             String ticketCreationDate = ticket.getCreationDate();
             String ticketResolutionDate = ticket.getResolutionDate();
-            LOGGER.debug("{} Creation Date: {} Resolution Date: {}", ticket.getKey(), ticket.getCreationDate(), ticket.getResolutionDate());
+            LOGGER.debug("{} Creation Date: {} Resolution Date: {}", ticketKey, ticketCreationDate, ticketResolutionDate);
         }
     }
 
