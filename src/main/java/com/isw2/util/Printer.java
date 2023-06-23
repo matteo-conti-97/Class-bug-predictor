@@ -15,11 +15,17 @@ public class Printer {
     public static void printTicketsDetailed(List<Ticket> tickets) {
         int ticketSize = tickets.size();
         LOGGER.debug("\n{} tickets:", ticketSize);
-        for (Ticket tmp : tickets) {
-            String stringa = tmp.getKey() + " Resolution Date: " + tmp.getResolutionDate() + " Fix Version: " + tmp.getFv().getName() + " Num: " + tmp.getFv().getNumberStr() + " Creation Date: " + tmp.getCreationDate() + " Opening Version:" + tmp.getOv().getName() + " Num: " + tmp.getOv().getNumberStr();
-            LOGGER.info(stringa);
+        for (Ticket ticket : tickets) {
+            String ticketKey = ticket.getKey();
+            String ticketCreationDate = ticket.getCreationDate();
+            String ticketResolutionDate = ticket.getResolutionDate();
+            String fvName = ticket.getFv().getName();
+            String fvNumber = ticket.getFv().getNumberStr();
+            String ovName = ticket.getOv().getName();
+            String ovNumber = ticket.getOv().getNumberStr();
+            LOGGER.debug("{} Creation Date: {} Resolution Date: {} Fix Version: {} Num: {} Creation Date: {} Opening Version: {} Num: {}", ticketKey, ticketCreationDate, ticketResolutionDate, fvName, fvNumber, ticket.getCreationDate(), ovName, ovNumber);
             LOGGER.info("\tAffected Versions: ");
-            for (Release av : tmp.getJiraAv()) {
+            for (Release av : ticket.getJiraAv()) {
                 String avName = av.getName();
                 LOGGER.debug("\t\tVersion: {}", avName);
             }
@@ -29,8 +35,10 @@ public class Printer {
     public static void printTicketsBasic(List<Ticket> tickets){
         LOGGER.debug("\n" + tickets.size() + " tickets:");
         for (Ticket ticket : tickets) {
-            String stringa=ticket.getKey() + " Resolution Date: " + ticket.getResolutionDate()+ " Creation Date: " + ticket.getCreationDate();
-            LOGGER.info(stringa);
+            String ticketKey = ticket.getKey();
+            String ticketCreationDate = ticket.getCreationDate();
+            String ticketResolutionDate = ticket.getResolutionDate();
+            LOGGER.debug("{} Creation Date: {} Resolution Date: {}", ticket.getKey(), ticket.getCreationDate(), ticket.getResolutionDate());
         }
     }
 
