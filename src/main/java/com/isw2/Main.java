@@ -5,9 +5,11 @@ import com.isw2.control.ScraperController;
 
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.util.logging.Logger;
 
 
 public class Main {
+    private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
     private static final String AUTHOR = "apache";
     private static final String ZOOKEEPER = "zookeeper";
     private static final String BOOKKEEPER = "bookkeeper";
@@ -35,13 +37,13 @@ public class Main {
         scraperController.getProjectDataFromDb();
         MeasureController measureController = new MeasureController(scraperController.getProject());
         for (String[] coldStartProject : COLD_START_PROJECTS) {
-            System.out.println("Processing cold start data of project: " + coldStartProject[0] + " until release " + coldStartProject[1]);
+            LOGGER.info("Processing cold start data of project: " + coldStartProject[0] + " until release " + coldStartProject[1]);
             ScraperController coldStartScraperController = new ScraperController(coldStartProject[0], AUTHOR, coldStartProject[2]);
             coldStartScraperController.getColdStartDataFromDb();
             measureController.addColdStartProportionProject(coldStartScraperController.getProject());
         }
         double coldStartProportion = measureController.computeColdStartProportion();
-        System.out.println("Cold start proportion: " + coldStartProportion);
+        LOGGER.info("Cold start proportion: " + coldStartProportion);
         measureController.setColdStartProportion(coldStartProportion);
         measureController.createWalkForwardDatasets();
     }
@@ -52,7 +54,7 @@ public class Main {
         ScraperController scraperController2 = new ScraperController(ZOOKEEPER, AUTHOR, ZOOKEEPER_CREATION);
         scraperController2.saveProjectDataOnDb(LAST_ZOOKEEPER_RELEASE, null);
         for (String[] coldStartProject : COLD_START_PROJECTS) {
-            System.out.println("Scraping cold start data of project: " + coldStartProject[0] + " until release " + coldStartProject[1]);
+            LOGGER.info("Scraping cold start data of project: " + coldStartProject[0] + " until release " + coldStartProject[1]);
             ScraperController coldStartScraperController = new ScraperController(coldStartProject[0], AUTHOR, coldStartProject[2]);
             coldStartScraperController.saveColdStartDataOnDb(coldStartProject[1]);
         }
