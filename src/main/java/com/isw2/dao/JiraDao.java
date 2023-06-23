@@ -1,6 +1,5 @@
 package com.isw2.dao;
 
-import com.isw2.entity.Project;
 import com.isw2.entity.Release;
 import com.isw2.entity.Ticket;
 import com.isw2.util.JsonParser;
@@ -17,7 +16,6 @@ public class JiraDao {
     private final String projectName;
     private static final String FIXED_BUG_QUERY = "https://issues.apache.org/jira/rest/api/2/search?jql=project='%s'AND'issueType'='Bug'AND('status'='closed'OR'status'='resolved')AND'resolution'='fixed'&fields=key,resolutiondate,versions,created&startAt=%s&maxResults=%s";
     private static final String ALL_RELEASE_QUERY = "https://issues.apache.org/jira/rest/api/2/project/%s/version?maxResults=1000&orderBy=releaseDate&status=released";
-    private static final String ALL_PROJECTS_QUERY = "https://issues.apache.org/jira/rest/api/2/project/";
 
     public JiraDao(String projectName) {
         this.projectName = projectName.toUpperCase();

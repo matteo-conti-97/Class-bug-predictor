@@ -1,6 +1,5 @@
 package com.isw2.dao;
 
-import com.isw2.control.ScraperController;
 import com.isw2.entity.Commit;
 import com.isw2.entity.JavaFile;
 import com.isw2.util.AuthJsonParser;
