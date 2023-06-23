@@ -1,5 +1,7 @@
 package com.isw2.weka;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
 import weka.core.Instances;
@@ -7,6 +9,7 @@ import weka.core.converters.ConverterUtils.DataSource;
 
 
 public class WekaAnalyzer {
+    private static final Logger LOGGER = LoggerFactory.getLogger(WekaAnalyzer.class);
 
     public static void main(String[] args) throws Exception {
         //load datasets
@@ -26,9 +29,10 @@ public class WekaAnalyzer {
         Evaluation eval = new Evaluation(testing);
 
         eval.evaluateModel(classifier, testing);
-
-        System.out.println("AUC = " + eval.areaUnderROC(1));
-        System.out.println("Kappa = " + eval.kappa());
+        double auc = eval.areaUnderROC(1);
+        LOGGER.debug("AUC = {}", auc);
+        double kappa = eval.kappa();
+        LOGGER.debug("Kappa = {}", kappa);
 
 
     }

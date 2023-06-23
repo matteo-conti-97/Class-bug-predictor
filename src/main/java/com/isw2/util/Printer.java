@@ -33,7 +33,8 @@ public class Printer {
     }
 
     public static void printTicketsBasic(List<Ticket> tickets){
-        LOGGER.debug("\n" + tickets.size() + " tickets:");
+        int ticketSize = tickets.size();
+        LOGGER.debug("\n{} tickets", ticketSize);
         for (Ticket ticket : tickets) {
             String ticketKey = ticket.getKey();
             String ticketCreationDate = ticket.getCreationDate();
