@@ -163,7 +163,7 @@ public class ScraperController {
         List<Commit> commits;
         commits = gitDao.getAllCommitsUntil(lastRelOfInterestEndDate);
         assert commits != null;
-        System.out.println("commit list size: " + commits.size());
+        LOGGER.info("commit list size: " + commits.size());
         for (Commit commit : commits) {
             commitDbDao.insertCommit(commit.getSha(), commit.getId(), commit.getMessage(), commit.getAuthor(), commit.getDate(), commit.getTreeUrl(), this.project.getName());
             saveTouchedFilesDataOnDb(commit);
@@ -207,14 +207,14 @@ public class ScraperController {
         for (int i = start; i < releaseOfInterest.size(); i++) {
             Release release = releaseOfInterest.get(i);
             List<Commit> commits = release.getCommits();
-            System.out.println("Processing release " + release.getName() + " - " + release.getNumberStr() + " tree");
+            LOGGER.info("Processing release " + release.getName() + " - " + release.getNumberStr() + " tree");
             if (!commits.isEmpty()) { //Questo check è necessario per evitare eccezioni in caso la release non abbia commit
                 Commit lastCommit = commits.get(0);
                 List<JavaFile> treeFiles = null;
                 try {
                     treeFiles = gitDao.getRepoFileAtReleaseEnd(lastCommit.getTreeUrl());
                 } catch (IOException e) {
-                    AuthJsonParser.setFlag_token_onibaku(true);
+                    AuthJsonParser.setFlagTokenOnibaku(true);
                     LOGGER.info("Token scaduto, swappo il token");
                     //Mettere un i-- per ripetere la chiamata con il nuovo token
                     continue;
@@ -312,12 +312,12 @@ public class ScraperController {
         setProjectCommits(commits);
         linkCommitsToReleases();
         removeEmptyReleases(); //ASSUNZIONE 2
-        System.out.println("Project: " + getProjectName());
-        System.out.println("Creation date: " + getProjectCreationDate());
-        System.out.println("Last interest release end date: " + lastInterestReleaseEndDate);
-        System.out.println("\nReleases of interest: ");
+        LOGGER.info("Project: " + getProjectName());
+        LOGGER.info("Creation date: " + getProjectCreationDate());
+        LOGGER.info("Last interest release end date: " + lastInterestReleaseEndDate);
+        LOGGER.info("\nReleases of interest: ");
         for (Release release : releasesOfInterest) {
-            System.out.println("Release: " + release.getName() + " number " + release.getNumberStr() + " has " + release.getCommits().size() + " commits and " + release.getFileTreeAtReleaseEnd().size() + " non test java files, starts at " + release.getStartDate() + " and ends at " + release.getEndDate());
+            LOGGER.info("Release: " + release.getName() + " number " + release.getNumberStr() + " has " + release.getCommits().size() + " commits and " + release.getFileTreeAtReleaseEnd().size() + " non test java files, starts at " + release.getStartDate() + " and ends at " + release.getEndDate());
         }
 
         List<Ticket> allTickets = getAllTickets();
@@ -347,7 +347,7 @@ public class ScraperController {
         saveProjectOnDb();
         saveCommitDataOnDb(lastInterestReleaseEndDate);
         saveReleasesOfInterestOnDb();
-        System.out.println("Saved releases of interest on db");
+        LOGGER.info("Saved releases of interest on db");
 
         List<Commit> commits = getCommitsFromDb();
         setProjectCommits(commits);
@@ -420,10 +420,10 @@ public class ScraperController {
 
     public void getColdStartDataFromDb() throws ParseException, SQLException {
         List<Release> releases = getReleasesFromDb();
-        System.out.println("Project: " + getProjectName());
-        System.out.println("Creation date: " + getProjectCreationDate());
+        LOGGER.info("Project: " + getProjectName());
+        LOGGER.info("Creation date: " + getProjectCreationDate());
         for (Release release : releases) {
-            System.out.println("Release: " + release.getName() + " number " + release.getNumberStr() + " starts at " + release.getStartDate() + " and ends at " + release.getEndDate());
+            LOGGER.info("Release: " + release.getName() + " number " + release.getNumberStr() + " starts at " + release.getStartDate() + " and ends at " + release.getEndDate());
         }
         List<Ticket> allTickets = commitDbDao.getTickets(this.project.getName());
 

@@ -16,10 +16,10 @@ import java.util.Base64;
 public class AuthJsonParser extends JsonParser {
     private static final String USERNAME = "matteo-conti-97";
     private static final String USERNAME2 = "OniBaku972";
-    private static boolean flag_token_onibaku = false;
+    private static boolean flagTokenOnibaku = false;
 
-    public static void setFlag_token_onibaku(boolean flag_token_onibaku) {
-        AuthJsonParser.flag_token_onibaku = flag_token_onibaku;
+    public static void setFlagTokenOnibaku(boolean flagTokenOnibaku) {
+        AuthJsonParser.flagTokenOnibaku = flagTokenOnibaku;
     }
 
     private InputStreamReader getAuthStream(URL url) throws IOException {
@@ -27,7 +27,7 @@ public class AuthJsonParser extends JsonParser {
         uc.setRequestProperty("X-Requested-With", "Curl");
         String token;
         String user;
-        if (flag_token_onibaku) {
+        if (flagTokenOnibaku) {
             user = USERNAME2;
             try (BufferedReader oauthReader = new BufferedReader(new FileReader("src/main/java/resource/token/git_token_onibaku"))) {
                 token = oauthReader.readLine();

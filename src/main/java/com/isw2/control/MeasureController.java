@@ -7,11 +7,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Logger;
 
 public class MeasureController {
     private final Project project;
     private List<Project> coldStartProportionProjects;
     private double coldStartProportion;
+    private static final Logger LOGGER = Logger.getLogger(MeasureController.class.getName());
 
     public MeasureController(Project project) {
         this.project = project;
@@ -167,7 +169,7 @@ public class MeasureController {
         int tot=0;
         int propSum=0;
         if((tickets.size()<5)||(currRelNum<4)){
-            System.out.println("Per release "+currRelNum+" ho usato cold start");
+            LOGGER.info("Per release "+currRelNum+" ho usato cold start");
             return this.coldStartProportion;//ASSUNZIONE 16/18
         }
         for(Ticket ticket: tickets){
@@ -183,7 +185,7 @@ public class MeasureController {
         }
         assert tot != 0;
         double ret=(double) propSum /tot;
-        System.out.println("Incremental Proportion per " + currRelNum+" release è "+ret+" propSum "+propSum+" tot "+tot);
+        LOGGER.info("Incremental Proportion per " + currRelNum+" release è "+ret+" propSum "+propSum+" tot "+tot);
         return ret;
     }
 
@@ -297,7 +299,7 @@ public class MeasureController {
     }
 
     private double computeProjectColdStartProportion(Project project){
-        System.out.println("Computing proportion for "+project.getName());
+        LOGGER.info("Computing proportion for "+project.getName());
         double projPropSum=0;
         double projPropCnt=0;
 
