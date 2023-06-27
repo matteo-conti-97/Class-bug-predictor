@@ -3,7 +3,7 @@ package com.isw2.control;
 import com.isw2.dao.CommitDbDao;
 import com.isw2.dao.GitDao;
 import com.isw2.dao.JiraDao;
-import com.isw2.entity.*;
+import com.isw2.model.*;
 import com.isw2.util.AuthJsonParser;
 import com.isw2.util.Printer;
 import org.slf4j.Logger;

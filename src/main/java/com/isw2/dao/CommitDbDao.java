@@ -1,9 +1,9 @@
 package com.isw2.dao;
 
-import com.isw2.entity.Commit;
-import com.isw2.entity.JavaFile;
-import com.isw2.entity.Release;
-import com.isw2.entity.Ticket;
+import com.isw2.model.Commit;
+import com.isw2.model.JavaFile;
+import com.isw2.model.Release;
+import com.isw2.model.Ticket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

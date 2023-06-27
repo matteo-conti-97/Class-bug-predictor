@@ -30,7 +30,7 @@ public class Main {
 
     public static void main(String[] args) throws ParseException, SQLException {
         createDataset(BOOKKEEPER, BOOKKEEPER_CREATION);
-        createDataset(ZOOKEEPER, ZOOKEEPER_CREATION);
+        //createDataset(ZOOKEEPER, ZOOKEEPER_CREATION);
     }
 
     public static void createDataset(String project, String projectCreationDate) throws ParseException, SQLException {

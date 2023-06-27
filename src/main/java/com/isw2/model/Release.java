@@ -1,4 +1,4 @@
-package com.isw2.entity;
+package com.isw2.model;
 
 import java.util.ArrayList;
 import java.util.List;

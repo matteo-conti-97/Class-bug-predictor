@@ -1,6 +1,6 @@
 package com.isw2.control;
 
-import com.isw2.entity.*;
+import com.isw2.model.*;
 import com.isw2.util.CsvHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,10 +43,12 @@ public class MeasureController {
     }
 
     public void createWalkForwardDatasets() {
+        String projectName=this.project.getName();
         List<List<JavaFile>> releaseFiles = new ArrayList<>();
         List<List<Commit>> commits = new ArrayList<>();
         List<Ticket> tickets= this.project.getFixedBugTicketsOfInterest();
         List<Release> releases = this.project.getReleasesOfInterest();
+        //Qui mi genero in modo walkforward tutti i training set
         for (int i = 0; i < releases.size(); i++) {
             Release release = releases.get(i);
             int lastRelNum=release.getNumber();
@@ -63,8 +65,10 @@ public class MeasureController {
             computeTicketsIv(currRelFixTicket, proportion);
             measureBuggy(releaseFiles, commits, currRelFixTicket);
             CsvHandler.writeDataLineByLine(releaseFiles, i+1, this.project.getName());
-            CsvHandler.convertDataset(i+1, this.project.getName());
+            CsvHandler.convertDataset(i+1, projectName);
         }
+        //Qui mi genero in modo walkforward tutti i test set prendendo l'ultimo training set generato il quale non viene utilizzato nella validazione-ASSUNZIONE 23
+        //CsvHandler.generateTestingSets(releases.size(), projectName);
     }
 
     public void affectPreviousVersion(JavaFile file, List<List<JavaFile>> releaseFiles, List<Ticket> tickets){
@@ -133,7 +137,7 @@ public class MeasureController {
                 else{
                     int iv;
                     if(fv<=ov) iv=(int) (fv-proportion);  //ASSUNZIONE 15
-                    else  iv=(int) (fv-(proportion*(fv-ov)));
+                    else  iv=(int) (fv-(proportion*(fv-ov))); //ASSUNZIONE 20
                     ticket.setIv(iv);
                     adjustIv(ticket); //Se iv è 0 lo setto a 1 perche le release le numero a partire da 1
                 }

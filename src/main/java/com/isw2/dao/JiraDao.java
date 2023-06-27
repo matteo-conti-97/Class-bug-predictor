@@ -1,7 +1,7 @@
 package com.isw2.dao;
 
-import com.isw2.entity.Release;
-import com.isw2.entity.Ticket;
+import com.isw2.model.Release;
+import com.isw2.model.Ticket;
 import com.isw2.util.JsonParser;
 import org.json.JSONArray;
 import org.json.JSONObject;

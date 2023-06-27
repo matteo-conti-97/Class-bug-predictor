@@ -1,4 +1,4 @@
-package com.isw2.entity;
+package com.isw2.model;
 
 public class JavaFile {
     String name;

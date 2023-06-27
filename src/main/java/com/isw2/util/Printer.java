@@ -1,8 +1,8 @@
 package com.isw2.util;
 
-import com.isw2.entity.Project;
-import com.isw2.entity.Release;
-import com.isw2.entity.Ticket;
+import com.isw2.model.Project;
+import com.isw2.model.Release;
+import com.isw2.model.Ticket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

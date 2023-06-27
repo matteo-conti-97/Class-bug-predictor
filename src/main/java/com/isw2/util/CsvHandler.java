@@ -1,6 +1,6 @@
 package com.isw2.util;
 
-import com.isw2.entity.JavaFile;
+import com.isw2.model.JavaFile;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.CSVWriter;
@@ -11,7 +11,8 @@ import java.util.List;
 
 public class CsvHandler {
 
-    private static final String OUTPUT_PATH = "src/main/java/resource/csv/dataset_";
+    private static final String CSV_OUTPUT_PATH = "src/main/java/resource/csv/dataset_";
+    private static final String ARFF_OUTPUT_PATH = "src/main/java/resource/arff/dataset_";
 
     private CsvHandler() {
     }
@@ -20,18 +21,25 @@ public class CsvHandler {
     public static void writeDataLineByLine(List<List<JavaFile>> files, int numReleases, String projectName) {
         // first create file object for file placed at location
         // specified by filepath
-        String filePath = OUTPUT_PATH + projectName + "_"+numReleases + ".csv";
-        File file = new File(filePath);
+        String trainFilePath = CSV_OUTPUT_PATH + projectName + "_"+numReleases + "Train.csv";
+        String testFilePath = CSV_OUTPUT_PATH + projectName + "_"+numReleases + "Test.csv";
+        File fileTrain = new File(trainFilePath);
+        File fileTest = new File(testFilePath);
         try {
             // create FileWriter object with file as parameter
 
-            FileWriter outputfile = new FileWriter(file, false);
+            FileWriter outputFileTrain = new FileWriter(fileTrain, false);
             // create CSVWriter object filewriter object as parameter
-            CSVWriter writer = new CSVWriter(outputfile);
+            CSVWriter writerTrain = new CSVWriter(outputFileTrain);
+
+            FileWriter outputFileTest = new FileWriter(fileTest, false);
+            // create CSVWriter object filewriter object as parameter
+            CSVWriter writerTest = new CSVWriter(outputFileTest);
 
             // adding header to csv
             String[] header = {"Release", "File", "# Authors in Release", "LOC", "Avg Churn in Release", "Avg Churn from Start", "Avg LOC Added in Release", "Avg LOC Added from Start", "# Revision in Release", "# Revision from Start", "# Bug Fix in Release", "# Bug Fix from Start", "Buggy"};
-            writer.writeNext(header);
+            writerTrain.writeNext(header);
+            writerTest.writeNext(header);
             for (int i = 0; i < files.size(); i++) {
                 for (int j = 0; j < files.get(i).size(); j++) {
                     String filename = files.get(i).get(j).getName();
@@ -47,11 +55,13 @@ public class CsvHandler {
                     String nBugFixFromStart = files.get(i).get(j).getnFixCommitFromStart();
                     String buggy= files.get(i).get(j).getBuggy();
                     String[] data = {Integer.toString(i + 1), filename, nAuthorsInRel, locInRel, avgChurnInRel, avgChurnFromStart, avgAddInRel, avgAddFromStart, nRevInRel, nRevFromStart, nBugFixInRel, nBugFixFromStart, buggy};
-                    writer.writeNext(data);
+                    if(i==files.size()-1) writerTest.writeNext(data);
+                    else writerTrain.writeNext(data);
                 }
             }
             // closing writer connection
-            writer.close();
+            writerTrain.close();
+            writerTest.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -90,29 +100,48 @@ public class CsvHandler {
     }
 
     private static void csvToArff(int release, String projectName){
-        String csvFilePath = OUTPUT_PATH +projectName+"_"+ release + ".csv";
-        String arffFilePath = OUTPUT_PATH+projectName+"_"+ release +  ".arff";
-        List<String[]> csvData = readCsv(csvFilePath);
-        File file = new File(arffFilePath);
+        String csvTrainFilePath = CSV_OUTPUT_PATH +projectName+"_"+ release + "Train.csv";
+        String csvTestFilePath = CSV_OUTPUT_PATH +projectName+"_"+ release + "Test.csv";
+        String arffTrainFilePath = ARFF_OUTPUT_PATH+projectName+"_"+ release +  "Train.arff";
+        String arffTestFilePath = ARFF_OUTPUT_PATH+projectName+"_"+ release +  "Test.arff";
 
-        FileWriter outputfile = null;
+        List<String[]> csvDataTrain = readCsv(csvTrainFilePath);
+        List<String[]> csvDataTest = readCsv(csvTestFilePath);
+
+        File fileTrain = new File(arffTrainFilePath);
+        File fileTest = new File(arffTestFilePath);
+
+        FileWriter outputfileTrain = null;
+        FileWriter outputfileTest = null;
         try {
-            outputfile = new FileWriter(file, false);
-            BufferedWriter bufferedWriter = new BufferedWriter(outputfile);
-            writeHeader(bufferedWriter,"dataset"+release);
-            for(String[] line:csvData){
-                List<String> tmp=stripCsvLine(line);
-                for(int i=0;i<tmp.size()-1;i++){
-                    bufferedWriter.write(Integer.parseInt(tmp.get(i))+",");
-                }
-                bufferedWriter.write(tmp.get(tmp.size()-1));
-                bufferedWriter.newLine();
-            }
-            bufferedWriter.close();
+            outputfileTrain = new FileWriter(fileTrain, false);
+            BufferedWriter bufferedWriterTrain = new BufferedWriter(outputfileTrain);
+            writeHeader(bufferedWriterTrain,"dataset-"+release+"-training");
+            writeCsvDataOnArff(bufferedWriterTrain, csvDataTrain);
+
+            outputfileTest = new FileWriter(fileTest, false);
+            BufferedWriter bufferedWriterTest = new BufferedWriter(outputfileTest);
+            writeHeader(bufferedWriterTest,"dataset-"+release+"-testing");
+            writeCsvDataOnArff(bufferedWriterTest, csvDataTest);
+
+            bufferedWriterTrain.close();
+            bufferedWriterTest.close();
         }catch (IOException e) {
             e.printStackTrace();
         }
     }
+
+    private static void writeCsvDataOnArff(BufferedWriter writer, List<String[]> csvData) throws IOException {
+        for(String[] line:csvData){
+            List<String> tmp=stripCsvLine(line);
+            for(int i=0;i<tmp.size()-1;i++){
+                writer.write(Integer.parseInt(tmp.get(i))+",");
+            }
+            writer.write(tmp.get(tmp.size()-1));
+            writer.newLine();
+        }
+    }
+
 
     private static void writeHeader(BufferedWriter bufferedWriter, String title) throws IOException {
         String[] header = {"@relation "+title,"@attribute Release numeric", "@attribute #AuthorsInRelease numeric", "@attribute LOC numeric",

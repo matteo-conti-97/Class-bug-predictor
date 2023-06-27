@@ -1,7 +1,7 @@
 package com.isw2.dao;
 
-import com.isw2.entity.Commit;
-import com.isw2.entity.JavaFile;
+import com.isw2.model.Commit;
+import com.isw2.model.JavaFile;
 import com.isw2.util.AuthJsonParser;
 import com.isw2.util.CodeParser;
 import com.isw2.util.JsonParser;
