@@ -113,8 +113,7 @@ public class CsvHandler {
 
     private static List<String> stripCsvLine(String[] line){
         List<String> ret=new ArrayList<>();
-        for(int i=0;i<line.length;i++){
-            if(i==1) continue;
+        for(int i=2;i<line.length;i++){ //Parto da 2 perche 0 e 1 sono il release number ed il nome del file
             ret.add(line[i]);
         }
         return ret;
@@ -165,7 +164,7 @@ public class CsvHandler {
 
 
     private static void writeHeader(BufferedWriter bufferedWriter, String title) throws IOException {
-        String[] header = {"@relation "+title,"@attribute Release numeric", "@attribute #AuthorsInRelease numeric", "@attribute LOC numeric",
+        String[] header = {"@relation "+title, "@attribute #AuthorsInRelease numeric", "@attribute LOC numeric",
                 "@attribute AvgChurnInRelease numeric", "@attribute AvgChurnFromStart numeric",
                 "@attribute AvgLOCAddedInRelease numeric", "@attribute AvgLOCAddedFromStart numeric",
                 "@attribute #RevisionInRelease numeric", "@attribute #RevisionFromStart numeric",
