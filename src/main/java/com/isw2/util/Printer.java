@@ -32,9 +32,10 @@ public class Printer {
         }
     }
 
-    public static void printTicketsBasic(List<Ticket> tickets){
+    public static void printTicketsBasic(List<Ticket> tickets, boolean interest){
         int ticketSize = tickets.size();
-        LOGGER.info("\n{} tickets", ticketSize);
+        if(interest) LOGGER.info("\n{} tickets of interest", ticketSize);
+        else LOGGER.info("\n{} tickets", ticketSize);
         for (Ticket ticket : tickets) {
             String ticketKey = ticket.getKey();
             String ticketCreationDate = ticket.getCreationDate();
@@ -50,8 +51,9 @@ public class Printer {
         LOGGER.info("Creation date: {}", projectCreationDate);
     }
 
-    public static void printReleasesDetailed(List<Release> releases){
-        LOGGER.info("Releases of interest: ");
+    public static void printReleasesDetailed(List<Release> releases, boolean interest){
+        if(interest) LOGGER.info("Releases of interest: ");
+        else LOGGER.info("All releases: ");
         for (Release release : releases) {
             String releaseName = release.getName();
             String releaseNumber = release.getNumberStr();

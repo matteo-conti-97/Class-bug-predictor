@@ -16,9 +16,9 @@ public class Main {
     private static final String BOOKKEEPER = "bookkeeper";
     private static final String BOOKKEEPER_CREATION = "2011-03-30";
     private static final String ZOOKEEPER_CREATION = "2008-05-19";
-    private static final String LAST_BOOKKEEPER_RELEASE = "4.5.0";
-    private static final String LAST_BOOKKEEPER_RELEASE_END = "2017-06-16";
-    private static final String LAST_ZOOKEEPER_RELEASE = "3.5.3";
+    private static final String LAST_BOOKKEEPER_RELEASE = "4.3.0";
+    private static final String LAST_BOOKKEEPER_RELEASE_END = "2017-06-16"; //ASSUNZIONE 5
+    private static final String LAST_ZOOKEEPER_RELEASE = "3.5.1";
     private static final String[][] COLD_START_PROJECTS = { //Prese la meta delle release su jira
             {"accumulo", "1.7.0", "2011-10-06"},
             {"tajo", "0.11.0", "2011-12-09"},
@@ -29,13 +29,15 @@ public class Main {
     };
 
     public static void main(String[] args) throws ParseException, SQLException {
-        createDataset(BOOKKEEPER, BOOKKEEPER_CREATION);
-        //createDataset(ZOOKEEPER, ZOOKEEPER_CREATION);
+        //createDataset(BOOKKEEPER, BOOKKEEPER_CREATION, LAST_BOOKKEEPER_RELEASE);
+        createDataset(ZOOKEEPER, ZOOKEEPER_CREATION, LAST_ZOOKEEPER_RELEASE);
+        //scrapeDatasetData(BOOKKEEPER, BOOKKEEPER_CREATION);
+        //scrapeDatasetData(ZOOKEEPER, ZOOKEEPER_CREATION);
     }
 
-    public static void createDataset(String project, String projectCreationDate) throws ParseException, SQLException {
+    public static void createDataset(String project, String projectCreationDate, String lastRelease) throws ParseException, SQLException {
         ScraperController scraperController = new ScraperController(project, AUTHOR, projectCreationDate);
-        scraperController.getProjectDataFromDb();
+        scraperController.getProjectDataFromDb(lastRelease);
         MeasureController measureController = new MeasureController(scraperController.getProject());
         for (String[] coldStartProject : COLD_START_PROJECTS) {
             LOGGER.info("Processing cold start data of project: {} until release {}", coldStartProject[0], coldStartProject[1]);
@@ -49,15 +51,13 @@ public class Main {
         measureController.createWalkForwardDatasets();
     }
 
-    public void scrapeDatasetData() throws ParseException {
-        ScraperController scraperController1 = new ScraperController(BOOKKEEPER, AUTHOR, BOOKKEEPER_CREATION);
-        scraperController1.saveProjectDataOnDb(LAST_BOOKKEEPER_RELEASE, LAST_BOOKKEEPER_RELEASE_END);
-        ScraperController scraperController2 = new ScraperController(ZOOKEEPER, AUTHOR, ZOOKEEPER_CREATION);
-        scraperController2.saveProjectDataOnDb(LAST_ZOOKEEPER_RELEASE, null);
-        for (String[] coldStartProject : COLD_START_PROJECTS) {
+    public static void scrapeDatasetData(String project, String projectCreationDate) throws ParseException {
+        ScraperController scraperController1 = new ScraperController(project, AUTHOR, projectCreationDate);
+        scraperController1.saveProjectDataOnDb();
+       /*for (String[] coldStartProject : COLD_START_PROJECTS) {
             LOGGER.info("Scraping cold start data of project: {} until release {}", coldStartProject[0], coldStartProject[1]);
             ScraperController coldStartScraperController = new ScraperController(coldStartProject[0], AUTHOR, coldStartProject[2]);
             coldStartScraperController.saveColdStartDataOnDb(coldStartProject[1]);
-        }
+        }*/
     }
 }

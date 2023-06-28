@@ -67,7 +67,7 @@ public class MeasureController {
             CsvHandler.writeDataLineByLine(releaseFiles, i+1, this.project.getName());
             CsvHandler.convertDataset(i+1, projectName);
         }
-        //Qui mi genero in modo walkforward tutti i test set prendendo l'ultimo training set generato il quale non viene utilizzato nella validazione-ASSUNZIONE 23
+        //Qui mi genero in modo walkforward tutti i test set prendendo l'ultimo training set generato il quale non viene utilizzato nella validazione-ASSUNZIONE 22
         //CsvHandler.generateTestingSets(releases.size(), projectName);
     }
 
@@ -137,7 +137,7 @@ public class MeasureController {
                 else{
                     int iv;
                     if(fv<=ov) iv=(int) (fv-proportion);  //ASSUNZIONE 15
-                    else  iv=(int) (fv-(proportion*(fv-ov))); //ASSUNZIONE 20
+                    else  iv=(int) (fv-(proportion*(fv-ov))); //ASSUNZIONE 19
                     ticket.setIv(iv);
                     adjustIv(ticket); //Se iv è 0 lo setto a 1 perche le release le numero a partire da 1
                 }
@@ -174,10 +174,6 @@ public class MeasureController {
     private double computeIncrementalProportion(List<Ticket> tickets , int currRelNum){
         int tot=0;
         int propSum=0;
-        if((tickets.size()<5)||(currRelNum<4)){
-            LOGGER.info("Per release {} ho usato cold start", currRelNum);
-            return this.coldStartProportion;//ASSUNZIONE 16/18
-        }
         for(Ticket ticket: tickets){
             double prop;
             int fv=ticket.getFv().getNumber();
@@ -185,11 +181,15 @@ public class MeasureController {
             int iv=ticket.getIv();
             if((fv>ov)&&(fv>iv)&&(ov>=iv)){
                 prop=((double)(fv - iv) /(fv-ov)); //ASSUNZIONE 14
+                if(currRelNum==3) System.out.println("L'ho usato e prop è"+prop);
                 propSum+=prop;
-                tot++;
+                tot++; //Essenzialmente tot sono i ticket validi
             }
         }
-        assert tot != 0;
+        if((tickets.size()<5)||(currRelNum<3)||(tot<5)){
+            LOGGER.info("Per release {} ho usato cold start proportion è {}", currRelNum, this.coldStartProportion);
+            return this.coldStartProportion;//ASSUNZIONE 16/18
+        }
         double ret=(double) propSum /tot;
         LOGGER.info("Incremental Proportion per release {} è {} propSum {} e tot {}", currRelNum, ret, propSum, tot);
         return ret;

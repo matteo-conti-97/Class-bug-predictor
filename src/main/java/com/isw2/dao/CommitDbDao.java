@@ -64,7 +64,7 @@ public class CommitDbDao {
 
             ps.setString(1, sha);
             ps.setString(2, id);
-            ps.setString(3, message);
+            ps.setString(3, message.substring(0,25));
             ps.setString(4, author);
             ps.setString(5, date);
             ps.setString(6, treeUrl);
