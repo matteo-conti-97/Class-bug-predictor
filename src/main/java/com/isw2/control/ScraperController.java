@@ -229,7 +229,6 @@ public class ScraperController {
                     else LOGGER.info("Token finiti");
                     AuthJsonParser.setFlagToken(token+1);
                     //Mettere un i-- per ripetere la chiamata con il nuovo token
-                    i--;
                     continue;
                 }
                 for (JavaFile file : treeFiles) {
@@ -323,7 +322,7 @@ public class ScraperController {
         }
     }
 
-    public void getProjectDataFromDb(String lastRelease) throws ParseException, SQLException {
+    public void getProjectDataFromDb(String lastRelease) throws ParseException {
         List<Release> allReleases = getReleasesOfInterestFromDb(); //In realta ora le prende tutte
         setProjectReleases(allReleases);
         List<Commit> commits = getCommitsFromDb();
@@ -437,12 +436,11 @@ public class ScraperController {
 
     public void getColdStartDataFromDb() throws ParseException, SQLException {
         List<Release> releases = getReleasesFromDb();
-        String projectName = getProjectName();
-        String projectCreationDate = getProjectCreationDate();
+        String projectName = this.project.getName();
         Printer.printProjectInfo(this.project);
         Printer.printReleasesBasic(releases);
 
-        List<Ticket> allTickets = commitDbDao.getTickets(this.project.getName());
+        List<Ticket> allTickets = commitDbDao.getTickets(projectName);
 
         linkTicketDatesToReleases(allTickets, releases);
         purgeTicketWithNoOvOrFv(allTickets);

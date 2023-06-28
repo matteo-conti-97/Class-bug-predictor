@@ -30,8 +30,6 @@ public class Main {
     public static void main(String[] args) throws ParseException, SQLException {
         createDataset(BOOKKEEPER, BOOKKEEPER_CREATION, LAST_BOOKKEEPER_RELEASE);
         createDataset(ZOOKEEPER, ZOOKEEPER_CREATION, LAST_ZOOKEEPER_RELEASE);
-        //scrapeDatasetData(BOOKKEEPER, BOOKKEEPER_CREATION);
-        //scrapeDatasetData(ZOOKEEPER, ZOOKEEPER_CREATION);
     }
 
     public static void createDataset(String project, String projectCreationDate, String lastRelease) throws ParseException, SQLException {

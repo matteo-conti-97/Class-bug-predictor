@@ -193,6 +193,7 @@ public class MeasureController {
             LOGGER.info("Per release {} ho usato cold start proportion è {}", currRelNum, this.coldStartProportion);
             return this.coldStartProportion;//ASSUNZIONE 16/18
         }
+        assert tot != 0;
         double ret=(double) propSum /tot;
         LOGGER.info("Incremental Proportion per release {} è {} propSum {} e tot {}", currRelNum, ret, propSum, tot);
         return ret;
