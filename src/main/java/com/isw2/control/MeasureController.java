@@ -78,17 +78,17 @@ public class MeasureController {
     public void affectPreviousVersion(JavaFile file, List<List<JavaFile>> releaseFiles, List<Ticket> tickets){
         for(Ticket ticket: tickets){
             int iv=ticket.getIv();
-            setBuggy(file, releaseFiles, iv-1, releaseFiles.size()-1, "1"); //Setto buggy a 1 il file nelle release successive all'IV
+            setBuggy(file, releaseFiles, iv-1, releaseFiles.size()-1); //Setto buggy a 1 il file nelle release successive all'IV
             //setBuggy(file,releaseFiles,0,iv-1,"0"); //Setto buggy a 0 il file nelle release precedenti all'IV, iv-2
         }
     }
 
-    private void setBuggy(JavaFile file, List<List<JavaFile>> releaseFiles, int start, int end, String value){
+    private void setBuggy(JavaFile file, List<List<JavaFile>> releaseFiles, int start, int end){
         for(int i=start;i<end;i++){
             List<JavaFile> release=releaseFiles.get(i);
             for(JavaFile releaseFile:release){
                 if(releaseFile.getName().equals(file.getName())){
-                    releaseFile.setBuggy(value);
+                    releaseFile.setBuggy("1");
                 }
             }
         }

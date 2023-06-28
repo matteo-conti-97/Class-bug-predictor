@@ -197,8 +197,8 @@ public class ScraperController {
         }
     }
 
-    public void saveTicketsOnDb(){
-        for(Ticket ticket: this.project.getFixedBugTicketsOfInterest()){
+    public void saveTicketsOnDb(List<Ticket> tickets){
+        for(Ticket ticket: tickets){
             if(!ticket.getJiraAv().isEmpty()){
                 for(Release av: ticket.getJiraAv()){
                     commitDbDao.insertTicket(ticket.getKey(), ticket.getResolutionDate(), ticket.getCreationDate(), this.project.getName(), av.getName());
@@ -323,7 +323,7 @@ public class ScraperController {
         }
     }
 
-    public void getProjectDataFromDb(String lastRelease) throws ParseException {
+    public void getProjectDataFromDb(String lastRelease) throws ParseException, SQLException {
         List<Release> allReleases = getReleasesOfInterestFromDb(); //In realta ora le prende tutte
         setProjectReleases(allReleases);
         List<Commit> commits = getCommitsFromDb();
@@ -370,8 +370,12 @@ public class ScraperController {
             e.printStackTrace();
         }
 
-
         saveFileTreeOnDb(allReleases);
+
+        List<Ticket> allTickets = getAllTickets();
+        setProjectFixedBugTickets(allTickets);
+        saveTicketsOnDb(allTickets);
+        LOGGER.info("Saved tickets on db");
 
     }
 
@@ -415,7 +419,7 @@ public class ScraperController {
 
         saveProjectOnDb();
         saveReleasesOnDb();
-        saveTicketsOnDb();
+        saveTicketsOnDb(ticketOfInterest);
 
     }
 
@@ -435,16 +439,9 @@ public class ScraperController {
         List<Release> releases = getReleasesFromDb();
         String projectName = getProjectName();
         String projectCreationDate = getProjectCreationDate();
-        LOGGER.info("Project: {}", projectName);
-        LOGGER.info("Creation date: {}", projectCreationDate);
-        LOGGER.info("\nReleases: ");
-        for (Release release : releases) {
-            String releaseName = release.getName();
-            String releaseNumber = release.getNumberStr();
-            String releaseStartDate = release.getStartDate();
-            String releaseEndDate = release.getEndDate();
-            LOGGER.info("Release: {} number {} starts at {} and ends at {}", releaseName, releaseNumber, releaseStartDate, releaseEndDate);
-        }
+        Printer.printProjectInfo(this.project);
+        Printer.printReleasesBasic(releases);
+
         List<Ticket> allTickets = commitDbDao.getTickets(this.project.getName());
 
         linkTicketDatesToReleases(allTickets, releases);

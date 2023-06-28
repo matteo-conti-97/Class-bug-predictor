@@ -36,12 +36,11 @@ in particolare si è ignorato quando fv<=iv, fv<=ov, ed ov<iv
 
 15-Nel calcolo dell'IV con proportion se parto da FV<=OV non lo considero pongo FV-OV=1 per non avere FV=IV
 
-16-Se ci sono meno di 5 ticket passati uso coldStart
+16-Se ci sono meno di 5 ticket validi passati uso coldStart
 
 17-La release 1 non la uso per fare proportion perchè FV=IV=OV=1
 
 18-Fino a release 3 uso coldstart, 1 e 2 perche incremental non lo posso fare in quanto in 1 non ho IV!=FV e in 2 non ho info sulle IV di 1
-e la 3 mi viene sempre proportion=1 sia su bookeeper che su zookeeper
 
 19-Col calcolo dell'IV tramite proportion ho fatto approssimazione per difetto perchè preferisco prendere un falso positivo
 

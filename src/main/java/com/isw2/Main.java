@@ -29,7 +29,7 @@ public class Main {
     };
 
     public static void main(String[] args) throws ParseException, SQLException {
-        //createDataset(BOOKKEEPER, BOOKKEEPER_CREATION, LAST_BOOKKEEPER_RELEASE);
+        createDataset(BOOKKEEPER, BOOKKEEPER_CREATION, LAST_BOOKKEEPER_RELEASE);
         createDataset(ZOOKEEPER, ZOOKEEPER_CREATION, LAST_ZOOKEEPER_RELEASE);
         //scrapeDatasetData(BOOKKEEPER, BOOKKEEPER_CREATION);
         //scrapeDatasetData(ZOOKEEPER, ZOOKEEPER_CREATION);
@@ -54,10 +54,10 @@ public class Main {
     public static void scrapeDatasetData(String project, String projectCreationDate) throws ParseException {
         ScraperController scraperController1 = new ScraperController(project, AUTHOR, projectCreationDate);
         scraperController1.saveProjectDataOnDb();
-       /*for (String[] coldStartProject : COLD_START_PROJECTS) {
+       for (String[] coldStartProject : COLD_START_PROJECTS) {
             LOGGER.info("Scraping cold start data of project: {} until release {}", coldStartProject[0], coldStartProject[1]);
             ScraperController coldStartScraperController = new ScraperController(coldStartProject[0], AUTHOR, coldStartProject[2]);
             coldStartScraperController.saveColdStartDataOnDb(coldStartProject[1]);
-        }*/
+        }
     }
 }
