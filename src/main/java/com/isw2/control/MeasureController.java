@@ -46,8 +46,9 @@ public class MeasureController {
         String projectName=this.project.getName();
         List<List<JavaFile>> releaseFiles = new ArrayList<>();
         List<List<Commit>> commits = new ArrayList<>();
-        List<Ticket> tickets= this.project.getFixedBugTicketsOfInterest();
-        List<Release> releases = this.project.getReleasesOfInterest();
+        List<Ticket> tickets= this.project.getFixedBugTickets();
+        List<Release> releases = this.project.getReleases();
+        int releasesOfInterestSize = this.project.getReleasesOfInterest().size();
         //Qui mi genero in modo walkforward tutti i training set
         for (int i = 0; i < releases.size(); i++) {
             Release release = releases.get(i);
@@ -64,18 +65,21 @@ public class MeasureController {
             double proportion=computeIncrementalProportion(prevTickets, lastRelNum);
             computeTicketsIv(currRelFixTicket, proportion);
             measureBuggy(releaseFiles, commits, currRelFixTicket);
-            CsvHandler.writeDataLineByLine(releaseFiles, i+1, this.project.getName());
-            CsvHandler.convertDataset(i+1, projectName);
+            if(i<releasesOfInterestSize) CsvHandler.createTrainingSet(releaseFiles, i + 1, projectName);
         }
-        //Qui mi genero in modo walkforward tutti i test set prendendo l'ultimo training set generato il quale non viene utilizzato nella validazione-ASSUNZIONE 22
-        //CsvHandler.generateTestingSets(releases.size(), projectName);
+
+        //Qui mi genero in modo walkforward tutti i testing set prendendo le informazioni dell'ultima release disponibile
+        for(int i = 0; i < releasesOfInterestSize; i++){ //ASSUNZIONE 23
+            CsvHandler.createTestingSet(releaseFiles.get(i), i + 1, projectName);
+            CsvHandler.convertDataset(i + 1, projectName);
+        }
     }
 
     public void affectPreviousVersion(JavaFile file, List<List<JavaFile>> releaseFiles, List<Ticket> tickets){
         for(Ticket ticket: tickets){
             int iv=ticket.getIv();
             setBuggy(file, releaseFiles, iv-1, releaseFiles.size()-1, "1"); //Setto buggy a 1 il file nelle release successive all'IV
-            setBuggy(file,releaseFiles,0,iv-1,"0"); //Setto buggy a 0 il file nelle release precedenti all'IV, iv-2
+            //setBuggy(file,releaseFiles,0,iv-1,"0"); //Setto buggy a 0 il file nelle release precedenti all'IV, iv-2
         }
     }
 
@@ -181,7 +185,6 @@ public class MeasureController {
             int iv=ticket.getIv();
             if((fv>ov)&&(fv>iv)&&(ov>=iv)){
                 prop=((double)(fv - iv) /(fv-ov)); //ASSUNZIONE 14
-                if(currRelNum==3) System.out.println("L'ho usato e prop è"+prop);
                 propSum+=prop;
                 tot++; //Essenzialmente tot sono i ticket validi
             }

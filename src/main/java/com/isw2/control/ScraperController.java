@@ -329,15 +329,15 @@ public class ScraperController {
         List<Commit> commits = getCommitsFromDb();
         setProjectCommits(commits);
         linkCommitsToReleases(commits, allReleases);
-        removeEmptyReleases(allReleases); //ASSUNZIONE 2
-        adjustReleaseIndexes(allReleases); //Se alcune release le ho tolte rimuovo il "buco" lasciato negli indici
         Printer.printProjectInfo(this.project);
         Printer.printReleasesDetailed(allReleases,false);
+        removeEmptyReleases(allReleases); //ASSUNZIONE 2
+        adjustReleaseIndexes(allReleases); //Se alcune release le ho tolte rimuovo il "buco" lasciato negli indici
 
         List<Ticket> allTickets = getAllTickets();
         setProjectFixedBugTickets(allTickets);
         linkTicketDatesToReleases(allTickets, allReleases);
-        purgeTicketWithNoOvOrFv(allTickets); //ASSUNZIONE 23
+        purgeTicketWithNoOvOrFv(allTickets); //ASSUNZIONE 22
         Printer.printTicketsBasic(allTickets, false);
 
         //Release e ticket di interesse, in teoria forse posso anche non usarli più e prendere AllRelease/2

@@ -43,16 +43,14 @@ in particolare si è ignorato quando fv<=iv, fv<=ov, ed ov<iv
 18-Fino a release 3 uso coldstart, 1 e 2 perche incremental non lo posso fare in quanto in 1 non ho IV!=FV e in 2 non ho info sulle IV di 1
 e la 3 mi viene sempre proportion=1 sia su bookeeper che su zookeeper
 
-19-Col calcolo di proportion ho fatto approssimazione per difetto perchè preferisco prendere un falso positivo
+19-Col calcolo dell'IV tramite proportion ho fatto approssimazione per difetto perchè preferisco prendere un falso positivo
 
 20-Quando estraggo da Jira ignoro le release senza data di rilascio e chiusura
 
 21-Utilizziamo le date di creazione e chiusura del ticket per identificare la release a cui appartengono
 
-22-Nella validazione ignoro la prima iterazione e l'ultima, la prima perchè è solo training set e non da informazione oltre al fatto
-che ho tutte le classi con buggy 0, l'ultima perchè il testing set dell'ultima dato che la buggyness viene settata a 1 solo tramite AV
-ho che anche qui tutte le classi saranno con buggy 0 e quindi mi andrebbe ad influire negativamente sull'accuracy perche gli sto dando
-un testing set realistico ma inaccurato, per questo motivo l'ultima iterazione viene utilizzata solamente per definire i testing set delle precedenti
-in quanto è quello che contiene le informazioni più accurate sulle release passate
+22-Butto i ticket senza OV o FV
 
-23-Butto i ticket senza OV o FV
+23-Per calcolare i testing set uso il dataset generato usando dati fino all'ultima release disponibile su jira, dato
+che per lo studio considero la metà di tali release, in questo modo cerco di andare a ridurre lo snoring sul testing set
+dei training set che si basano su release molto piu vecchie dell'ultima disponibile.
