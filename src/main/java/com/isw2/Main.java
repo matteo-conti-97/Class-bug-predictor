@@ -17,7 +17,6 @@ public class Main {
     private static final String BOOKKEEPER_CREATION = "2011-03-30";
     private static final String ZOOKEEPER_CREATION = "2008-05-19";
     private static final String LAST_BOOKKEEPER_RELEASE = "4.3.0";
-    private static final String LAST_BOOKKEEPER_RELEASE_END = "2017-06-16"; //ASSUNZIONE 5
     private static final String LAST_ZOOKEEPER_RELEASE = "3.5.1";
     private static final String[][] COLD_START_PROJECTS = { //Prese la meta delle release su jira
             {"accumulo", "1.7.0", "2011-10-06"},
