@@ -2,18 +2,15 @@
 di associarle alla prima release in quanto 1 è una cosa ragionevole 2 molte sono di configurazione e non associate a ticket e di conseguenza scartate
 in fasi di filtraggio successive.
 
-2-Release 4.1.0 di bookeeper ossia release numero 3 dura solamente 3 giorni ed ha 0 commit, la scarto in quanto non è significativa, lo faccio anche per altre release di questo tipo.
+2-Butto le release senza commit
 
 3-Ho tolto i test perchè se in fase di predizione mi dice che un test di una classe è buggy ma la classe testata ha passato il test che faccio?
 La considero buggy anche se non lo era? Mi darebbe "falsi positivi" o se la classe passa il test ma il test è buggy mi darebbe "falsi negativi".
 
 4-Ho tolto i package-info.java perchè penso siano poco significativi ai fine della predizione
 
-5-Nell'ultima release apache ha fatto la migrazione da jira a github issue pertanto alcuni ticket non sono presenti su jira
-in particolare dal 16-06-2017 ci sono ticket su github issue, per questioni di tempo (SE NON HO TEMPO) ho deciso di non
-considerare questi ticket e per fare una scelta consistente ho fatto finta che la release termini il 16-06-2018
-invece del 10-08-2017, potevo anche scartare la release intera tuttavia la precedente termina l'anno precedente il che significa
-parecchi dati in meno.
+5-Sia Zookeeper che Bookkeeper ad un certo punto hanno migrato su github issue, il progetto si considera terminato in corrispondenza di tale migrazione
+ad esempio Bookeeper dal 2017-06-16 passa a github issue, ho simulato che la release 4.5.0 termini in tale data
 
 6-Sto misurando solo e soltanto il sorgente, cioè quello che sta in src
 
@@ -21,7 +18,7 @@ parecchi dati in meno.
 
 8-Le commit con data uguale alla fine di una release e quindi all'inizio della successiva le considero appartententi alla release che termina
 
-9-I commenti sono il 10% delle righe di codice totale ho usato math.floor cosi per valori piccoli l'approssimazione sparisce perchè su poche righe è ragionevole pensare che non ci sono commenti
+9-Assumo che i commenti siano il 10% delle LOC del file ho usato math.floor cosi per valori piccoli l'approssimazione sparisce perchè su poche righe è ragionevole pensare che non ci sono commenti
 
 10-I commenti sono il 10% degli add/del della commit, lascio 10% perchè probabilmente l'api fornisce un valore che conta anche i blank, ho usato math.floor cosi per valori piccoli l'approssimazione sparisce perchè su poche righe è ragionevole pensare che non ci sono commenti
 tuttavia nelle dels potrebbero esserci molte blank line magari per code refactoring, ma non ho tempo per fare un'analisi più approfondita
@@ -39,24 +36,20 @@ in particolare si è ignorato quando fv<=iv, fv<=ov, ed ov<iv
 
 15-Nel calcolo dell'IV con proportion se parto da FV<=OV non lo considero pongo FV-OV=1 per non avere FV=IV
 
-16-Se ci sono meno di 5 ticket passati uso coldStart
+16-Se ci sono meno di 5 ticket validi passati uso coldStart
 
 17-La release 1 non la uso per fare proportion perchè FV=IV=OV=1
 
 18-Fino a release 3 uso coldstart, 1 e 2 perche incremental non lo posso fare in quanto in 1 non ho IV!=FV e in 2 non ho info sulle IV di 1
-e la 3 mi viene sempre proportion=1 sia su bookeeper che su zookeeper
 
-19-Bookeeper dal 2017-06-16 passa a github issue, ho simulato che la release 4.5.0 cioè l'ultima che prendo finisca in quella data
-cosi da rimanere su jira e prendere poi commit solo fino a quella data
+19-Col calcolo dell'IV tramite proportion ho fatto approssimazione per difetto perchè preferisco prendere un falso positivo
 
-20-Col calcolo di proportion ho fatto approssimazione per difetto perchè preferisco prendere un falso positivo
+20-Quando estraggo da Jira ignoro le release senza data di rilascio e chiusura
 
-21-Quando estraggo da Jira ignoro le release senza data di rilascio e chiusura
+21-Utilizziamo le date di creazione e chiusura del ticket per identificare la release a cui appartengono
 
-22-Utilizziamo le date di creazione e chiusura del ticket per identificare la release a cui appartengono
+22-Butto i ticket senza OV o FV
 
-23-Nella validazione ignoro la prima iterazione e l'ultima, la prima perchè è solo training set e non da informazione oltre al fatto
-che ho tutte le classi con buggy 0, l'ultima perchè il testing set dell'ultima dato che la buggyness viene settata a 1 solo tramite AV
-ho che anche qui tutte le classi saranno con buggy 0 e quindi mi andrebbe ad influire negativamente sull'accuracy perche gli sto dando
-un testing set realistico ma inaccurato, per questo motivo l'ultima iterazione viene utilizzata solamente per definire i testing set delle precedenti
-in quanto è quello che contiene le informazioni più accurate sulle release passate
+23-Per calcolare i testing set uso il dataset generato usando dati fino all'ultima release disponibile su jira, dato
+che per lo studio considero la metà di tali release, in questo modo cerco di andare a ridurre lo snoring sul testing set
+dei training set che si basano su release molto piu vecchie dell'ultima disponibile.

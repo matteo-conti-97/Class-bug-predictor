@@ -185,14 +185,20 @@ public class ScraperController {
         }
     }
 
+    public void saveReleases() {
+        for (Release release : this.project.getReleases()) {
+            commitDbDao.insertRelease(release.getName(), release.getNumberStr(), release.getStartDate(), release.getEndDate(), this.project.getName());
+        }
+    }
+
     public void saveReleasesOnDb() {
         for (Release release : this.project.getReleasesOfInterest()) {
             commitDbDao.insertRelease(release.getName(), release.getNumberStr(), release.getStartDate(), release.getEndDate(), this.project.getName());
         }
     }
 
-    public void saveTicketsOnDb(){
-        for(Ticket ticket: this.project.getFixedBugTicketsOfInterest()){
+    public void saveTicketsOnDb(List<Ticket> tickets){
+        for(Ticket ticket: tickets){
             if(!ticket.getJiraAv().isEmpty()){
                 for(Release av: ticket.getJiraAv()){
                     commitDbDao.insertTicket(ticket.getKey(), ticket.getResolutionDate(), ticket.getCreationDate(), this.project.getName(), av.getName());
@@ -204,11 +210,10 @@ public class ScraperController {
         }
     }
 
-    public void saveFileTreeOnDb() {
-        List<Release> releaseOfInterest = this.project.getReleasesOfInterest();
+    public void saveFileTreeOnDb(List<Release> releases) {
         int start = 0; //*****Mettere un numero più alto in caso si finiscano le chiamate all'api******
-        for (int i = start; i < releaseOfInterest.size(); i++) {
-            Release release = releaseOfInterest.get(i);
+        for (int i = start; i < releases.size(); i++) {
+            Release release = releases.get(i);
             List<Commit> commits = release.getCommits();
             String releaseName = release.getName();
             String releaseNumber = release.getNumberStr();
@@ -219,9 +224,12 @@ public class ScraperController {
                 try {
                     treeFiles = gitDao.getRepoFileAtReleaseEnd(lastCommit.getTreeUrl());
                 } catch (IOException e) {
-                    AuthJsonParser.setFlagTokenOnibaku(true);
-                    LOGGER.info("Token scaduto, swappo il token");
+                    int token=AuthJsonParser.getFlagToken();
+                    if(token<=5) LOGGER.info("Token {} scaduto, swappo con token {}", token, token+1);
+                    else LOGGER.info("Token finiti");
+                    AuthJsonParser.setFlagToken(token+1);
                     //Mettere un i-- per ripetere la chiamata con il nuovo token
+                    i--;
                     continue;
                 }
                 for (JavaFile file : treeFiles) {
@@ -277,99 +285,97 @@ public class ScraperController {
         return ret;
     }
 
-    public void linkCommitsToReleases() throws ParseException {
+    public void linkCommitsToReleases(List<Commit> commits, List<Release> releases) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
-        for (int j = 0; j < this.project.getReleasesOfInterest().size(); j++) {
-            Release release = this.project.getReleasesOfInterest().get(j);
-            for (int i = 0; i < this.project.getCommits().size(); i++) {
-                Commit commit = this.project.getCommits().get(i);
+        for (int j = 0; j < releases.size(); j++) {
+            Release release = releases.get(j);
+            for (int i = 0; i < commits.size(); i++) {
+                Commit commit = commits.get(i);
                 String commitDate = commit.getDate();
                 String releaseStartDate = release.getStartDate();
                 String releaseEndDate = release.getEndDate();
                 //Condizione 1 ASSUNZIONE se la commit è antecedente alla data di inizio della prima release, la inglobo nella prima release
                 //Condizione 2 Se la data della commit combacia con la fine dell'ultima commit la assegno all'ultima release perche non posso metterla come prima commit della successiva
                 //Condizione 3 Se la data della commit si trova all'interno del range di date di una release o combacia con la data di inizio della release la considero appartenente alla release
-                if (((release.getNumberStr().equals("1")) && (sdf.parse(commitDate).before(sdf.parse(releaseStartDate)))) || ((release.getNumberStr().equals(Integer.toString(this.project.getReleasesOfInterest().size()))) && (sdf.parse(commitDate).compareTo(sdf.parse(releaseEndDate)) == 0)) || ((sdf.parse(commitDate).compareTo(sdf.parse(releaseStartDate)) == 0) || ((sdf.parse(commitDate).after(sdf.parse(releaseStartDate))) && (sdf.parse(commitDate).before(sdf.parse(releaseEndDate)))))) {
-                    this.project.getReleasesOfInterest().get(j).addCommit(commit);
+                if (((release.getNumberStr().equals("1")) && (sdf.parse(commitDate).before(sdf.parse(releaseStartDate)))) || ((release.getNumberStr().equals(Integer.toString(releases.size()))) && (sdf.parse(commitDate).compareTo(sdf.parse(releaseEndDate)) == 0)) || ((sdf.parse(commitDate).compareTo(sdf.parse(releaseStartDate)) == 0) || ((sdf.parse(commitDate).after(sdf.parse(releaseStartDate))) && (sdf.parse(commitDate).before(sdf.parse(releaseEndDate)))))) {
+                    releases.get(j).addCommit(commit);
                 }
 
             }
         }
     }
 
-    public void removeEmptyReleases() {
+    public void removeEmptyReleases(List<Release> releases) {
         List<Release> releaseToRemove = new ArrayList<>();
-        for (Release release : this.project.getReleasesOfInterest()) {
+        for (Release release : releases) {
             if (release.getCommits().isEmpty()) {
                 releaseToRemove.add(release);
             }
         }
         for (Release release : releaseToRemove) {
-            this.project.getReleasesOfInterest().remove(release);
+            releases.remove(release);
         }
     }
 
-    public void getProjectDataFromDb() throws ParseException {
-        List<Release> releasesOfInterest = getReleasesOfInterestFromDb();
-        setProjectReleasesOfInterest(releasesOfInterest);
-        String lastInterestReleaseEndDate = getLastReleaseEndDateOfInterest();
+    public void adjustReleaseIndexes(List<Release> releases) {
+        for (int i = 0; i < releases.size(); i++) {
+            releases.get(i).setNumber(i + 1);
+        }
+    }
+
+    public void getProjectDataFromDb(String lastRelease) throws ParseException, SQLException {
+        List<Release> allReleases = getReleasesOfInterestFromDb(); //In realta ora le prende tutte
+        setProjectReleases(allReleases);
         List<Commit> commits = getCommitsFromDb();
         setProjectCommits(commits);
-        linkCommitsToReleases();
-        removeEmptyReleases(); //ASSUNZIONE 2
-        LOGGER.info("Project: {}", getProjectName());
-        LOGGER.info("Creation date: {}", getProjectCreationDate());
-        LOGGER.info("Last interest release end date: {}", lastInterestReleaseEndDate);
-        LOGGER.info("\nReleases of interest: ");
-        for (Release release : releasesOfInterest) {
-            String releaseName = release.getName();
-            String releaseNumber = release.getNumberStr();
-            int releaseCommitSize = release.getCommits().size();
-            int releaseFileTreeSize = release.getFileTreeAtReleaseEnd().size();
-            String releaseStartDate = release.getStartDate();
-            String releaseEndDate = release.getEndDate();
-            LOGGER.info("Release: {} number {} has {} commits and {} non test java files, starts at {} and ends at {}", releaseName, releaseNumber, releaseCommitSize, releaseFileTreeSize, releaseStartDate, releaseEndDate);
-        }
+        linkCommitsToReleases(commits, allReleases);
+        Printer.printProjectInfo(this.project);
+        Printer.printReleasesDetailed(allReleases,false);
+        removeEmptyReleases(allReleases); //ASSUNZIONE 2
+        adjustReleaseIndexes(allReleases); //Se alcune release le ho tolte rimuovo il "buco" lasciato negli indici
 
         List<Ticket> allTickets = getAllTickets();
         setProjectFixedBugTickets(allTickets);
+        linkTicketDatesToReleases(allTickets, allReleases);
+        purgeTicketWithNoOvOrFv(allTickets); //ASSUNZIONE 22
+        Printer.printTicketsBasic(allTickets, false);
+
+        //Release e ticket di interesse, in teoria forse posso anche non usarli più e prendere AllRelease/2
+        List<Release> releasesOfInterest = getReleasesOfInterest(lastRelease);
+        setProjectReleasesOfInterest(releasesOfInterest);
+        String lastInterestReleaseEndDate = getLastReleaseEndDateOfInterest();
         List<Ticket> ticketOfInterest =getTicketsOfInterest(lastInterestReleaseEndDate);
         setProjectFixedBugTicketsOfInterest(ticketOfInterest);
-        linkTicketDatesToReleases(ticketOfInterest, releasesOfInterest);
-        purgeTicketWithExceedingOvOrFv(ticketOfInterest);
-        Printer.printTicketsBasic(ticketOfInterest);
+
+        Printer.printReleasesDetailed(releasesOfInterest,true);
+        Printer.printTicketsBasic(ticketOfInterest, true);
     }
 
-    public void saveProjectDataOnDb(String lastReleaseOfInterest, String lastInterestReleaseEndDate) {
+    public void saveProjectDataOnDb() {
         List<Release> allReleases = getAllReleases();
         setProjectReleases(allReleases);
-        List<Release> releasesOfInterest = getReleasesOfInterest(lastReleaseOfInterest);
-        setProjectReleasesOfInterest(releasesOfInterest);
-
-        //--ASSUNZIONE 5
-        if (lastInterestReleaseEndDate == null) {
-            lastInterestReleaseEndDate = getLastReleaseEndDateOfInterest();
-        }
-        setLastReleaseEndDateOfInterest(lastInterestReleaseEndDate);
-        //--ASSUNZIONE 5
-
         Printer.printProjectInfo(this.project);
 
         saveProjectOnDb();
-        saveCommitDataOnDb(lastInterestReleaseEndDate);
-        saveReleasesOfInterestOnDb();
-        LOGGER.info("Saved releases of interest on db");
+        String lastReleaseDate=allReleases.get(allReleases.size()-1).getEndDate();
+        saveCommitDataOnDb(lastReleaseDate);
+        saveReleases();
+        LOGGER.info("Saved releases on db");
 
         List<Commit> commits = getCommitsFromDb();
         setProjectCommits(commits);
         try {
-            linkCommitsToReleases();
+            linkCommitsToReleases(commits, allReleases);
         } catch (ParseException e) {
             e.printStackTrace();
         }
 
+        saveFileTreeOnDb(allReleases);
 
-        saveFileTreeOnDb();
+        List<Ticket> allTickets = getAllTickets();
+        setProjectFixedBugTickets(allTickets);
+        saveTicketsOnDb(allTickets);
+        LOGGER.info("Saved tickets on db");
 
     }
 
@@ -409,15 +415,15 @@ public class ScraperController {
 
         Printer.printProjectInfo(this.project);
         Printer.printReleasesBasic(releasesOfInterest);
-        Printer.printTicketsBasic(ticketOfInterest);
+        Printer.printTicketsBasic(ticketOfInterest, false);
 
         saveProjectOnDb();
         saveReleasesOnDb();
-        saveTicketsOnDb();
+        saveTicketsOnDb(ticketOfInterest);
 
     }
 
-    public void purgeTicketWithExceedingOvOrFv(List<Ticket> tickets){
+    public void purgeTicketWithNoOvOrFv(List<Ticket> tickets){
         List<Ticket> ticketToPurge=new ArrayList<>();
         for(Ticket ticket:tickets){
             if((ticket.getOv()==null)||(ticket.getFv()==null)){
@@ -433,20 +439,13 @@ public class ScraperController {
         List<Release> releases = getReleasesFromDb();
         String projectName = getProjectName();
         String projectCreationDate = getProjectCreationDate();
-        LOGGER.info("Project: {}", projectName);
-        LOGGER.info("Creation date: {}", projectCreationDate);
-        LOGGER.info("\nReleases: ");
-        for (Release release : releases) {
-            String releaseName = release.getName();
-            String releaseNumber = release.getNumberStr();
-            String releaseStartDate = release.getStartDate();
-            String releaseEndDate = release.getEndDate();
-            LOGGER.info("Release: {} number {} starts at {} and ends at {}", releaseName, releaseNumber, releaseStartDate, releaseEndDate);
-        }
+        Printer.printProjectInfo(this.project);
+        Printer.printReleasesBasic(releases);
+
         List<Ticket> allTickets = commitDbDao.getTickets(this.project.getName());
 
         linkTicketDatesToReleases(allTickets, releases);
-        purgeTicketWithExceedingOvOrFv(allTickets);
+        purgeTicketWithNoOvOrFv(allTickets);
         setProjectFixedBugTickets(allTickets);
         setProjectReleases(releases);
 

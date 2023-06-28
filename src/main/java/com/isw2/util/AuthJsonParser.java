@@ -16,10 +16,18 @@ import java.util.Base64;
 public class AuthJsonParser extends JsonParser {
     private static final String USERNAME = "matteo-conti-97";
     private static final String USERNAME2 = "OniBaku972";
-    private static boolean flagTokenOnibaku = false;
+    private static final String USERNAME3 = "mcuni97";
+    private static final String USERNAME4 = "sdgasg82";
+    private static final String USERNAME5 = "sdfas6695";
+    private static final String USERNAME6 = "rioeuto";
+    private static int flagToken = 4;
 
-    public static void setFlagTokenOnibaku(boolean flagTokenOnibaku) {
-        AuthJsonParser.flagTokenOnibaku = flagTokenOnibaku;
+    public static void setFlagToken(int flagToken) {
+        AuthJsonParser.flagToken = flagToken;
+    }
+
+    public static int getFlagToken(){
+        return flagToken;
     }
 
     private InputStreamReader getAuthStream(URL url) throws IOException {
@@ -27,9 +35,29 @@ public class AuthJsonParser extends JsonParser {
         uc.setRequestProperty("X-Requested-With", "Curl");
         String token;
         String user;
-        if (flagTokenOnibaku) {
+        if (flagToken ==1) {
             user = USERNAME2;
             try (BufferedReader oauthReader = new BufferedReader(new FileReader("src/main/java/resource/token/git_token_onibaku"))) {
+                token = oauthReader.readLine();
+            }
+        }else if(flagToken ==2){
+            user = USERNAME3;
+            try (BufferedReader oauthReader = new BufferedReader(new FileReader("src/main/java/resource/token/git_token_mcuni"))) {
+                token = oauthReader.readLine();
+            }
+        }else if(flagToken ==3){
+            user = USERNAME4;
+            try (BufferedReader oauthReader = new BufferedReader(new FileReader("src/main/java/resource/token/git_token_sdgasg82"))) {
+                token = oauthReader.readLine();
+            }
+        }else if(flagToken ==4) {
+            user = USERNAME5;
+            try (BufferedReader oauthReader = new BufferedReader(new FileReader("src/main/java/resource/token/git_token_sdfas6695"))) {
+                token = oauthReader.readLine();
+            }
+        }else if(flagToken ==5) {
+            user = USERNAME6;
+            try (BufferedReader oauthReader = new BufferedReader(new FileReader("src/main/java/resource/token/git_token_rioeuto"))) {
                 token = oauthReader.readLine();
             }
         } else {

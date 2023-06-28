@@ -83,7 +83,7 @@ public class GitDao {
     public List<Commit> getAllCommitsUntil(String relEndDate) {
         JsonParser jsonParser = new AuthJsonParser();
         List<Commit> ret = new ArrayList<>();
-        int page = 1; //*****Mettere un numero di pagina più alto se si finiscono gli accessi dell'api*****
+        int page = 0; //*****Mettere un numero di pagina più alto se si finiscono gli accessi dell'api*****
         long commitId = 0;
         while (true) {
             JSONArray tmp;

@@ -17,51 +17,72 @@ public class CsvHandler {
     private CsvHandler() {
     }
 
-    //takes a list of lists which containt all the filenames of a release for each release
-    public static void writeDataLineByLine(List<List<JavaFile>> files, int numReleases, String projectName) {
-        // first create file object for file placed at location
-        // specified by filepath
-        String trainFilePath = CSV_OUTPUT_PATH + projectName + "_"+numReleases + "Train.csv";
-        String testFilePath = CSV_OUTPUT_PATH + projectName + "_"+numReleases + "Test.csv";
-        File fileTrain = new File(trainFilePath);
-        File fileTest = new File(testFilePath);
+    private static void writeReleaseDataLineByLine(List<JavaFile> releaseFiles, CSVWriter writer, int release){
+        for (JavaFile releaseFile : releaseFiles) {
+            String filename = releaseFile.getName();
+            String nAuthorsInRel = releaseFile.getnAuthorInRelease();
+            String locInRel = releaseFile.getLocAtEndRelease();
+            String avgChurnInRel = releaseFile.getAvgChurnInRelease();
+            String nRevInRel = releaseFile.getnRevInRelease();
+            String avgAddInRel = releaseFile.getAvgLocAddedInRelease();
+            String avgAddFromStart = releaseFile.getAvgLocAddedFromStart();
+            String avgChurnFromStart = releaseFile.getAvgChurnFromStart();
+            String nRevFromStart = releaseFile.getnRevFromStart();
+            String nBugFixInRel = releaseFile.getnFixCommitInRelease();
+            String nBugFixFromStart = releaseFile.getnFixCommitFromStart();
+            String buggy = releaseFile.getBuggy();
+            String[] data = {Integer.toString(release), filename, nAuthorsInRel, locInRel, avgChurnInRel, avgChurnFromStart, avgAddInRel, avgAddFromStart, nRevInRel, nRevFromStart, nBugFixInRel, nBugFixFromStart, buggy};
+            writer.writeNext(data);
+        }
+    }
+
+    public static void createTestingSet(List<JavaFile> releaseFiles, int numReleases, String projectName){
+        String filePath = CSV_OUTPUT_PATH + projectName + "_"+numReleases + "Test.csv";
+        File file = new File(filePath);
+
         try {
             // create FileWriter object with file as parameter
 
-            FileWriter outputFileTrain = new FileWriter(fileTrain, false);
+            FileWriter outputFile = new FileWriter(file, false);
             // create CSVWriter object filewriter object as parameter
-            CSVWriter writerTrain = new CSVWriter(outputFileTrain);
-
-            FileWriter outputFileTest = new FileWriter(fileTest, false);
-            // create CSVWriter object filewriter object as parameter
-            CSVWriter writerTest = new CSVWriter(outputFileTest);
+            CSVWriter writer = new CSVWriter(outputFile);
 
             // adding header to csv
             String[] header = {"Release", "File", "# Authors in Release", "LOC", "Avg Churn in Release", "Avg Churn from Start", "Avg LOC Added in Release", "Avg LOC Added from Start", "# Revision in Release", "# Revision from Start", "# Bug Fix in Release", "# Bug Fix from Start", "Buggy"};
-            writerTrain.writeNext(header);
-            writerTest.writeNext(header);
-            for (int i = 0; i < files.size(); i++) {
-                for (int j = 0; j < files.get(i).size(); j++) {
-                    String filename = files.get(i).get(j).getName();
-                    String nAuthorsInRel = files.get(i).get(j).getnAuthorInRelease();
-                    String locInRel = files.get(i).get(j).getLocAtEndRelease();
-                    String avgChurnInRel = files.get(i).get(j).getAvgChurnInRelease();
-                    String nRevInRel = files.get(i).get(j).getnRevInRelease();
-                    String avgAddInRel = files.get(i).get(j).getAvgLocAddedInRelease();
-                    String avgAddFromStart = files.get(i).get(j).getAvgLocAddedFromStart();
-                    String avgChurnFromStart = files.get(i).get(j).getAvgChurnFromStart();
-                    String nRevFromStart = files.get(i).get(j).getnRevFromStart();
-                    String nBugFixInRel = files.get(i).get(j).getnFixCommitInRelease();
-                    String nBugFixFromStart = files.get(i).get(j).getnFixCommitFromStart();
-                    String buggy= files.get(i).get(j).getBuggy();
-                    String[] data = {Integer.toString(i + 1), filename, nAuthorsInRel, locInRel, avgChurnInRel, avgChurnFromStart, avgAddInRel, avgAddFromStart, nRevInRel, nRevFromStart, nBugFixInRel, nBugFixFromStart, buggy};
-                    if(i==files.size()-1) writerTest.writeNext(data);
-                    else writerTrain.writeNext(data);
-                }
+            writer.writeNext(header);
+            writeReleaseDataLineByLine(releaseFiles, writer, numReleases);
+            // closing writer connection
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+    //takes a list of lists which containt all the filenames of a release for each release
+    public static void createTrainingSet(List<List<JavaFile>> files, int numReleases, String projectName) {
+        // first create file object for file placed at location
+        // specified by filepath
+        String filePath = CSV_OUTPUT_PATH + projectName + "_"+numReleases + "Train.csv";
+
+        File file = new File(filePath);
+
+        try {
+            // create FileWriter object with file as parameter
+
+            FileWriter outputFile = new FileWriter(file, false);
+            // create CSVWriter object filewriter object as parameter
+            CSVWriter writer = new CSVWriter(outputFile);
+
+            // adding header to csv
+            String[] header = {"Release", "File", "# Authors in Release", "LOC", "Avg Churn in Release", "Avg Churn from Start", "Avg LOC Added in Release", "Avg LOC Added from Start", "# Revision in Release", "# Revision from Start", "# Bug Fix in Release", "# Bug Fix from Start", "Buggy"};
+            writer.writeNext(header);
+            for (int i = 0; i < numReleases-1; i++) {
+                writeReleaseDataLineByLine(files.get(i), writer, i+1);
             }
             // closing writer connection
-            writerTrain.close();
-            writerTest.close();
+            writer.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
