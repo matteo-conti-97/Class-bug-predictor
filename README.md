@@ -1,1 +1,1 @@
-# isw2-jira-git-measurement
+# isw2-jira-git-measurement [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=matteo-conti-97_isw2-jira-git-measurement&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=matteo-conti-97_isw2-jira-git-measurement)
