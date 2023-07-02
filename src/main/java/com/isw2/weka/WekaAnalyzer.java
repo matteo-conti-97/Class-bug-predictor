@@ -55,6 +55,7 @@ public class WekaAnalyzer {
                 LOGGER.error("Invalid classifier type");
         }
 
+        assert classifier != null;
         classifier.buildClassifier(trainingSet);
 
         Evaluation eval = new Evaluation(testingSet);
