@@ -30,9 +30,9 @@ public class Main {
 
     public static void main(String[] args) throws ParseException, SQLException {
         int bookkeeperDatasetNum=createDataset(BOOKKEEPER, BOOKKEEPER_CREATION, LAST_BOOKKEEPER_RELEASE);
-        //int zookeeperDatasetNum=createDataset(ZOOKEEPER, ZOOKEEPER_CREATION, LAST_ZOOKEEPER_RELEASE);
+        int zookeeperDatasetNum=createDataset(ZOOKEEPER, ZOOKEEPER_CREATION, LAST_ZOOKEEPER_RELEASE);
         analyzeDataset(BOOKKEEPER, bookkeeperDatasetNum);
-        //analyzeDataset(ZOOKEEPER, zookeeperDatasetNum);
+        analyzeDataset(ZOOKEEPER, zookeeperDatasetNum);
     }
 
     public static void analyzeDataset(String project, int datasetNum){
