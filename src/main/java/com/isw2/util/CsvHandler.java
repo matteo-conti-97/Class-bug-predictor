@@ -7,6 +7,7 @@ import com.opencsv.CSVWriter;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class CsvHandler {
@@ -112,11 +113,7 @@ public class CsvHandler {
     }
 
     private static List<String> stripCsvLine(String[] line){
-        List<String> ret=new ArrayList<>();
-        for(int i=2;i<line.length;i++){ //Parto da 2 perche 0 e 1 sono il release number ed il nome del file
-            ret.add(line[i]);
-        }
-        return ret;
+        return new ArrayList<>(Arrays.asList(line).subList(2, line.length));
     }
 
     private static void csvToArff(int release, String projectName){

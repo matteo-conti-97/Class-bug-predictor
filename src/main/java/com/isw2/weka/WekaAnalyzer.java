@@ -76,8 +76,10 @@ public class WekaAnalyzer {
         List<List<String>> datasetPath= generateDatasetPaths(project, datasetNum);
         LOGGER.info("Analyzing project: {}", project);
         for(List<String> dataset: datasetPath){
-            LOGGER.info("Training set path: {}", dataset.get(0));
-            LOGGER.info("Testing set path: {}\n", dataset.get(1));
+            String trainingSetPath=dataset.get(0);
+            String testingSetPath=dataset.get(1);
+            LOGGER.info("Training set path: {}", trainingSetPath);
+            LOGGER.info("Testing set path: {}\n", testingSetPath);
             //load datasets
             DataSource trainingSetSrc = new DataSource(dataset.get(0));
             Instances trainingSet = trainingSetSrc.getDataSet();
