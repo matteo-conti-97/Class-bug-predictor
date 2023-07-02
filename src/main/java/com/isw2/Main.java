@@ -2,6 +2,7 @@ package com.isw2;
 
 import com.isw2.control.MeasureController;
 import com.isw2.control.ScraperController;
+import com.isw2.weka.WekaAnalyzer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,11 +29,21 @@ public class Main {
     };
 
     public static void main(String[] args) throws ParseException, SQLException {
-        createDataset(BOOKKEEPER, BOOKKEEPER_CREATION, LAST_BOOKKEEPER_RELEASE);
-        createDataset(ZOOKEEPER, ZOOKEEPER_CREATION, LAST_ZOOKEEPER_RELEASE);
+        //int bookeeperDatasetNum=createDataset(BOOKKEEPER, BOOKKEEPER_CREATION, LAST_BOOKKEEPER_RELEASE);
+        //int zookeeperDatasetNum=createDataset(ZOOKEEPER, ZOOKEEPER_CREATION, LAST_ZOOKEEPER_RELEASE);
+        analyzeDataset(BOOKKEEPER, 6);
     }
 
-    public static void createDataset(String project, String projectCreationDate, String lastRelease) throws ParseException, SQLException {
+    public static void analyzeDataset(String project, int datasetNum){
+        WekaAnalyzer wekaAnalyzer = new WekaAnalyzer();
+        try {
+            wekaAnalyzer.runExperiment(project, datasetNum);
+        } catch (Exception e) {
+            LOGGER.error("Error while running experiment", e);
+        }
+    }
+
+    public static int createDataset(String project, String projectCreationDate, String lastRelease) throws ParseException, SQLException {
         ScraperController scraperController = new ScraperController(project, AUTHOR, projectCreationDate);
         scraperController.getProjectDataFromDb(lastRelease);
         MeasureController measureController = new MeasureController(scraperController.getProject());
@@ -46,6 +57,7 @@ public class Main {
         LOGGER.info("Cold start proportion: {}", coldStartProportion);
         measureController.setColdStartProportion(coldStartProportion);
         measureController.createWalkForwardDatasets();
+        return measureController.getDatasetNum();
     }
 
     public static void scrapeDatasetData(String project, String projectCreationDate) throws ParseException {

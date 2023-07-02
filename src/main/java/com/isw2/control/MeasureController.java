@@ -38,6 +38,10 @@ public class MeasureController {
         this.coldStartProportionProjects = coldStartProportionProjects;
     }
 
+    public int getDatasetNum(){
+        return this.project.getReleasesOfInterest().size();
+    }
+
     public void addColdStartProportionProject(Project project) {
         this.coldStartProportionProjects.add(project);
     }
@@ -88,7 +92,7 @@ public class MeasureController {
             List<JavaFile> release=releaseFiles.get(i);
             for(JavaFile releaseFile:release){
                 if(releaseFile.getName().equals(file.getName())){
-                    releaseFile.setBuggy("1");
+                    releaseFile.setBuggy("YES");
                 }
             }
         }
@@ -101,7 +105,7 @@ public class MeasureController {
                 if((touchedFile.getName().equals(file.getName()))&&(Collections.frequency(processedFiles,file)<1) ){
                     processedFiles.add(file);
                     List<Ticket> commitLinkedTickets= getCommitFixTickets(commit,tickets);
-                    file.setBuggy("0"); //Nella current release o non è buggy o è stato fixato
+                    file.setBuggy("NO"); //Nella current release o non è buggy o è stato fixato
                     if (!commitLinkedTickets.isEmpty()) affectPreviousVersion(file, releaseFiles, commitLinkedTickets);
                 }
             }

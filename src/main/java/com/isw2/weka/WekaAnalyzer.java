@@ -1,39 +1,92 @@
 package com.isw2.weka;
 
+import com.isw2.util.ClassifierType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
+import weka.classifiers.lazy.IBk;
+import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class WekaAnalyzer {
     private static final Logger LOGGER = LoggerFactory.getLogger(WekaAnalyzer.class);
+    private static final String DATASET_SET_PATH = "src/main/java/resource/arff/dataset_";
 
-    public static void main(String[] args) throws Exception {
-        //load datasets
-        DataSource source1 = new DataSource("C:\\Users\\matte\\Documents\\GitHub\\isw2-jira-git-measurement\\src\\main\\java\\resource\\breast-cancer-train.arff");
-        Instances training = source1.getDataSet();
-        DataSource source2 = new DataSource("C:\\Users\\matte\\Documents\\GitHub\\isw2-jira-git-measurement\\src\\main\\java\\resource\\breast-cancer-test.arff");
-        Instances testing = source2.getDataSet();
+    List<List<String>> generateDatasetPaths(String project, int datasetNum) {
+        List<List<String>> ret = new ArrayList<>();
+        for (int i = 2; i <= datasetNum; i++) {
+            List<String> dataset = new ArrayList<>();
+            String trainingSetPath=DATASET_SET_PATH + project + "_" + i + "Train.arff";
+            String testingSetPath=DATASET_SET_PATH + project + "_" + i + "Test.arff";
+            dataset.add(trainingSetPath);
+            dataset.add(testingSetPath);
+            ret.add(dataset);
+        }
+        return ret;
+    }
 
-        int numAttr = training.numAttributes();
-        training.setClassIndex(numAttr - 1);
-        testing.setClassIndex(numAttr - 1);
+    private void evualuateClassifier(Instances trainingSet, Instances testingSet, ClassifierType classifierType) throws Exception {
+        int numAttr = trainingSet.numAttributes();
+        trainingSet.setClassIndex(numAttr - 1);
+        testingSet.setClassIndex(numAttr - 1);
+        Classifier classifier = null;
 
-        NaiveBayes classifier = new NaiveBayes();
+        switch(classifierType) {
+            case NAIVE_BAYES:
+                classifier = new NaiveBayes();
+                LOGGER.info("Using Naive Bayes classifier");
+                break;
+            case RANDOM_FOREST:
+                classifier = new RandomForest();
+                LOGGER.info("Using Random Forest classifier");
+                break;
+            case IBK:
+                classifier = new IBk();
+                LOGGER.info("Using IBK classifier");
+                break;
+            default:
+                LOGGER.error("Invalid classifier type");
+        }
 
-        classifier.buildClassifier(training);
+        classifier.buildClassifier(trainingSet);
 
-        Evaluation eval = new Evaluation(testing);
+        Evaluation eval = new Evaluation(testingSet);
 
-        eval.evaluateModel(classifier, testing);
-        double auc = eval.areaUnderROC(1);
-        LOGGER.info("AUC = {}", auc);
+        eval.evaluateModel(classifier, testingSet);
+        int classIndex = 0; // First class, the buggy "YES"
         double kappa = eval.kappa();
         LOGGER.info("Kappa = {}", kappa);
+        double precision = eval.precision(classIndex);
+        LOGGER.info("Precision = {}", precision);
+        double recall = eval.recall(classIndex);
+        LOGGER.info("Recall = {}", recall);
+        double auc = eval.areaUnderROC(classIndex);
+        LOGGER.info("AUC = {}\n\n", auc);
+    }
 
+    public void runExperiment(String project, int datasetNum) throws Exception {
+        List<List<String>> datasetPath= generateDatasetPaths(project, datasetNum);
+        LOGGER.info("Analyzing project: {}", project);
+        for(List<String> dataset: datasetPath){
+            LOGGER.info("Training set path: {}", dataset.get(0));
+            LOGGER.info("Testing set path: {}\n", dataset.get(1));
+            //load datasets
+            DataSource trainingSetSrc = new DataSource(dataset.get(0));
+            Instances trainingSet = trainingSetSrc.getDataSet();
+            DataSource testingSetSrc = new DataSource(dataset.get(1));
+            Instances testingSet = testingSetSrc.getDataSet();
+
+            evualuateClassifier(trainingSet, testingSet, ClassifierType.NAIVE_BAYES);
+            evualuateClassifier(trainingSet, testingSet, ClassifierType.IBK);
+            evualuateClassifier(trainingSet, testingSet, ClassifierType.RANDOM_FOREST);
+        }
 
     }
 }

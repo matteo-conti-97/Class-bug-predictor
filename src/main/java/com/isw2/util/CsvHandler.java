@@ -168,7 +168,7 @@ public class CsvHandler {
                 "@attribute AvgChurnInRelease numeric", "@attribute AvgChurnFromStart numeric",
                 "@attribute AvgLOCAddedInRelease numeric", "@attribute AvgLOCAddedFromStart numeric",
                 "@attribute #RevisionInRelease numeric", "@attribute #RevisionFromStart numeric",
-                "@attribute #BugFixInRelease numeric", "@attribute #BugFixFromStart numeric", "@attribute Buggy {1,0}", "@data"};
+                "@attribute #BugFixInRelease numeric", "@attribute #BugFixFromStart numeric", "@attribute Buggy {YES,NO}", "@data"};
         for (String line : header) {
             bufferedWriter.write(line);
             bufferedWriter.newLine();

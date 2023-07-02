@@ -27,7 +27,7 @@ public class JavaFile {
     public JavaFile(String name, String content) {
         this.name = name;
         this.content = content;
-        this.buggy="0";
+        this.buggy="NO";
     }
 
     //Usato per riempire la tabella delle commit nel db
@@ -38,7 +38,7 @@ public class JavaFile {
         this.content = content;
         this.status = status;
         this.prevName = prevName;
-        this.buggy="0";
+        this.buggy="NO";
     }
 
     public String getName() {
