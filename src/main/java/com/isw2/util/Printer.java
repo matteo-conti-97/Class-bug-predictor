@@ -75,4 +75,22 @@ public class Printer {
             LOGGER.info("Release: {} number {} starts at {} and ends at {}", releaseName, releaseNumber, releaseStartDate, releaseEndDate);
         }
     }
+
+    public static void printMeanEval(List<Double> meanEval, ClassifierType classifierType){
+        switch(classifierType){
+            case RANDOM_FOREST:
+                LOGGER.info("\n\nMean evaluation with Random Forest: ");
+                break;
+            case IBK:
+                LOGGER.info("\n\nMean evaluation with IBK: ");
+                break;
+            case NAIVE_BAYES:
+                LOGGER.info("\n\nMean evaluation with Naive Bayes: ");
+                break;
+        }
+        LOGGER.info("Kappa: {}", meanEval.get(0));
+        LOGGER.info("Precision: {}", meanEval.get(1));
+        LOGGER.info("Recall: {}", meanEval.get(2));
+        LOGGER.info("AUC: {}", meanEval.get(3));
+    }
 }
