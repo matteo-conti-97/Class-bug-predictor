@@ -17,6 +17,9 @@ import weka.core.SelectedTag;
 import weka.core.converters.ConverterUtils.DataSource;
 import weka.filters.Filter;
 import weka.filters.supervised.attribute.AttributeSelection;
+import weka.filters.supervised.instance.Resample;
+import weka.filters.supervised.instance.SpreadSubsample;
+import weka.classifiers.meta.FilteredClassifier;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,11 +44,8 @@ public class WekaAnalyzer {
         return ret;
     }
 
-    private List<Double> evualuateClassifier(Instances trainingSet, Instances testingSet, ClassifierType classifierType) throws Exception {
+    private List<Double> evualuateClassifier(Instances trainingSet, Instances testingSet, ClassifierType classifierType, FilteredClassifier filteredClassifier) throws Exception {
         List<Double> ret = new ArrayList<>();
-        int numAttr = trainingSet.numAttributes();
-        trainingSet.setClassIndex(numAttr - 1);
-        testingSet.setClassIndex(numAttr - 1);
         Classifier classifier = null;
 
         switch(classifierType) {
@@ -66,11 +66,19 @@ public class WekaAnalyzer {
         }
 
         assert classifier != null;
-        classifier.buildClassifier(trainingSet);
+
 
         Evaluation eval = new Evaluation(testingSet);
+        if(filteredClassifier!=null) { //Uso il classificatore che fa sampling
+            filteredClassifier.setClassifier(classifier);
+            filteredClassifier.buildClassifier(trainingSet);
+            eval.evaluateModel(filteredClassifier, testingSet);
+        }
+        else {
+            classifier.buildClassifier(trainingSet);
+            eval.evaluateModel(classifier, testingSet);
+        }
 
-        eval.evaluateModel(classifier, testingSet);
         int classIndex = 0; // First class, the buggy "YES"
         double kappa = eval.kappa();
         ret.add(kappa);
@@ -138,6 +146,8 @@ public class WekaAnalyzer {
             Instances trainingSet = null;
             Instances testingSet = null;
             List<Instances> filteredSets = null;
+            FilteredClassifier samplingFilter = null;
+            int numAttr = 0;
 
             switch(type){
                 case FEATURE_SELECTION: //Feature selection backwards
@@ -145,13 +155,40 @@ public class WekaAnalyzer {
                     filteredSets = featureSelection(vanillaTrainingSet, vanillaTestingSet);
                     trainingSet = filteredSets.get(0);
                     testingSet = filteredSets.get(1);
+                    numAttr = trainingSet.numAttributes();
+                    trainingSet.setClassIndex(numAttr - 1);
+                    testingSet.setClassIndex(numAttr - 1);
                     break;
 
-                case FEATURE_SELECTION_WITH_SAMPLING:
-                    LOGGER.info("Running feature selection with sampling experiment");
+                case FEATURE_SELECTION_WITH_UNDER_SAMPLING:
+                    LOGGER.info("Running feature selection with undersampling experiment");
                     filteredSets = featureSelection(vanillaTrainingSet, vanillaTestingSet);
                     trainingSet = filteredSets.get(0);
                     testingSet = filteredSets.get(1);
+                    numAttr = trainingSet.numAttributes();
+                    trainingSet.setClassIndex(numAttr - 1);
+                    testingSet.setClassIndex(numAttr - 1);
+                    SpreadSubsample spreadSubsample = new SpreadSubsample();
+                    spreadSubsample.setInputFormat(trainingSet);
+                    spreadSubsample.setOptions(new String[] {"-M", "1.0"});
+                    samplingFilter = new FilteredClassifier();
+                    samplingFilter.setFilter(spreadSubsample);
+                    break;
+
+                case FEATURE_SELECTION_WITH_OVER_SAMPLING:
+                    LOGGER.info("Running feature selection with oversampling experiment");
+                    filteredSets = featureSelection(vanillaTrainingSet, vanillaTestingSet);
+                    trainingSet = filteredSets.get(0);
+                    testingSet = filteredSets.get(1);
+                    numAttr = trainingSet.numAttributes();
+                    trainingSet.setClassIndex(numAttr - 1);
+                    testingSet.setClassIndex(numAttr - 1);
+                    Resample resample = new Resample();
+                    resample.setInputFormat(trainingSet);
+                    String sampleSizePercentage = computeSampleSizePercentage(trainingSet, numAttr);
+                    resample.setOptions(new String[] {"-B", "1.0", "-S", "1", "-Z", sampleSizePercentage});
+                    samplingFilter = new FilteredClassifier();
+                    samplingFilter.setFilter(resample);
                     break;
 
                 case FEATURE_SELECTION_WITH_COST_SENSITIVE:
@@ -159,24 +196,29 @@ public class WekaAnalyzer {
                     filteredSets = featureSelection(vanillaTrainingSet, vanillaTestingSet);
                     trainingSet = filteredSets.get(0);
                     testingSet = filteredSets.get(1);
+                    numAttr = trainingSet.numAttributes();
+                    trainingSet.setClassIndex(numAttr - 1);
+                    testingSet.setClassIndex(numAttr - 1);
                     break;
 
                 default:
                     LOGGER.error("Running vanilla experiment");
                     trainingSet = vanillaTrainingSet;
                     testingSet = vanillaTestingSet;
+                    numAttr = trainingSet.numAttributes();
+                    trainingSet.setClassIndex(numAttr - 1);
+                    testingSet.setClassIndex(numAttr - 1);
                     break;
             }
 
             List<Double> tmpNb;
             List<Double> tmpIbk;
             List<Double> tmpRf;
+
             //Evaluate classifiers
-            assert trainingSet != null;
-            assert testingSet != null;
-            tmpNb=evualuateClassifier(trainingSet, testingSet, ClassifierType.NAIVE_BAYES);
-            tmpIbk=evualuateClassifier(trainingSet, testingSet, ClassifierType.IBK);
-            tmpRf=evualuateClassifier(trainingSet, testingSet, ClassifierType.RANDOM_FOREST);
+            tmpNb=evualuateClassifier(trainingSet, testingSet, ClassifierType.NAIVE_BAYES, samplingFilter);
+            tmpIbk=evualuateClassifier(trainingSet, testingSet, ClassifierType.IBK, samplingFilter);
+            tmpRf=evualuateClassifier(trainingSet, testingSet, ClassifierType.RANDOM_FOREST, samplingFilter);
             //Sum up the evaluation results
             for(int i=0;i<8;i++){
                 nvEval.set(i, nvEval.get(i)+tmpNb.get(i));
@@ -193,6 +235,20 @@ public class WekaAnalyzer {
         Printer.printMeanEval(nbAvg, ClassifierType.NAIVE_BAYES);
         Printer.printMeanEval(ibkAvg, ClassifierType.IBK);
         Printer.printMeanEval(rfAvg, ClassifierType.RANDOM_FOREST);
+    }
+
+    private String computeSampleSizePercentage(Instances trainingSet, int numAttr) {
+        double ret;
+        int positive=0;
+        int negative=0;
+        for (weka.core.Instance instance : trainingSet) {
+            if(instance.classValue()==0.0) positive++;
+            else negative++;
+        }
+        if(positive>negative) ret= 100*(positive - negative)/(double)negative;
+        else ret= 100*(negative - positive)/(double)positive;
+        System.out.println("Sample size percentage: "+ret);
+        return String.valueOf(ret);
     }
 
     private List<Double> computeMeanEval(List<Double> eval, int numDataset){

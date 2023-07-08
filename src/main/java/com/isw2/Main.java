@@ -47,6 +47,12 @@ public class Main {
             wekaAnalyzer.runExperiment(project, datasetNum, ExperimentType.VANILLA);
             LOGGER.info("\n\n*************FEATURE SELECTION EXPERIMENT***************************************\n\n");
             wekaAnalyzer.runExperiment(project, datasetNum, ExperimentType.FEATURE_SELECTION);
+            LOGGER.info("\n\n*************FEATURE SELECTION WITH UNDER SAMPLING EXPERIMENT***************************************\n\n");
+            wekaAnalyzer.runExperiment(project, datasetNum, ExperimentType.FEATURE_SELECTION_WITH_UNDER_SAMPLING);
+            LOGGER.info("\n\n*************FEATURE SELECTION EXPERIMENT WITH OVER SAMPLING***************************************\n\n");
+            wekaAnalyzer.runExperiment(project, datasetNum, ExperimentType.FEATURE_SELECTION_WITH_OVER_SAMPLING);
+            LOGGER.info("\n\n*************FEATURE SELECTION EXPERIMENT WITH COST SENSITIVE***************************************\n\n");
+            wekaAnalyzer.runExperiment(project, datasetNum, ExperimentType.FEATURE_SELECTION_WITH_COST_SENSITIVE);
         } catch (Exception e) {
             LOGGER.error("Error while running experiment", e);
         }
