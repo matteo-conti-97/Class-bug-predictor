@@ -120,7 +120,7 @@ public class WekaAnalyzer {
         int[] selectedAttributes = bestFirstSrc.search(subsetEval, trainingSet);
         LOGGER.info("Selected features: ");
         for (int selectedAttribute : selectedAttributes) {
-            LOGGER.info(String.valueOf(selectedAttribute));
+            LOGGER.info("Feature: {}", FEATURES[selectedAttribute]);
         }
         return Arrays.asList(filteredTrainingSet, filteredTestingSet);
     }
@@ -185,7 +185,7 @@ public class WekaAnalyzer {
                     testingSet.setClassIndex(numAttr - 1);
                     Resample resample = new Resample();
                     resample.setInputFormat(trainingSet);
-                    String sampleSizePercentage = computeSampleSizePercentage(trainingSet, numAttr);
+                    String sampleSizePercentage = computeSampleSizePercentage(trainingSet);
                     resample.setOptions(new String[] {"-B", "1.0", "-S", "1", "-Z", sampleSizePercentage});
                     samplingFilter = new FilteredClassifier();
                     samplingFilter.setFilter(resample);
@@ -237,7 +237,7 @@ public class WekaAnalyzer {
         Printer.printMeanEval(rfAvg, ClassifierType.RANDOM_FOREST);
     }
 
-    private String computeSampleSizePercentage(Instances trainingSet, int numAttr) {
+    private String computeSampleSizePercentage(Instances trainingSet) {
         double ret;
         int positive=0;
         int negative=0;
@@ -245,9 +245,9 @@ public class WekaAnalyzer {
             if(instance.classValue()==0.0) positive++;
             else negative++;
         }
+        assert negative !=0;
         if(positive>negative) ret= 100*(positive - negative)/(double)negative;
         else ret= 100*(negative - positive)/(double)positive;
-        System.out.println("Sample size percentage: "+ret);
         return String.valueOf(ret);
     }
 
