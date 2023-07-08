@@ -246,6 +246,7 @@ public class WekaAnalyzer {
             else negative++;
         }
         assert negative !=0;
+        assert positive !=0;
         if(positive>negative) ret= 100*(positive - negative)/(double)negative;
         else ret= 100*(negative - positive)/(double)positive;
         return String.valueOf(ret);
