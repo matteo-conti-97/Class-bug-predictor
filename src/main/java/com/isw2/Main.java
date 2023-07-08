@@ -30,14 +30,14 @@ public class Main {
     };
 
     public static void main(String[] args) throws ParseException, SQLException {
-        //int bookkeeperDatasetNum=createDataset(BOOKKEEPER, BOOKKEEPER_CREATION, LAST_BOOKKEEPER_RELEASE);
+        long startTime = System.nanoTime();
+        int bookkeeperDatasetNum=createDataset(BOOKKEEPER, BOOKKEEPER_CREATION, LAST_BOOKKEEPER_RELEASE);
         //int zookeeperDatasetNum=createDataset(ZOOKEEPER, ZOOKEEPER_CREATION, LAST_ZOOKEEPER_RELEASE);
         //analyzeDataset(BOOKKEEPER, bookkeeperDatasetNum);
-        long startTime = System.nanoTime();
         analyzeDataset(BOOKKEEPER, 6);
+        //analyzeDataset(ZOOKEEPER, zookeeperDatasetNum);
         long elapsedTime = System.nanoTime() - startTime;
         LOGGER.info("Execution has taken {} ms", elapsedTime/1000000);
-        //analyzeDataset(ZOOKEEPER, zookeeperDatasetNum);
     }
 
     public static void analyzeDataset(String project, int datasetNum){

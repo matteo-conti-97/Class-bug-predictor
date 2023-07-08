@@ -1,0 +1,19 @@
+version: "3.9"
+services:
+  mysqlDb:
+    image: mysql:latest
+    container_name: mysqlDb
+    restart: always
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql/data:/docker-entrypoint-initdb.d
+    environment:
+      MYSQL_ROOT_PASSWORD: 'root'
+      MYSQL_DATABASE: 'isw2_scraping_db'
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      interval: 3s
+      timeout: 30s
+      retries: 10
+      start_period: 3s
