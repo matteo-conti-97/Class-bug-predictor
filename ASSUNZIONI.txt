@@ -53,3 +53,7 @@ in particolare si è ignorato quando fv<=iv, fv<=ov, ed ov<iv
 23-Per calcolare i testing set uso il dataset generato usando dati fino all'ultima release disponibile su jira, dato
 che per lo studio considero la metà di tali release, in questo modo cerco di andare a ridurre lo snoring sul testing set
 dei training set che si basano su release molto piu vecchie dell'ultima disponibile.
+
+24-Ho usato bidirectional come feature selection direction perchè prendeva poco tempo in più e dava un risultato più
+preciso fin dalla prima iterazione (con dataset più piccolo) selezionando le stesse feature che backward selezionava
+solo ad iterazioni successive (con dataset più grande)

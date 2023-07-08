@@ -2,6 +2,7 @@ package com.isw2;
 
 import com.isw2.control.MeasureController;
 import com.isw2.control.ScraperController;
+import com.isw2.util.ExperimentType;
 import com.isw2.weka.WekaAnalyzer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,16 +30,23 @@ public class Main {
     };
 
     public static void main(String[] args) throws ParseException, SQLException {
-        int bookkeeperDatasetNum=createDataset(BOOKKEEPER, BOOKKEEPER_CREATION, LAST_BOOKKEEPER_RELEASE);
-        int zookeeperDatasetNum=createDataset(ZOOKEEPER, ZOOKEEPER_CREATION, LAST_ZOOKEEPER_RELEASE);
-        analyzeDataset(BOOKKEEPER, bookkeeperDatasetNum);
-        analyzeDataset(ZOOKEEPER, zookeeperDatasetNum);
+        //int bookkeeperDatasetNum=createDataset(BOOKKEEPER, BOOKKEEPER_CREATION, LAST_BOOKKEEPER_RELEASE);
+        //int zookeeperDatasetNum=createDataset(ZOOKEEPER, ZOOKEEPER_CREATION, LAST_ZOOKEEPER_RELEASE);
+        //analyzeDataset(BOOKKEEPER, bookkeeperDatasetNum);
+        long startTime = System.nanoTime();
+        analyzeDataset(BOOKKEEPER, 6);
+        long elapsedTime = System.nanoTime() - startTime;
+        LOGGER.info("Execution has taken {} ms", elapsedTime/1000000);
+        //analyzeDataset(ZOOKEEPER, zookeeperDatasetNum);
     }
 
     public static void analyzeDataset(String project, int datasetNum){
         WekaAnalyzer wekaAnalyzer = new WekaAnalyzer();
         try {
-            wekaAnalyzer.runExperiment(project, datasetNum);
+            LOGGER.info("\n\n*************VANILLA EXPERIMENT***************************************\n\n");
+            wekaAnalyzer.runExperiment(project, datasetNum, ExperimentType.VANILLA);
+            LOGGER.info("\n\n*************FEATURE SELECTION EXPERIMENT***************************************\n\n");
+            wekaAnalyzer.runExperiment(project, datasetNum, ExperimentType.FEATURE_SELECTION);
         } catch (Exception e) {
             LOGGER.error("Error while running experiment", e);
         }

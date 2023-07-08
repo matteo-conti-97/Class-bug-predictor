@@ -92,5 +92,6 @@ public class Printer {
         LOGGER.info("Precision: {}", meanEval.get(1));
         LOGGER.info("Recall: {}", meanEval.get(2));
         LOGGER.info("AUC: {}", meanEval.get(3));
+        LOGGER.info("TP: {} FN: {}: FP: {} TN: {}", meanEval.get(4), meanEval.get(5), meanEval.get(6), meanEval.get(7));
     }
 }

@@ -1,0 +1,8 @@
+package com.isw2.util;
+
+public enum ExperimentType {
+    FEATURE_SELECTION,
+    FEATURE_SELECTION_WITH_SAMPLING,
+    FEATURE_SELECTION_WITH_COST_SENSITIVE,
+    VANILLA
+}

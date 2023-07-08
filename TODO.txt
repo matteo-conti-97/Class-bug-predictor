@@ -15,3 +15,7 @@ se il ticket riporta le AV o meno, se si marchiare le versioni del file delle ve
 che non ho avuto il tempo e prenderla come assunzione, magari troncando la release. - GETTATA LA SPUGNA
 
 -Calcolo linkage
+
+-Feature selection DONE
+-Feature selection+oversampling/undersampling
+-Feature selection+cost sensitive
