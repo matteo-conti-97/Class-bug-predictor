@@ -90,7 +90,7 @@ public class WekaAnalyzer {
         int classIndex = 0; // First class, the buggy "YES"
         double kappa = eval.kappa();
         ret.add(kappa);
-        //LOGGER.info("Kappa = {}", kappa);
+        LOGGER.info("Kappa = {}", kappa);
         double precision = eval.precision(classIndex);
         ret.add(precision);
         LOGGER.info("Precision = {}", precision);
