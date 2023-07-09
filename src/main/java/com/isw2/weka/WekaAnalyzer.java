@@ -54,15 +54,15 @@ public class WekaAnalyzer {
         switch(classifierType) {
             case NAIVE_BAYES:
                 classifier = new NaiveBayes();
-                //LOGGER.info("\nUsing Naive Bayes classifier");
+                LOGGER.info("\nUsing Naive Bayes classifier");
                 break;
             case RANDOM_FOREST:
                 classifier = new RandomForest();
-                //LOGGER.info("\nUsing Random Forest classifier");
+                LOGGER.info("\nUsing Random Forest classifier");
                 break;
             case IBK:
                 classifier = new IBk();
-                //LOGGER.info("\nUsing IBK classifier");
+                LOGGER.info("\nUsing IBK classifier");
                 break;
             default:
                 LOGGER.error("\nInvalid classifier type");
@@ -93,13 +93,13 @@ public class WekaAnalyzer {
         //LOGGER.info("Kappa = {}", kappa);
         double precision = eval.precision(classIndex);
         ret.add(precision);
-        //LOGGER.info("Precision = {}", precision);
+        LOGGER.info("Precision = {}", precision);
         double recall = eval.recall(classIndex);
         ret.add(recall);
-        //LOGGER.info("Recall = {}", recall);
+        LOGGER.info("Recall = {}", recall);
         double auc = eval.areaUnderROC(classIndex);
         ret.add(auc);
-        //LOGGER.info("AUC = {}", auc);
+        LOGGER.info("AUC = {}", auc);
         double[][] confusionMatrix = eval.confusionMatrix();
         double tp = confusionMatrix[0][0];
         double fn = confusionMatrix[0][1];
@@ -109,7 +109,7 @@ public class WekaAnalyzer {
         ret.add(fn);
         ret.add(fp);
         ret.add(tn);
-        //LOGGER.info("TP: {} FN: {}: FP: {} TN: {}\n\n", tp, fn, fp, tn);
+        LOGGER.info("TP: {} FN: {}: FP: {} TN: {}\n\n", tp, fn, fp, tn);
         return ret;
     }
 
@@ -131,11 +131,11 @@ public class WekaAnalyzer {
         filteredTrainingSet.setClassIndex(numAttr - 1);
         filteredTestingSet.setClassIndex(numAttr - 1);
         // Print the selected attribute subset
-        /*int[] selectedAttributes = bestFirstSrc.search(subsetEval, trainingSet);
+        int[] selectedAttributes = bestFirstSrc.search(subsetEval, trainingSet);
         LOGGER.info("Selected features: \n");
         for (int selectedAttribute : selectedAttributes) {
             LOGGER.info("Feature: {}", FEATURES[selectedAttribute]);
-        }*/
+        }
         return Arrays.asList(filteredTrainingSet, filteredTestingSet);
     }
 
@@ -158,8 +158,8 @@ public class WekaAnalyzer {
         for(List<String> dataset: datasetPath){
             String trainingSetPath=dataset.get(0);
             String testingSetPath=dataset.get(1);
-            //LOGGER.info("Training set path: {}", trainingSetPath);
-            //LOGGER.info("Testing set path: {}\n", testingSetPath);
+            LOGGER.info("Training set path: {}", trainingSetPath);
+            LOGGER.info("Testing set path: {}\n", testingSetPath);
 
             //load datasets
             DataSource trainingSetSrc = new DataSource(dataset.get(0));
