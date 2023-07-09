@@ -31,7 +31,7 @@ public class Main {
 
     public static void main(String[] args) throws ParseException, SQLException {
         long startTime = System.nanoTime();
-        int bookkeeperDatasetNum=createDataset(BOOKKEEPER, BOOKKEEPER_CREATION, LAST_BOOKKEEPER_RELEASE);
+        //int bookkeeperDatasetNum=createDataset(BOOKKEEPER, BOOKKEEPER_CREATION, LAST_BOOKKEEPER_RELEASE);
         //int zookeeperDatasetNum=createDataset(ZOOKEEPER, ZOOKEEPER_CREATION, LAST_ZOOKEEPER_RELEASE);
         //analyzeDataset(BOOKKEEPER, bookkeeperDatasetNum);
         analyzeDataset(BOOKKEEPER, 6);
@@ -51,8 +51,12 @@ public class Main {
             wekaAnalyzer.runExperiment(project, datasetNum, ExperimentType.FEATURE_SELECTION_WITH_UNDER_SAMPLING);
             LOGGER.info("\n\n*************FEATURE SELECTION EXPERIMENT WITH OVER SAMPLING***************************************\n\n");
             wekaAnalyzer.runExperiment(project, datasetNum, ExperimentType.FEATURE_SELECTION_WITH_OVER_SAMPLING);
-            LOGGER.info("\n\n*************FEATURE SELECTION EXPERIMENT WITH COST SENSITIVE***************************************\n\n");
-            wekaAnalyzer.runExperiment(project, datasetNum, ExperimentType.FEATURE_SELECTION_WITH_COST_SENSITIVE);
+            LOGGER.info("\n\n*************FEATURE SELECTION EXPERIMENT WITH COST SENSITIVE CLASSIFIER WITH CFN 4***************************************\n\n");
+            wekaAnalyzer.runExperiment(project, datasetNum, ExperimentType.FEATURE_SELECTION_WITH_COST_SENSITIVE_CLASSIFIER_CFN_4);
+            LOGGER.info("\n\n*************FEATURE SELECTION EXPERIMENT WITH COST SENSITIVE CLASSIFIER WITH CFN 3***************************************\n\n");
+            wekaAnalyzer.runExperiment(project, datasetNum, ExperimentType.FEATURE_SELECTION_WITH_COST_SENSITIVE_CLASSIFIER_CFN_3);
+            LOGGER.info("\n\n*************FEATURE SELECTION EXPERIMENT WITH COST SENSITIVE LEARNING***************************************\n\n");
+            wekaAnalyzer.runExperiment(project, datasetNum, ExperimentType.FEATURE_SELECTION_WITH_COST_SENSITIVE_LEARNING);
         } catch (Exception e) {
             LOGGER.error("Error while running experiment", e);
         }
