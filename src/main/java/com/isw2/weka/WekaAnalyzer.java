@@ -36,7 +36,9 @@ public class WekaAnalyzer {
 
     List<List<String>> generateDatasetPaths(String project, int datasetNum) {
         List<List<String>> ret = new ArrayList<>();
-        for (int i = 2; i <= datasetNum; i++) {
+        int i=2;
+        if(project.equals("zookeeper")) i=3;
+        for (; i <= datasetNum; i++) {
             List<String> dataset = new ArrayList<>();
             String trainingSetPath=DATASET_SET_PATH + project + "_" + i + "Train.arff";
             String testingSetPath=DATASET_SET_PATH + project + "_" + i + "Test.arff";
@@ -260,7 +262,7 @@ public class WekaAnalyzer {
             boolean someNanIbk= checkNans(tmpIbk);
             boolean someNanRf= checkNans(tmpRf);
 
-            //Sum up the evaluation results
+            //Sum up the evaluation results ASSUNZIONE 25/26
             if(!someNanNb){
                 sumEvalResults(nvEval, tmpNb);
                 cntNb++;

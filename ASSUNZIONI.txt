@@ -57,3 +57,8 @@ dei training set che si basano su release molto piu vecchie dell'ultima disponib
 24-Ho usato bidirectional come feature selection direction perchè prendeva poco tempo in più e dava un risultato più
 preciso fin dalla prima iterazione (con dataset più piccolo) selezionando le stesse feature che backward selezionava
 solo ad iterazioni successive (con dataset più grande)
+
+25-A volte il classificatore ritorna NaN in particolare ho notato che lo fa in quelle volte in cui il numero
+di positive è quasi nullo rispetto al numero dei negative, in realtà questo succede solo su zookeeper2 percio vedi 26
+
+26-Il primo dataset di zookeeper sporca la misura con dei NaN perciò l'ho rimosso

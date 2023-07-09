@@ -46,7 +46,7 @@ public class Main {
         try {
             LOGGER.info("\n\n*************VANILLA EXPERIMENT**************************************\n\n");
             wekaAnalyzer.runExperiment(project, datasetNum, ExperimentType.VANILLA);
-            /*LOGGER.info("\n\n*************FEATURE SELECTION EXPERIMENT***************************************\n\n");
+            LOGGER.info("\n\n*************FEATURE SELECTION EXPERIMENT***************************************\n\n");
             wekaAnalyzer.runExperiment(project, datasetNum, ExperimentType.FEATURE_SELECTION);
             LOGGER.info("\n\n*************FEATURE SELECTION WITH UNDER SAMPLING EXPERIMENT***************************************\n\n");
             wekaAnalyzer.runExperiment(project, datasetNum, ExperimentType.FEATURE_SELECTION_WITH_UNDER_SAMPLING);
@@ -57,7 +57,7 @@ public class Main {
             LOGGER.info("\n\n*************FEATURE SELECTION EXPERIMENT WITH COST SENSITIVE CLASSIFIER WITH CFN 3***************************************\n\n");
             wekaAnalyzer.runExperiment(project, datasetNum, ExperimentType.FEATURE_SELECTION_WITH_COST_SENSITIVE_CLASSIFIER_CFN_3);
             LOGGER.info("\n\n*************FEATURE SELECTION EXPERIMENT WITH COST SENSITIVE LEARNING***************************************\n\n");
-            wekaAnalyzer.runExperiment(project, datasetNum, ExperimentType.FEATURE_SELECTION_WITH_COST_SENSITIVE_LEARNING);*/
+            wekaAnalyzer.runExperiment(project, datasetNum, ExperimentType.FEATURE_SELECTION_WITH_COST_SENSITIVE_LEARNING);
         } catch (Exception e) {
             LOGGER.error("Error while running experiment", e);
         }
