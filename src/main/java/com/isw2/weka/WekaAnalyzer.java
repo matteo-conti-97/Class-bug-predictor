@@ -153,7 +153,9 @@ public class WekaAnalyzer {
         List<Double> nvEval = new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
         List<Double> ibkEval = new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
         List<Double> rfEval = new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-        int numDataset = datasetPath.size();
+        int cntNb = 0;
+        int cntIbk = 0;
+        int cntRf = 0;
         LOGGER.info("Analyzing project: {}", project);
         for(List<String> dataset: datasetPath){
             String trainingSetPath=dataset.get(0);
@@ -253,22 +255,48 @@ public class WekaAnalyzer {
             tmpNb=evualuateClassifier(trainingSet, testingSet, ClassifierType.NAIVE_BAYES, fc, csc);
             tmpIbk=evualuateClassifier(trainingSet, testingSet, ClassifierType.IBK, fc, csc);
             tmpRf=evualuateClassifier(trainingSet, testingSet, ClassifierType.RANDOM_FOREST, fc, csc);
+
+            boolean someNanNb= checkNans(tmpNb);
+            boolean someNanIbk= checkNans(tmpIbk);
+            boolean someNanRf= checkNans(tmpRf);
+
             //Sum up the evaluation results
-            for(int i=0;i<8;i++){
-                nvEval.set(i, nvEval.get(i)+tmpNb.get(i));
-                ibkEval.set(i, ibkEval.get(i)+tmpIbk.get(i));
-                rfEval.set(i, rfEval.get(i)+tmpRf.get(i));
+            if(!someNanNb){
+                sumEvalResults(nvEval, tmpNb);
+                cntNb++;
             }
+            if(!someNanIbk){
+                sumEvalResults(ibkEval, tmpIbk);
+                cntIbk++;
+            }
+            if(!someNanRf) {
+                sumEvalResults(rfEval, tmpRf);
+                cntRf++;
+            }
+
         }
         //Average the evaluation results
-        List<Double> nbAvg = computeMeanEval(nvEval, numDataset);
-        List<Double> ibkAvg = computeMeanEval(ibkEval, numDataset);
-        List<Double> rfAvg = computeMeanEval(rfEval, numDataset);
+        List<Double> nbAvg = computeMeanEval(nvEval, cntNb);
+        List<Double> ibkAvg = computeMeanEval(ibkEval, cntIbk);
+        List<Double> rfAvg = computeMeanEval(rfEval, cntRf);
 
         //Print the average evaluation results
         Printer.printMeanEval(nbAvg, ClassifierType.NAIVE_BAYES);
         Printer.printMeanEval(ibkAvg, ClassifierType.IBK);
         Printer.printMeanEval(rfAvg, ClassifierType.RANDOM_FOREST);
+    }
+
+    private void sumEvalResults(List<Double> eval, List<Double> tmp){
+        for(int i=0;i<8;i++){
+            eval.set(i, eval.get(i) + tmp.get(i));
+        }
+    }
+
+    private boolean checkNans(List<Double> tmp){
+        for(Double d: tmp){
+            if(d.isNaN()) return true;
+        }
+        return false;
     }
 
     private String computeSampleSizePercentage(Instances trainingSet) {
