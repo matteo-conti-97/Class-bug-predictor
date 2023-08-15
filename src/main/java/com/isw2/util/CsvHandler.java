@@ -17,6 +17,8 @@ public class CsvHandler {
     private static final String CSV_OUTPUT_PATH = "src/main/java/resource/csv/dataset_";
     private static final String ARFF_OUTPUT_PATH = "src/main/java/resource/arff/dataset_";
     private static final String OUTPUT_PATH = "src/main/java/resource/out/";
+    private static final String NONE = "None";
+    private static final String FEATURE_SELECTION_STRING = "Best_First_Bidirectional";
 
     private CsvHandler() {
     }
@@ -61,6 +63,7 @@ public class CsvHandler {
                     "Random Forest", String.valueOf(rf.get(0)), String.valueOf(rf.get(1)), String.valueOf(rf.get(2)),
                     String.valueOf(rf.get(3)), String.valueOf(rf.get(4)), String.valueOf(rf.get(5)),
                     String.valueOf(rf.get(6)), String.valueOf(rf.get(7))};
+            writer.writeNext(header);
             writer.writeNext(nbData);
             writer.writeNext(ibkData);
             writer.writeNext(rfData);
@@ -75,38 +78,38 @@ public class CsvHandler {
         List<String> ret = new ArrayList<>();
         switch(type){
             case VANILLA:
-                ret.add("None");
-                ret.add("None");
-                ret.add("None");
+                ret.add(NONE);
+                ret.add(NONE);
+                ret.add(NONE);
                 break;
             case FEATURE_SELECTION:
-                ret.add("Best_First_Bidirectional");
-                ret.add("None");
-                ret.add("None");
+                ret.add(FEATURE_SELECTION_STRING);
+                ret.add(NONE);
+                ret.add(NONE);
                 break;
             case FEATURE_SELECTION_WITH_OVER_SAMPLING:
-                ret.add("Best_First_Bidirectional");
+                ret.add(FEATURE_SELECTION_STRING);
                 ret.add("Over_Sampling");
-                ret.add("None");
+                ret.add(NONE);
                 break;
             case FEATURE_SELECTION_WITH_UNDER_SAMPLING:
-                ret.add("Best_First_Bidirectional");
+                ret.add(FEATURE_SELECTION_STRING);
                 ret.add("Under_Sampling");
-                ret.add("None");
+                ret.add(NONE);
                 break;
             case FEATURE_SELECTION_WITH_COST_SENSITIVE_CLASSIFIER_CFN_3:
-                ret.add("Best_First_Bidirectional");
-                ret.add("None");
+                ret.add(FEATURE_SELECTION_STRING);
+                ret.add(NONE);
                 ret.add("Sensitive_Classifier_FN_Cost_3");
                 break;
             case FEATURE_SELECTION_WITH_COST_SENSITIVE_CLASSIFIER_CFN_4:
-                ret.add("Best_First_Bidirectional");
-                ret.add("None");
+                ret.add(FEATURE_SELECTION_STRING);
+                ret.add(NONE);
                 ret.add("Sensitive_Classifier_FN_Cost_4");
                 break;
             case FEATURE_SELECTION_WITH_COST_SENSITIVE_LEARNING:
-                ret.add("Best_First_Bidirectional");
-                ret.add("None");
+                ret.add(FEATURE_SELECTION_STRING);
+                ret.add(NONE);
                 ret.add("Sensitive_Learning_FN_Cost_18.7");
                 break;
         }
