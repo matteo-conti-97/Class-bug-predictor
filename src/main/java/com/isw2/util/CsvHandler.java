@@ -9,13 +9,108 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CsvHandler {
 
     private static final String CSV_OUTPUT_PATH = "src/main/java/resource/csv/dataset_";
     private static final String ARFF_OUTPUT_PATH = "src/main/java/resource/arff/dataset_";
+    private static final String OUTPUT_PATH = "src/main/java/resource/out/";
 
     private CsvHandler() {
+    }
+
+    private static int digitMatcher(String in){
+        String pattern = "\\d+";
+        StringBuilder ret= new StringBuilder();
+
+        Pattern digitPattern = Pattern.compile(pattern);
+        Matcher matcher = digitPattern.matcher(in);
+
+        while (matcher.find()) {
+            String digit = matcher.group();
+            ret.append(digit);
+        }
+        return Integer.parseInt(ret.toString());
+    }
+
+    public static void writeOutData(String project, String datasetPath, ExperimentType type, List<Double> nb,
+                                    List<Double> ibk, List<Double> rf){
+        String numRel;
+        if(datasetPath.equals("mean")) numRel=datasetPath;
+        else numRel= String.valueOf(digitMatcher(datasetPath)-1);
+        String outPath= OUTPUT_PATH + project + "_" + numRel + "_" + type + ".csv";
+        List<String> experimentTuple = getExperimentTypeTuple(type);
+        File file = new File(outPath);
+        String[] header={"PROJECT", "#TRAIN_RELEASES", "FEATURE_SELECTION", "SAMPLING", "COST_SENSITIVE", "CLASSIFIER",
+                "KAPPA", "PRECISION", "RECALL", "AUC", "TP", "FP", "TN", "FN" };
+        try {
+            FileWriter outputFile = new FileWriter(file, false);
+            // create CSVWriter object filewriter object as parameter
+            CSVWriter writer = new CSVWriter(outputFile);
+            String[] nbData = {project, numRel, experimentTuple.get(0), experimentTuple.get(1), experimentTuple.get(2),
+            "Naive Bayes", String.valueOf(nb.get(0)), String.valueOf(nb.get(1)), String.valueOf(nb.get(2)),
+                    String.valueOf(nb.get(3)), String.valueOf(nb.get(4)), String.valueOf(nb.get(5)),
+                    String.valueOf(nb.get(6)), String.valueOf(nb.get(7))};
+            String[] ibkData = {project, numRel, experimentTuple.get(0), experimentTuple.get(1), experimentTuple.get(2),
+                    "IBK", String.valueOf(ibk.get(0)), String.valueOf(ibk.get(1)), String.valueOf(ibk.get(2)),
+                    String.valueOf(ibk.get(3)), String.valueOf(ibk.get(4)), String.valueOf(ibk.get(5)),
+                    String.valueOf(ibk.get(6)), String.valueOf(ibk.get(7))};
+            String[] rfData = {project, numRel, experimentTuple.get(0), experimentTuple.get(1), experimentTuple.get(2),
+                    "Random Forest", String.valueOf(rf.get(0)), String.valueOf(rf.get(1)), String.valueOf(rf.get(2)),
+                    String.valueOf(rf.get(3)), String.valueOf(rf.get(4)), String.valueOf(rf.get(5)),
+                    String.valueOf(rf.get(6)), String.valueOf(rf.get(7))};
+            writer.writeNext(nbData);
+            writer.writeNext(ibkData);
+            writer.writeNext(rfData);
+            // closing writer connection
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static List<String> getExperimentTypeTuple(ExperimentType type){
+        List<String> ret = new ArrayList<>();
+        switch(type){
+            case VANILLA:
+                ret.add("None");
+                ret.add("None");
+                ret.add("None");
+                break;
+            case FEATURE_SELECTION:
+                ret.add("Best_First_Bidirectional");
+                ret.add("None");
+                ret.add("None");
+                break;
+            case FEATURE_SELECTION_WITH_OVER_SAMPLING:
+                ret.add("Best_First_Bidirectional");
+                ret.add("Over_Sampling");
+                ret.add("None");
+                break;
+            case FEATURE_SELECTION_WITH_UNDER_SAMPLING:
+                ret.add("Best_First_Bidirectional");
+                ret.add("Under_Sampling");
+                ret.add("None");
+                break;
+            case FEATURE_SELECTION_WITH_COST_SENSITIVE_CLASSIFIER_CFN_3:
+                ret.add("Best_First_Bidirectional");
+                ret.add("None");
+                ret.add("Sensitive_Classifier_FN_Cost_3");
+                break;
+            case FEATURE_SELECTION_WITH_COST_SENSITIVE_CLASSIFIER_CFN_4:
+                ret.add("Best_First_Bidirectional");
+                ret.add("None");
+                ret.add("Sensitive_Classifier_FN_Cost_4");
+                break;
+            case FEATURE_SELECTION_WITH_COST_SENSITIVE_LEARNING:
+                ret.add("Best_First_Bidirectional");
+                ret.add("None");
+                ret.add("Sensitive_Learning_FN_Cost_18.7");
+                break;
+        }
+        return ret;
     }
 
     private static void writeReleaseDataLineByLine(List<JavaFile> releaseFiles, CSVWriter writer, int release){

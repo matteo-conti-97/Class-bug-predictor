@@ -1,6 +1,7 @@
 package com.isw2.weka;
 
 import com.isw2.util.ClassifierType;
+import com.isw2.util.CsvHandler;
 import com.isw2.util.ExperimentType;
 import com.isw2.util.Printer;
 import org.slf4j.Logger;
@@ -92,26 +93,27 @@ public class WekaAnalyzer {
         int classIndex = 0; // First class, the buggy "YES"
         double kappa = eval.kappa();
         ret.add(kappa);
-        LOGGER.info("Kappa = {}", kappa);
+        //LOGGER.info("Kappa = {}", kappa);
         double precision = eval.precision(classIndex);
         ret.add(precision);
-        LOGGER.info("Precision = {}", precision);
+        //LOGGER.info("Precision = {}", precision);
         double recall = eval.recall(classIndex);
         ret.add(recall);
-        LOGGER.info("Recall = {}", recall);
+        //LOGGER.info("Recall = {}", recall);
         double auc = eval.areaUnderROC(classIndex);
         ret.add(auc);
-        LOGGER.info("AUC = {}", auc);
+        //LOGGER.info("AUC = {}", auc);
         double[][] confusionMatrix = eval.confusionMatrix();
         double tp = confusionMatrix[0][0];
         double fn = confusionMatrix[0][1];
         double fp = confusionMatrix[1][0];
         double tn = confusionMatrix[1][1];
         ret.add(tp);
-        ret.add(fn);
         ret.add(fp);
         ret.add(tn);
-        LOGGER.info("TP: {} FN: {}: FP: {} TN: {}\n\n", tp, fn, fp, tn);
+        ret.add(fn);
+        LOGGER.info("KAPPA: {}, PRECISION: {}, RECALL: {}, AUC: {}\n TP: {}, FP: {}, TN: {}, FN: {}\n\n",
+                ret.get(0), ret.get(1), ret.get(2), ret.get(3), ret.get(4), ret.get(5), ret.get(6), ret.get(7));
         return ret;
     }
 
@@ -134,10 +136,10 @@ public class WekaAnalyzer {
         filteredTestingSet.setClassIndex(numAttr - 1);
         // Print the selected attribute subset
         int[] selectedAttributes = bestFirstSrc.search(subsetEval, trainingSet);
-        LOGGER.info("Selected features: \n");
+        /*LOGGER.info("Selected features: \n");
         for (int selectedAttribute : selectedAttributes) {
             LOGGER.info("Feature: {}", FEATURES[selectedAttribute]);
-        }
+        }*/
         return Arrays.asList(filteredTrainingSet, filteredTestingSet);
     }
 
@@ -258,6 +260,8 @@ public class WekaAnalyzer {
             tmpIbk=evualuateClassifier(trainingSet, testingSet, ClassifierType.IBK, fc, csc);
             tmpRf=evualuateClassifier(trainingSet, testingSet, ClassifierType.RANDOM_FOREST, fc, csc);
 
+            CsvHandler.writeOutData(project, trainingSetPath, type, tmpNb, tmpIbk, tmpRf);
+
             boolean someNanNb= checkNans(tmpNb);
             boolean someNanIbk= checkNans(tmpIbk);
             boolean someNanRf= checkNans(tmpRf);
@@ -281,6 +285,8 @@ public class WekaAnalyzer {
         List<Double> nbAvg = computeMeanEval(nvEval, cntNb);
         List<Double> ibkAvg = computeMeanEval(ibkEval, cntIbk);
         List<Double> rfAvg = computeMeanEval(rfEval, cntRf);
+
+        CsvHandler.writeOutData(project, "mean", type, nbAvg, ibkAvg, rfAvg);
 
         //Print the average evaluation results
         Printer.printMeanEval(nbAvg, ClassifierType.NAIVE_BAYES);

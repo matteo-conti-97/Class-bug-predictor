@@ -34,9 +34,9 @@ public class Main {
         //int bookkeeperDatasetNum=createDataset(BOOKKEEPER, BOOKKEEPER_CREATION, LAST_BOOKKEEPER_RELEASE);
         //int zookeeperDatasetNum=createDataset(ZOOKEEPER, ZOOKEEPER_CREATION, LAST_ZOOKEEPER_RELEASE);
         //analyzeDataset(BOOKKEEPER, bookkeeperDatasetNum);
-        //analyzeDataset(BOOKKEEPER, 6);
+        analyzeDataset(BOOKKEEPER, 6);
         //analyzeDataset(ZOOKEEPER, zookeeperDatasetNum);
-        analyzeDataset(ZOOKEEPER, 22);
+        //analyzeDataset(ZOOKEEPER, 22);
         long elapsedTime = System.nanoTime() - startTime;
         LOGGER.info("Execution has taken {} ms", elapsedTime/1000000);
     }
