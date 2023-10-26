@@ -13,7 +13,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CsvHandler {
-
+    private static final String[] OUT_HEADER={"PROJECT", "#TRAIN_RELEASES", "FEATURE_SELECTION", "SAMPLING", "COST_SENSITIVE", "CLASSIFIER",
+            "KAPPA", "PRECISION", "RECALL", "AUC", "TP", "FP", "TN", "FN" };
     private static final String CSV_OUTPUT_PATH = "src/main/java/resource/csv/dataset_";
     private static final String ARFF_OUTPUT_PATH = "src/main/java/resource/arff/dataset_";
     private static final String OUTPUT_PATH = "src/main/java/resource/out/";
@@ -45,8 +46,6 @@ public class CsvHandler {
         String outPath= OUTPUT_PATH + project + "_" + numRel + "_" + type + ".csv";
         List<String> experimentTuple = getExperimentTypeTuple(type);
         File file = new File(outPath);
-        String[] header={"PROJECT", "#TRAIN_RELEASES", "FEATURE_SELECTION", "SAMPLING", "COST_SENSITIVE", "CLASSIFIER",
-                "KAPPA", "PRECISION", "RECALL", "AUC", "TP", "FP", "TN", "FN" };
         try {
             FileWriter outputFile = new FileWriter(file, false);
             // create CSVWriter object filewriter object as parameter
@@ -63,7 +62,7 @@ public class CsvHandler {
                     "Random Forest", String.valueOf(rf.get(0)), String.valueOf(rf.get(1)), String.valueOf(rf.get(2)),
                     String.valueOf(rf.get(3)), String.valueOf(rf.get(4)), String.valueOf(rf.get(5)),
                     String.valueOf(rf.get(6)), String.valueOf(rf.get(7))};
-            writer.writeNext(header);
+            writer.writeNext(OUT_HEADER);
             writer.writeNext(nbData);
             writer.writeNext(ibkData);
             writer.writeNext(rfData);
@@ -269,6 +268,50 @@ public class CsvHandler {
         for (String line : header) {
             bufferedWriter.write(line);
             bufferedWriter.newLine();
+        }
+    }
+
+    public static void writeCsv(List<String[]> data, String path, String[] header) {
+        File file = new File(path);
+        boolean exists = file.exists();
+        try {
+            // create FileWriter object with file as parameter
+            FileWriter outputFile = new FileWriter(file, true);
+            // create CSVWriter object filewriter object as parameter
+            CSVWriter writer = new CSVWriter(outputFile);
+
+            // adding header to csv
+            if(!exists)
+                writer.writeNext(header);
+            for(String[] elem : data){
+                writer.writeNext(elem);
+            }
+            // closing writer connection
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void collectDataExperiment(String project, int datasetNum){
+        String writePathTot = OUTPUT_PATH + project + ".csv";
+        for(int i=0;i<datasetNum;i++){
+            for (ExperimentType experimentType : ExperimentType.values()) {
+                String readPath;
+                String writePathPart;
+                if(i==0) {
+                    readPath = OUTPUT_PATH + project + "_mean_" + experimentType + ".csv";
+                    writePathPart=OUTPUT_PATH + project + "_mean.csv";
+                }
+                else {
+                    readPath = OUTPUT_PATH + project + "_" + i + "_" + experimentType + ".csv";
+                    writePathPart=OUTPUT_PATH + project + "_" + i + ".csv";
+                }
+                List<String[]> csvContent=readCsv(readPath);
+                writeCsv(csvContent, writePathPart, OUT_HEADER);
+                writeCsv(csvContent, writePathTot, OUT_HEADER);
+
+            }
         }
     }
 }

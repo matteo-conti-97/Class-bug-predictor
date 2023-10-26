@@ -2,6 +2,7 @@ package com.isw2;
 
 import com.isw2.control.MeasureController;
 import com.isw2.control.ScraperController;
+import com.isw2.util.CsvHandler;
 import com.isw2.util.ExperimentType;
 import com.isw2.weka.WekaAnalyzer;
 import org.slf4j.Logger;
@@ -35,10 +36,13 @@ public class Main {
         //int zookeeperDatasetNum=createDataset(ZOOKEEPER, ZOOKEEPER_CREATION, LAST_ZOOKEEPER_RELEASE);
         //analyzeDataset(BOOKKEEPER, bookkeeperDatasetNum);
         analyzeDataset(BOOKKEEPER, 6);
+        CsvHandler.collectDataExperiment(BOOKKEEPER,6);
         //analyzeDataset(ZOOKEEPER, zookeeperDatasetNum);
         //analyzeDataset(ZOOKEEPER, 22);
+        //CsvHandler.collectDataExperiment(ZOOKEEPER,22);
         long elapsedTime = System.nanoTime() - startTime;
         LOGGER.info("Execution has taken {} ms", elapsedTime/1000000);
+
     }
 
     public static void analyzeDataset(String project, int datasetNum){
@@ -58,6 +62,7 @@ public class Main {
             wekaAnalyzer.runExperiment(project, datasetNum, ExperimentType.FEATURE_SELECTION_WITH_COST_SENSITIVE_CLASSIFIER_CFN_3);
             LOGGER.info("\n\n*************FEATURE SELECTION EXPERIMENT WITH COST SENSITIVE LEARNING***************************************\n\n");
             wekaAnalyzer.runExperiment(project, datasetNum, ExperimentType.FEATURE_SELECTION_WITH_COST_SENSITIVE_LEARNING);
+
         } catch (Exception e) {
             LOGGER.error("Error while running experiment", e);
         }
