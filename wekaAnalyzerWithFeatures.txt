@@ -33,6 +33,7 @@ import java.util.Objects;
 public class WekaAnalyzer {
     private static final Logger LOGGER = LoggerFactory.getLogger(WekaAnalyzer.class);
     private static final String DATASET_SET_PATH = "src/main/java/resource/arff/dataset_";
+    //private static final String[] FEATURES={ "#AuthorsInRelease", "LOC", "AvgChurnInRelease", "AvgChurnFromStart", "AvgLOCAddedInRelease", "AvgLOCAddedFromStart", "#RevisionInRelease", "#RevisionFromStart", "#BugFixInRelease", "#BugFixFromStart"};
 
     List<List<String>> generateDatasetPaths(String project, int datasetNum) {
         List<List<String>> ret = new ArrayList<>();
@@ -129,6 +130,12 @@ public class WekaAnalyzer {
         int numAttr = filteredTrainingSet.numAttributes();
         filteredTrainingSet.setClassIndex(numAttr - 1);
         filteredTestingSet.setClassIndex(numAttr - 1);
+        // Print the selected attribute subset
+        // lol int[] selectedAttributes = bestFirstSrc.search(subsetEval, trainingSet);
+        /*lol LOGGER.info("Selected features: \n");
+        lol for (int selectedAttribute : selectedAttributes) {
+            lol LOGGER.info("Feature: {}", FEATURES[selectedAttribute]);
+        lol }*/
         return Arrays.asList(filteredTrainingSet, filteredTestingSet);
     }
 
