@@ -1,14 +1,18 @@
 package com.isw2.util;
 
 import com.isw2.model.JavaFile;
+import com.isw2.weka.WekaAnalyzer;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.CSVWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,6 +24,8 @@ public class CsvHandler {
     private static final String OUTPUT_PATH = "src/main/java/resource/out/";
     private static final String NONE = "None";
     private static final String FEATURE_SELECTION_STRING = "Best_First_Bidirectional";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CsvHandler.class);
 
     private CsvHandler() {
     }
@@ -293,6 +299,19 @@ public class CsvHandler {
         }
     }
 
+    public static boolean checkIfOutDirIsEmpty(){
+        String path = CSV_OUTPUT_PATH.substring(0,26);
+        File directory = new File(path);
+        if (directory.isDirectory()) {
+            String[] files = directory.list();
+
+            return files != null && files.length == 0;
+        } else {
+            LOGGER.info("Not a valid directory path");
+        }
+        return false;
+    }
+
     public static void collectDataExperiment(String project, int datasetNum){
         String writePathTot = OUTPUT_PATH + project + ".csv";
         for(int i=0;i<datasetNum;i++){
@@ -303,6 +322,7 @@ public class CsvHandler {
                     readPath = OUTPUT_PATH + project + "_mean_" + experimentType + ".csv";
                     writePathPart=OUTPUT_PATH + project + "_mean.csv";
                 }
+                else if((i==1)&&(Objects.equals(project, "zookeeper"))) continue; //Zookeeper jump release 1 which is 2 in fact cause of NaN values
                 else {
                     readPath = OUTPUT_PATH + project + "_" + i + "_" + experimentType + ".csv";
                     writePathPart=OUTPUT_PATH + project + "_" + i + ".csv";

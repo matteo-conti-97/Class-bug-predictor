@@ -38,7 +38,7 @@ public class WekaAnalyzer {
     List<List<String>> generateDatasetPaths(String project, int datasetNum) {
         List<List<String>> ret = new ArrayList<>();
         int i=2;
-        if(project.equals("zookeeper")) i=3;
+        if(project.equals("zookeeper")) i=3; //Zookeeper jump release 2 cause of NaN values
         for (; i <= datasetNum; i++) {
             List<String> dataset = new ArrayList<>();
             String trainingSetPath=DATASET_SET_PATH + project + "_" + i + "Train.arff";

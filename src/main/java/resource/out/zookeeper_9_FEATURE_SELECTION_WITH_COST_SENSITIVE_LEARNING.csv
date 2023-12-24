@@ -1,0 +1,4 @@
+"PROJECT","#TRAIN_RELEASES","FEATURE_SELECTION","SAMPLING","COST_SENSITIVE","CLASSIFIER","KAPPA","PRECISION","RECALL","AUC","TP","FP","TN","FN"
+"zookeeper","9","Best_First_Bidirectional","None","Sensitive_Learning_FN_Cost_18.7","Naive Bayes","0.3306966618287371","0.45652173913043476","0.5","0.685218566922037","42.0","50.0","267.0","42.0"
+"zookeeper","9","Best_First_Bidirectional","None","Sensitive_Learning_FN_Cost_18.7","IBK","-0.04321920107418561","0.16666666666666666","0.11904761904761904","0.4890528766711732","10.0","50.0","267.0","74.0"
+"zookeeper","9","Best_First_Bidirectional","None","Sensitive_Learning_FN_Cost_18.7","Random Forest","0.01359829744893741","0.21686746987951808","0.42857142857142855","0.5764420910319964","36.0","130.0","187.0","48.0"

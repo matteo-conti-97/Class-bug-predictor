@@ -30,19 +30,18 @@ public class Main {
             {"kafka", "2.6.2", "2011-08-01"}
     };
 
-    //Zookeeper report start from release 2 cause of NaN values
     public static void main(String[] args) throws ParseException, SQLException {
         long startTime = System.nanoTime();
-        int bookkeeperDatasetNum=6;
-        int zookeeperDatasetNum=22;
-        if(CsvHandler.checkIfOutDirIsEmpty()) {
-            bookkeeperDatasetNum = createDataset(BOOKKEEPER, BOOKKEEPER_CREATION, LAST_BOOKKEEPER_RELEASE);
-            zookeeperDatasetNum = createDataset(ZOOKEEPER, ZOOKEEPER_CREATION, LAST_ZOOKEEPER_RELEASE);
-        }
+        int bookkeeperDatasetNum=createDataset(BOOKKEEPER, BOOKKEEPER_CREATION, LAST_BOOKKEEPER_RELEASE);
+        int zookeeperDatasetNum=createDataset(ZOOKEEPER, ZOOKEEPER_CREATION, LAST_ZOOKEEPER_RELEASE);
         analyzeDataset(BOOKKEEPER, bookkeeperDatasetNum);
+        //analyzeDataset(BOOKKEEPER, 6);
         CsvHandler.collectDataExperiment(BOOKKEEPER,bookkeeperDatasetNum);
+        //CsvHandler.collectDataExperiment(BOOKKEEPER,6);
         analyzeDataset(ZOOKEEPER, zookeeperDatasetNum);
+        //analyzeDataset(ZOOKEEPER, 22);
         CsvHandler.collectDataExperiment(ZOOKEEPER,zookeeperDatasetNum);
+        //CsvHandler.collectDataExperiment(ZOOKEEPER,22);
         long elapsedTime = System.nanoTime() - startTime;
         LOGGER.info("Execution has taken {} ms", elapsedTime/1000000);
 
