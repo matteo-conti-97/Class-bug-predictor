@@ -135,7 +135,7 @@ public class WekaAnalyzer {
         filteredTrainingSet.setClassIndex(numAttr - 1);
         filteredTestingSet.setClassIndex(numAttr - 1);
         // Print the selected attribute subset
-        int[] selectedAttributes = bestFirstSrc.search(subsetEval, trainingSet);
+        // lol int[] selectedAttributes = bestFirstSrc.search(subsetEval, trainingSet);
         /*lol LOGGER.info("Selected features: \n");
         lol for (int selectedAttribute : selectedAttributes) {
             lol LOGGER.info("Feature: {}", FEATURES[selectedAttribute]);
