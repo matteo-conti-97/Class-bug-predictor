@@ -33,7 +33,7 @@ import java.util.Objects;
 public class WekaAnalyzer {
     private static final Logger LOGGER = LoggerFactory.getLogger(WekaAnalyzer.class);
     private static final String DATASET_SET_PATH = "src/main/java/resource/arff/dataset_";
-    private static final String[] FEATURES={ "#AuthorsInRelease", "LOC", "AvgChurnInRelease", "AvgChurnFromStart", "AvgLOCAddedInRelease", "AvgLOCAddedFromStart", "#RevisionInRelease", "#RevisionFromStart", "#BugFixInRelease", "#BugFixFromStart"};
+    //private static final String[] FEATURES={ "#AuthorsInRelease", "LOC", "AvgChurnInRelease", "AvgChurnFromStart", "AvgLOCAddedInRelease", "AvgLOCAddedFromStart", "#RevisionInRelease", "#RevisionFromStart", "#BugFixInRelease", "#BugFixFromStart"};
 
     List<List<String>> generateDatasetPaths(String project, int datasetNum) {
         List<List<String>> ret = new ArrayList<>();
@@ -93,16 +93,12 @@ public class WekaAnalyzer {
         int classIndex = 0; // First class, the buggy "YES"
         double kappa = eval.kappa();
         ret.add(kappa);
-        //lol LOGGER.info("Kappa = {}", kappa);
         double precision = eval.precision(classIndex);
         ret.add(precision);
-        //lol LOGGER.info("Precision = {}", precision);
         double recall = eval.recall(classIndex);
         ret.add(recall);
-        //lol LOGGER.info("Recall = {}", recall);
         double auc = eval.areaUnderROC(classIndex);
         ret.add(auc);
-        //lol LOGGER.info("AUC = {}", auc);
         double[][] confusionMatrix = eval.confusionMatrix();
         double tp = confusionMatrix[0][0];
         double fn = confusionMatrix[0][1];
