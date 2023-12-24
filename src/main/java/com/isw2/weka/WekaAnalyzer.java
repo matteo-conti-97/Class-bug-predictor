@@ -93,16 +93,16 @@ public class WekaAnalyzer {
         int classIndex = 0; // First class, the buggy "YES"
         double kappa = eval.kappa();
         ret.add(kappa);
-        //LOGGER.info("Kappa = {}", kappa);
+        //lol LOGGER.info("Kappa = {}", kappa);
         double precision = eval.precision(classIndex);
         ret.add(precision);
-        //LOGGER.info("Precision = {}", precision);
+        //lol LOGGER.info("Precision = {}", precision);
         double recall = eval.recall(classIndex);
         ret.add(recall);
-        //LOGGER.info("Recall = {}", recall);
+        //lol LOGGER.info("Recall = {}", recall);
         double auc = eval.areaUnderROC(classIndex);
         ret.add(auc);
-        //LOGGER.info("AUC = {}", auc);
+        //lol LOGGER.info("AUC = {}", auc);
         double[][] confusionMatrix = eval.confusionMatrix();
         double tp = confusionMatrix[0][0];
         double fn = confusionMatrix[0][1];
@@ -136,10 +136,10 @@ public class WekaAnalyzer {
         filteredTestingSet.setClassIndex(numAttr - 1);
         // Print the selected attribute subset
         int[] selectedAttributes = bestFirstSrc.search(subsetEval, trainingSet);
-        /*LOGGER.info("Selected features: \n");
-        for (int selectedAttribute : selectedAttributes) {
-            LOGGER.info("Feature: {}", FEATURES[selectedAttribute]);
-        }*/
+        /*lol LOGGER.info("Selected features: \n");
+        lol for (int selectedAttribute : selectedAttributes) {
+            lol LOGGER.info("Feature: {}", FEATURES[selectedAttribute]);
+        lol }*/
         return Arrays.asList(filteredTrainingSet, filteredTestingSet);
     }
 

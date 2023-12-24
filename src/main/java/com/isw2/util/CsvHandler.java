@@ -1,7 +1,6 @@
 package com.isw2.util;
 
 import com.isw2.model.JavaFile;
-import com.isw2.weka.WekaAnalyzer;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.CSVWriter;
