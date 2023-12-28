@@ -93,14 +93,11 @@ public class CsvHandler {
             case FEATURE_SELECTION_WITH_UNDER_SAMPLING:
                 ret = FEATURE_SELECTION_STRING+"Under_Sampling";
                 break;
-            case FEATURE_SELECTION_WITH_COST_SENSITIVE_CLASSIFIER_CFP_3:
-                ret = FEATURE_SELECTION_STRING+"Sensitive_Classifier_FP_Cost_3";
-                break;
-            case FEATURE_SELECTION_WITH_COST_SENSITIVE_CLASSIFIER_CFP_1:
-                ret = FEATURE_SELECTION_STRING+"Sensitive_Classifier_FP_Cost_1";
+            case FEATURE_SELECTION_WITH_COST_SENSITIVE_CLASSIFIER:
+                ret = FEATURE_SELECTION_STRING+"Sensitive_Classifier_Threshold_CFP_1_CFN_10";
                 break;
             case FEATURE_SELECTION_WITH_COST_SENSITIVE_LEARNING:
-                ret = FEATURE_SELECTION_STRING+"Sensitive_Learning_FP_Cost_1";
+                ret = FEATURE_SELECTION_STRING+"Sensitive_Learning_CFP_1_CFN_10";
                 break;
             default:
                 break;

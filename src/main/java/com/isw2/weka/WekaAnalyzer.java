@@ -49,7 +49,7 @@ public class WekaAnalyzer {
         return ret;
     }
 
-    private List<Double> evualuateClassifier(Instances trainingSet, Instances testingSet, ClassifierType classifierType, FilteredClassifier fc, CostSensitiveClassifier csc) throws Exception {
+    private List<Double> evualuateClassifier(Instances trainingSet, Instances testingSet, ClassifierType classifierType, FilteredClassifier fc, CostSensitiveClassifier csc, CostMatrix cm) throws Exception {
         List<Double> ret = new ArrayList<>();
         Classifier classifier = null;
 
@@ -81,6 +81,7 @@ public class WekaAnalyzer {
         }
         else if(csc!=null){
             csc.setClassifier(classifier);
+            csc.setCostMatrix(cm);
             csc.buildClassifier(trainingSet);
             eval.evaluateModel(csc, testingSet);
         }
@@ -132,11 +133,11 @@ public class WekaAnalyzer {
         return Arrays.asList(filteredTrainingSet, filteredTestingSet);
     }
 
-    private CostMatrix getCostMatrix(double cfp){
+    private CostMatrix getCostMatrix(double cfp, double cfn){
         CostMatrix costMatrix = new CostMatrix(2);
         costMatrix.setCell(0, 0, 0.0); //Costo true positive
         costMatrix.setCell(1, 0, cfp); //Costo false positive
-        costMatrix.setCell(0, 1, 10.0*cfp); //Costo false negative
+        costMatrix.setCell(0, 1, cfn); //Costo false negative
         costMatrix.setCell(1, 1, 0.0); //Costo true negative
         return costMatrix;
     }
@@ -167,10 +168,7 @@ public class WekaAnalyzer {
             FilteredClassifier fc = null;
             String sampleSizePercentage = null;
             CostSensitiveClassifier csc = null;
-            CostMatrix costMatrix1 = getCostMatrix(1.0);
-            CostMatrix costMatrix2 = getCostMatrix(3.0);
-            CostMatrix costMatrixLearning = getCostMatrix(1.0);
-
+            CostMatrix cm=null;
 
             switch(type){
                 case FEATURE_SELECTION: //Feature selection bidirectional best first
@@ -204,22 +202,13 @@ public class WekaAnalyzer {
                     fc.setFilter(resample);
                     break;
 
-                case FEATURE_SELECTION_WITH_COST_SENSITIVE_CLASSIFIER_CFP_1:
+                case FEATURE_SELECTION_WITH_COST_SENSITIVE_CLASSIFIER:
                     filteredSets = featureSelection(vanillaTrainingSet, vanillaTestingSet);
                     trainingSet = filteredSets.get(0);
                     testingSet = filteredSets.get(1);
                     csc = new CostSensitiveClassifier();
                     csc.setMinimizeExpectedCost(true);
-                    csc.setCostMatrix(costMatrix1);
-                    break;
-
-                case FEATURE_SELECTION_WITH_COST_SENSITIVE_CLASSIFIER_CFP_3:
-                    filteredSets = featureSelection(vanillaTrainingSet, vanillaTestingSet);
-                    trainingSet = filteredSets.get(0);
-                    testingSet = filteredSets.get(1);
-                    csc = new CostSensitiveClassifier();
-                    csc.setMinimizeExpectedCost(true);
-                    csc.setCostMatrix(costMatrix2);
+                    cm = getCostMatrix(1.0, 10.0);
                     break;
 
                 case FEATURE_SELECTION_WITH_COST_SENSITIVE_LEARNING:
@@ -228,7 +217,7 @@ public class WekaAnalyzer {
                     testingSet = filteredSets.get(1);
                     csc = new CostSensitiveClassifier();
                     csc.setMinimizeExpectedCost(false);
-                    csc.setCostMatrix(costMatrixLearning);
+                    cm = getCostMatrix(1.0, 10.0);
                     break;
 
                 default:
@@ -245,9 +234,9 @@ public class WekaAnalyzer {
             List<Double> tmpRf;
 
             //Evaluate classifiers
-            tmpNb=evualuateClassifier(trainingSet, testingSet, ClassifierType.NAIVE_BAYES, fc, csc);
-            tmpIbk=evualuateClassifier(trainingSet, testingSet, ClassifierType.IBK, fc, csc);
-            tmpRf=evualuateClassifier(trainingSet, testingSet, ClassifierType.RANDOM_FOREST, fc, csc);
+            tmpNb=evualuateClassifier(trainingSet, testingSet, ClassifierType.NAIVE_BAYES, fc, csc, cm);
+            tmpIbk=evualuateClassifier(trainingSet, testingSet, ClassifierType.IBK, fc, csc, cm);
+            tmpRf=evualuateClassifier(trainingSet, testingSet, ClassifierType.RANDOM_FOREST, fc, csc, cm);
 
             CsvHandler.writeOutData(project, trainingSetPath, type, tmpNb, tmpIbk, tmpRf);
 

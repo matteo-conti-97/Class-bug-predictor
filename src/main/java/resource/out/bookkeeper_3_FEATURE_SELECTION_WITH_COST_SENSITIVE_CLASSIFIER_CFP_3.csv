@@ -1,4 +1,0 @@
-"PROJECT","#TRAIN_RELEASES","ADDONS","CLASSIFIER","KAPPA","PRECISION","RECALL","AUC","TP","FP","TN","FN"
-"bookkeeper","3","Best_First_BidirectionalSensitive_Classifier_FP_Cost_3","Naive Bayes","0.2465753424657534","0.3","0.42857142857142855","0.6461038961038961","18.0","42.0","266.0","24.0"
-"bookkeeper","3","Best_First_BidirectionalSensitive_Classifier_FP_Cost_3","IBK","-0.01969057665260208","0.10526315789473684","0.14285714285714285","0.48863636363636365","6.0","51.0","257.0","36.0"
-"bookkeeper","3","Best_First_BidirectionalSensitive_Classifier_FP_Cost_3","Random Forest","0.12197686645636183","0.1794871794871795","0.8333333333333334","0.6569264069264069","35.0","160.0","148.0","7.0"
