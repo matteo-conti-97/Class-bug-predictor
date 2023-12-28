@@ -4,61 +4,59 @@ in fasi di filtraggio successive.
 
 2-Butto le release senza commit
 
-3-Ho tolto i test perchè se in fase di predizione mi dice che un test di una classe è buggy ma la classe testata ha passato il test che faccio?
-La considero buggy anche se non lo era? Mi darebbe "falsi positivi" o se la classe passa il test ma il test è buggy mi darebbe "falsi negativi".
+3-Nell'analisi ho considerato solo classi Java che fanno parte della logica e non i test, inoltre accade che
+se in fase di predizione mi dice che un test di una classe è buggy ma la classe testata ha passato il test che faccio?
+La considero buggy anche se non lo era? Mi darebbe concettualmente dei "falsi positivi" o se la classe passa il test ma il test è buggy mi darebbe "falsi negativi".
 
 4-Ho tolto i package-info.java perchè penso siano poco significativi ai fine della predizione
 
 5-Sia Zookeeper che Bookkeeper ad un certo punto hanno migrato su github issue, il progetto si considera terminato in corrispondenza di tale migrazione
 ad esempio Bookeeper dal 2017-06-16 passa a github issue, ho simulato che la release 4.5.0 termini in tale data
 
-6-Sto misurando solo e soltanto il sorgente, cioè quello che sta in src
+6-Nei touched files delle commit ho contato solamente file java per consistenza con l'assunzione 3
 
-7-Nei touched files ho contato solamente file java
+7-Le commit con data uguale alla fine di una release e quindi all'inizio della successiva le considero appartententi alla release che termina
 
-8-Le commit con data uguale alla fine di una release e quindi all'inizio della successiva le considero appartententi alla release che termina
+8-Assumo che i commenti siano il 10% delle LOC del file ho usato math.floor cosi per valori piccoli l'approssimazione sparisce perchè su poche righe è ragionevole pensare che non ci sono commenti
 
-9-Assumo che i commenti siano il 10% delle LOC del file ho usato math.floor cosi per valori piccoli l'approssimazione sparisce perchè su poche righe è ragionevole pensare che non ci sono commenti
-
-10-I commenti sono il 10% degli add/del della commit, lascio 10% perchè probabilmente l'api fornisce un valore che conta anche i blank, ho usato math.floor cosi per valori piccoli l'approssimazione sparisce perchè su poche righe è ragionevole pensare che non ci sono commenti
+9-I commenti sono il 10% degli add/del della commit, lascio 10% perchè probabilmente l'api fornisce un valore che conta anche i blank, ho usato math.floor cosi per valori piccoli l'approssimazione sparisce perchè su poche righe è ragionevole pensare che non ci sono commenti
 tuttavia nelle dels potrebbero esserci molte blank line magari per code refactoring, ma non ho tempo per fare un'analisi più approfondita
 
-11-Ci sono molti file che vengono rinominati, però per lo più sono dei mock, quindi considero il file rinominato come nuovo file
+10-Ci sono molti file che vengono rinominati, però per lo più sono dei mock, quindi considero il file rinominato come nuovo file
 tuttavia per mantenere consistenti le feature devo aggiustare questi casi e forzare il fatto che se è rev 1 from start allora
 devo avere churn=loc=locAdded
 
-12-Se il ticket viene creato o risolto nella data di inizio di una release o di fine della precedente lo considero appartenente alla nuova release
+11-Se il ticket viene creato o risolto nella data di inizio di una release o di fine della precedente
+lo considero appartenente alla nuova release
 
-13-Se il ticket viene creato o risolto prima della data di inizio della prima release, lo accorpo alla prima release
+12-Se il ticket viene creato o risolto prima della data di inizio della prima release, lo accorpo alla prima release
 
-14-I casi in cui il calcolo di proportion è inconsistente o inutile sono stati ignorati,
+13-I casi in cui il calcolo di proportion è inconsistente o inutile sono stati ignorati,
 in particolare si è ignorato quando fv<=iv, fv<=ov, ed ov<iv
 
-15-Nel calcolo dell'IV con proportion se parto da FV<=OV non lo considero pongo FV-OV=1 per non avere FV=IV
+14-Nel calcolo dell'IV con proportion se parto da FV=OV non lo considero pongo FV-OV=1 per non avere FV=IV
 
-16-Se ci sono meno di 5 ticket validi passati uso coldStart
+15-Se ci sono meno di 5 ticket validi passati uso coldStart
 
-17-La release 1 non la uso per fare proportion perchè FV=IV=OV=1
+16-La release 1 non la uso per fare proportion perchè FV=IV=OV=1
 
-18-Fino a release 3 uso coldstart, 1 e 2 perche incremental non lo posso fare in quanto in 1 non ho IV!=FV e in 2 non ho info sulle IV di 1
+17-Fino a release <3 uso coldstart, 1 e 2 perche incremental non lo posso fare in quanto
+in 1 non ho IV!=FV e in 2 non ho info sulle IV di 1
 
-19-Col calcolo dell'IV tramite proportion ho fatto approssimazione per difetto perchè preferisco prendere un falso positivo
+18-Nel calcolo dell'IV tramite proportion è stata fatta un approssimazione per difetto
+perchè preferisco prendere un falso positivo
 
-20-Quando estraggo da Jira ignoro le release senza data di rilascio e chiusura
+19-Utilizziamo le date di creazione e chiusura del ticket per identificare la release a cui appartengono
 
-21-Utilizziamo le date di creazione e chiusura del ticket per identificare la release a cui appartengono
+20-Quando estraggo ticket da Jira ignoro le release senza data di rilascio e chiusura ed i ticket senza OV o FV (in termini di data)
 
-22-Butto i ticket senza OV o FV
+21-Ho usato bidirectional come feature selection direction perchè prendeva poco tempo in più e dava un risultato più
+preciso fin dalla prima iterazione (con dataset più piccolo) selezionando le stesse feature che backward selezionava
+solo ad iterazioni successive (con dataset più grande)
+
+22-Il primo dataset di zookeeper relativo alla release 2 sporca la misura con dei NaN perciò l'ho rimosso dato che
+su zookeeper è fattibile dato che ha molte release
 
 23-Per calcolare i testing set uso il dataset generato usando dati fino all'ultima release disponibile su jira, dato
 che per lo studio considero la metà di tali release, in questo modo cerco di andare a ridurre lo snoring sul testing set
 dei training set che si basano su release molto piu vecchie dell'ultima disponibile.
-
-24-Ho usato bidirectional come feature selection direction perchè prendeva poco tempo in più e dava un risultato più
-preciso fin dalla prima iterazione (con dataset più piccolo) selezionando le stesse feature che backward selezionava
-solo ad iterazioni successive (con dataset più grande)
-
-25-A volte il classificatore ritorna NaN in particolare ho notato che lo fa in quelle volte in cui il numero
-di positive è quasi nullo rispetto al numero dei negative, in realtà questo succede solo su zookeeper2 percio vedi 26
-
-26-Il primo dataset di zookeeper sporca la misura con dei NaN perciò l'ho rimosso

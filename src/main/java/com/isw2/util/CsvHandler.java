@@ -16,7 +16,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CsvHandler {
-    private static final String[] OUT_HEADER={"PROJECT", "#TRAIN_RELEASES", "FEATURE_SELECTION", "SAMPLING", "COST_SENSITIVE", "CLASSIFIER",
+    private static final String[] OUT_HEADER={"PROJECT", "#TRAIN_RELEASES", "ADDONS", "CLASSIFIER",
             "KAPPA", "PRECISION", "RECALL", "AUC", "TP", "FP", "TN", "FN" };
     private static final String CSV_OUTPUT_PATH = "src/main/java/resource/csv/dataset_";
     private static final String ARFF_OUTPUT_PATH = "src/main/java/resource/arff/dataset_";
@@ -49,21 +49,21 @@ public class CsvHandler {
         if(datasetPath.equals("mean")) numRel=datasetPath;
         else numRel= String.valueOf(digitMatcher(datasetPath)-1);
         String outPath= OUTPUT_PATH + project + "_" + numRel + "_" + type + ".csv";
-        List<String> experimentTuple = getExperimentTypeTuple(type);
+        String experimentTuple = getExperimentTypeTuple(type);
         File file = new File(outPath);
         try {
             FileWriter outputFile = new FileWriter(file, false);
             // create CSVWriter object filewriter object as parameter
             CSVWriter writer = new CSVWriter(outputFile);
-            String[] nbData = {project, numRel, experimentTuple.get(0), experimentTuple.get(1), experimentTuple.get(2),
+            String[] nbData = {project, numRel, experimentTuple,
             "Naive Bayes", String.valueOf(nb.get(0)), String.valueOf(nb.get(1)), String.valueOf(nb.get(2)),
                     String.valueOf(nb.get(3)), String.valueOf(nb.get(4)), String.valueOf(nb.get(5)),
                     String.valueOf(nb.get(6)), String.valueOf(nb.get(7))};
-            String[] ibkData = {project, numRel, experimentTuple.get(0), experimentTuple.get(1), experimentTuple.get(2),
+            String[] ibkData = {project, numRel, experimentTuple,
                     "IBK", String.valueOf(ibk.get(0)), String.valueOf(ibk.get(1)), String.valueOf(ibk.get(2)),
                     String.valueOf(ibk.get(3)), String.valueOf(ibk.get(4)), String.valueOf(ibk.get(5)),
                     String.valueOf(ibk.get(6)), String.valueOf(ibk.get(7))};
-            String[] rfData = {project, numRel, experimentTuple.get(0), experimentTuple.get(1), experimentTuple.get(2),
+            String[] rfData = {project, numRel, experimentTuple,
                     "Random Forest", String.valueOf(rf.get(0)), String.valueOf(rf.get(1)), String.valueOf(rf.get(2)),
                     String.valueOf(rf.get(3)), String.valueOf(rf.get(4)), String.valueOf(rf.get(5)),
                     String.valueOf(rf.get(6)), String.valueOf(rf.get(7))};
@@ -78,43 +78,29 @@ public class CsvHandler {
         }
     }
 
-    private static List<String> getExperimentTypeTuple(ExperimentType type){
-        List<String> ret = new ArrayList<>();
+    private static String getExperimentTypeTuple(ExperimentType type){
+        String ret = null;
         switch(type){
             case VANILLA:
-                ret.add(NONE);
-                ret.add(NONE);
-                ret.add(NONE);
+                ret = NONE;
                 break;
             case FEATURE_SELECTION:
-                ret.add(FEATURE_SELECTION_STRING);
-                ret.add(NONE);
-                ret.add(NONE);
+                ret = FEATURE_SELECTION_STRING;
                 break;
             case FEATURE_SELECTION_WITH_OVER_SAMPLING:
-                ret.add(FEATURE_SELECTION_STRING);
-                ret.add("Over_Sampling");
-                ret.add(NONE);
+                ret = FEATURE_SELECTION_STRING+"Over_Sampling";
                 break;
             case FEATURE_SELECTION_WITH_UNDER_SAMPLING:
-                ret.add(FEATURE_SELECTION_STRING);
-                ret.add("Under_Sampling");
-                ret.add(NONE);
+                ret = FEATURE_SELECTION_STRING+"Under_Sampling";
                 break;
-            case FEATURE_SELECTION_WITH_COST_SENSITIVE_CLASSIFIER_CFN_3:
-                ret.add(FEATURE_SELECTION_STRING);
-                ret.add(NONE);
-                ret.add("Sensitive_Classifier_FN_Cost_3");
+            case FEATURE_SELECTION_WITH_COST_SENSITIVE_CLASSIFIER_CFP_3:
+                ret = FEATURE_SELECTION_STRING+"Sensitive_Classifier_FP_Cost_3";
                 break;
-            case FEATURE_SELECTION_WITH_COST_SENSITIVE_CLASSIFIER_CFN_4:
-                ret.add(FEATURE_SELECTION_STRING);
-                ret.add(NONE);
-                ret.add("Sensitive_Classifier_FN_Cost_4");
+            case FEATURE_SELECTION_WITH_COST_SENSITIVE_CLASSIFIER_CFP_1:
+                ret = FEATURE_SELECTION_STRING+"Sensitive_Classifier_FP_Cost_1";
                 break;
             case FEATURE_SELECTION_WITH_COST_SENSITIVE_LEARNING:
-                ret.add(FEATURE_SELECTION_STRING);
-                ret.add(NONE);
-                ret.add("Sensitive_Learning_FN_Cost_18.7");
+                ret = FEATURE_SELECTION_STRING+"Sensitive_Learning_FP_Cost_1";
                 break;
             default:
                 break;
@@ -299,7 +285,7 @@ public class CsvHandler {
     }
 
     public static boolean checkIfOutDirIsEmpty(){
-        String path = CSV_OUTPUT_PATH.substring(0,26);
+        String path = ARFF_OUTPUT_PATH.substring(0,25);
         File directory = new File(path);
         if (directory.isDirectory()) {
             String[] files = directory.list();
@@ -311,7 +297,7 @@ public class CsvHandler {
         return false;
     }
 
-    public static void collectDataExperiment(String project, int datasetNum){
+    public static void  collectDataExperiment(String project, int datasetNum){
         String writePathTot = OUTPUT_PATH + project + ".csv";
         for(int i=0;i<datasetNum;i++){
             for (ExperimentType experimentType : ExperimentType.values()) {
@@ -321,7 +307,7 @@ public class CsvHandler {
                     readPath = OUTPUT_PATH + project + "_mean_" + experimentType + ".csv";
                     writePathPart=OUTPUT_PATH + project + "_mean.csv";
                 }
-                else if((i==1)&&(Objects.equals(project, "zookeeper"))) continue; //Zookeeper jump release 1 which is 2 in fact cause of NaN values
+                else if((i==1)&&(Objects.equals(project, "zookeeper"))) continue; //ASSUNZIONE 22 Zookeeper jump release 2 cause of NaN values
                 else {
                     readPath = OUTPUT_PATH + project + "_" + i + "_" + experimentType + ".csv";
                     writePathPart=OUTPUT_PATH + project + "_" + i + ".csv";

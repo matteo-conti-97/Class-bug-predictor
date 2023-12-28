@@ -37,7 +37,7 @@ public class WekaAnalyzer {
     List<List<String>> generateDatasetPaths(String project, int datasetNum) {
         List<List<String>> ret = new ArrayList<>();
         int i=2;
-        if(project.equals("zookeeper")) i=3; //Zookeeper jump release 2 cause of NaN values
+        if(project.equals("zookeeper")) i=3; // ASSUNZIONE 22 Zookeeper jump release 2 cause of NaN values
         for (; i <= datasetNum; i++) {
             List<String> dataset = new ArrayList<>();
             String trainingSetPath=DATASET_SET_PATH + project + "_" + i + "Train.arff";
@@ -132,12 +132,12 @@ public class WekaAnalyzer {
         return Arrays.asList(filteredTrainingSet, filteredTestingSet);
     }
 
-    private CostMatrix getCostMatrix(double cfn){
+    private CostMatrix getCostMatrix(double cfp){
         CostMatrix costMatrix = new CostMatrix(2);
-        costMatrix.setCell(0, 0, 0.0);
-        costMatrix.setCell(1, 0, 1.0);
-        costMatrix.setCell(0, 1, cfn);
-        costMatrix.setCell(1, 1, 0.0);
+        costMatrix.setCell(0, 0, 0.0); //Costo true positive
+        costMatrix.setCell(1, 0, cfp); //Costo false positive
+        costMatrix.setCell(0, 1, 10.0*cfp); //Costo false negative
+        costMatrix.setCell(1, 1, 0.0); //Costo true negative
         return costMatrix;
     }
 
@@ -167,13 +167,13 @@ public class WekaAnalyzer {
             FilteredClassifier fc = null;
             String sampleSizePercentage = null;
             CostSensitiveClassifier csc = null;
-            CostMatrix costMatrix1 = getCostMatrix(4.0);
+            CostMatrix costMatrix1 = getCostMatrix(1.0);
             CostMatrix costMatrix2 = getCostMatrix(3.0);
-            CostMatrix costMatrixLearning = getCostMatrix(18.7);
+            CostMatrix costMatrixLearning = getCostMatrix(1.0);
 
 
             switch(type){
-                case FEATURE_SELECTION: //Feature selection backwards
+                case FEATURE_SELECTION: //Feature selection bidirectional best first
                     filteredSets = featureSelection(vanillaTrainingSet, vanillaTestingSet);
                     trainingSet = filteredSets.get(0);
                     testingSet = filteredSets.get(1);
@@ -204,7 +204,7 @@ public class WekaAnalyzer {
                     fc.setFilter(resample);
                     break;
 
-                case FEATURE_SELECTION_WITH_COST_SENSITIVE_CLASSIFIER_CFN_4:
+                case FEATURE_SELECTION_WITH_COST_SENSITIVE_CLASSIFIER_CFP_1:
                     filteredSets = featureSelection(vanillaTrainingSet, vanillaTestingSet);
                     trainingSet = filteredSets.get(0);
                     testingSet = filteredSets.get(1);
@@ -213,7 +213,7 @@ public class WekaAnalyzer {
                     csc.setCostMatrix(costMatrix1);
                     break;
 
-                case FEATURE_SELECTION_WITH_COST_SENSITIVE_CLASSIFIER_CFN_3:
+                case FEATURE_SELECTION_WITH_COST_SENSITIVE_CLASSIFIER_CFP_3:
                     filteredSets = featureSelection(vanillaTrainingSet, vanillaTestingSet);
                     trainingSet = filteredSets.get(0);
                     testingSet = filteredSets.get(1);

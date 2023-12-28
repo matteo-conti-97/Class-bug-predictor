@@ -59,10 +59,10 @@ public class Main {
             wekaAnalyzer.runExperiment(project, datasetNum, ExperimentType.FEATURE_SELECTION_WITH_UNDER_SAMPLING);
             LOGGER.info("\n\n*************FEATURE SELECTION EXPERIMENT WITH OVER SAMPLING***************************************\n\n");
             wekaAnalyzer.runExperiment(project, datasetNum, ExperimentType.FEATURE_SELECTION_WITH_OVER_SAMPLING);
-            LOGGER.info("\n\n*************FEATURE SELECTION EXPERIMENT WITH COST SENSITIVE CLASSIFIER WITH CFN 4***************************************\n\n");
-            wekaAnalyzer.runExperiment(project, datasetNum, ExperimentType.FEATURE_SELECTION_WITH_COST_SENSITIVE_CLASSIFIER_CFN_4);
-            LOGGER.info("\n\n*************FEATURE SELECTION EXPERIMENT WITH COST SENSITIVE CLASSIFIER WITH CFN 3***************************************\n\n");
-            wekaAnalyzer.runExperiment(project, datasetNum, ExperimentType.FEATURE_SELECTION_WITH_COST_SENSITIVE_CLASSIFIER_CFN_3);
+            LOGGER.info("\n\n*************FEATURE SELECTION EXPERIMENT WITH COST SENSITIVE CLASSIFIER WITH CFP 1***************************************\n\n");
+            wekaAnalyzer.runExperiment(project, datasetNum, ExperimentType.FEATURE_SELECTION_WITH_COST_SENSITIVE_CLASSIFIER_CFP_1);
+            LOGGER.info("\n\n*************FEATURE SELECTION EXPERIMENT WITH COST SENSITIVE CLASSIFIER WITH CFP 3***************************************\n\n");
+            wekaAnalyzer.runExperiment(project, datasetNum, ExperimentType.FEATURE_SELECTION_WITH_COST_SENSITIVE_CLASSIFIER_CFP_3);
             LOGGER.info("\n\n*************FEATURE SELECTION EXPERIMENT WITH COST SENSITIVE LEARNING***************************************\n\n");
             wekaAnalyzer.runExperiment(project, datasetNum, ExperimentType.FEATURE_SELECTION_WITH_COST_SENSITIVE_LEARNING);
 
