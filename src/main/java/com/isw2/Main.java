@@ -63,6 +63,14 @@ public class Main {
             wekaAnalyzer.runExperiment(project, datasetNum, ExperimentType.FEATURE_SELECTION_WITH_COST_SENSITIVE_CLASSIFIER);
             LOGGER.info("\n\n*************FEATURE SELECTION EXPERIMENT WITH COST SENSITIVE LEARNING***************************************\n\n");
             wekaAnalyzer.runExperiment(project, datasetNum, ExperimentType.FEATURE_SELECTION_WITH_COST_SENSITIVE_LEARNING);
+            LOGGER.info("\n\n************EXPERIMENT WITH COST SENSITIVE CLASSIFIER THRESHOLD***************************************\n\n");
+            wekaAnalyzer.runExperiment(project, datasetNum, ExperimentType.COST_SENSITIVE_CLASSIFIER);
+            LOGGER.info("\n\n*************EXPERIMENT WITH COST SENSITIVE LEARNING***************************************\n\n");
+            wekaAnalyzer.runExperiment(project, datasetNum, ExperimentType.COST_SENSITIVE_LEARNING);
+            LOGGER.info("\n\n*************EXPERIMENT WITH OVER SAMPLING***************************************\n\n");
+            wekaAnalyzer.runExperiment(project, datasetNum, ExperimentType.OVER_SAMPLING);
+            LOGGER.info("\n\n*************EXPERIMENT WITH UNDER SAMPLING***************************************\n\n");
+            wekaAnalyzer.runExperiment(project, datasetNum, ExperimentType.UNDER_SAMPLING);
 
         } catch (Exception e) {
             LOGGER.error("Error while running experiment", e);

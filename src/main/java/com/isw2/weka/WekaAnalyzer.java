@@ -169,6 +169,9 @@ public class WekaAnalyzer {
             String sampleSizePercentage = null;
             CostSensitiveClassifier csc = null;
             CostMatrix cm=null;
+            int numAttr=0;
+            SpreadSubsample spreadSubsample = null;
+            Resample resample = null;
 
             switch(type){
                 case FEATURE_SELECTION: //Feature selection bidirectional best first
@@ -182,7 +185,7 @@ public class WekaAnalyzer {
                     trainingSet = filteredSets.get(0);
                     testingSet = filteredSets.get(1);
 
-                    SpreadSubsample spreadSubsample = new SpreadSubsample();
+                    spreadSubsample = new SpreadSubsample();
                     spreadSubsample.setInputFormat(trainingSet);
                     spreadSubsample.setOptions(new String[] {"-M", "1.0"});
                     fc = new FilteredClassifier();
@@ -194,7 +197,7 @@ public class WekaAnalyzer {
                     trainingSet = filteredSets.get(0);
                     testingSet = filteredSets.get(1);
 
-                    Resample resample = new Resample();
+                    resample = new Resample();
                     resample.setInputFormat(trainingSet);
                     sampleSizePercentage = computeSampleSizePercentage(trainingSet);
                     resample.setOptions(new String[] {"-B", "1.0", "-S", "1", "-Z", sampleSizePercentage});
@@ -220,10 +223,58 @@ public class WekaAnalyzer {
                     cm = getCostMatrix(1.0, 10.0);
                     break;
 
+                case COST_SENSITIVE_CLASSIFIER:
+                    trainingSet = vanillaTrainingSet;
+                    testingSet = vanillaTestingSet;
+                    numAttr = trainingSet.numAttributes();
+                    trainingSet.setClassIndex(numAttr - 1);
+                    testingSet.setClassIndex(numAttr - 1);
+                    csc = new CostSensitiveClassifier();
+                    csc.setMinimizeExpectedCost(true);
+                    cm = getCostMatrix(1.0, 10.0);
+                    break;
+
+                case COST_SENSITIVE_LEARNING:
+                    trainingSet = vanillaTrainingSet;
+                    testingSet = vanillaTestingSet;
+                    numAttr = trainingSet.numAttributes();
+                    trainingSet.setClassIndex(numAttr - 1);
+                    testingSet.setClassIndex(numAttr - 1);
+                    csc = new CostSensitiveClassifier();
+                    csc.setMinimizeExpectedCost(false);
+                    cm = getCostMatrix(1.0, 10.0);
+                    break;
+                case OVER_SAMPLING:
+                    trainingSet = vanillaTrainingSet;
+                    testingSet = vanillaTestingSet;
+                    numAttr = trainingSet.numAttributes();
+                    trainingSet.setClassIndex(numAttr - 1);
+                    testingSet.setClassIndex(numAttr - 1);
+
+                    resample = new Resample();
+                    resample.setInputFormat(trainingSet);
+                    sampleSizePercentage = computeSampleSizePercentage(trainingSet);
+                    resample.setOptions(new String[] {"-B", "1.0", "-S", "1", "-Z", sampleSizePercentage});
+                    fc = new FilteredClassifier();
+                    fc.setFilter(resample);
+                    break;
+                case UNDER_SAMPLING:
+                    trainingSet = vanillaTrainingSet;
+                    testingSet = vanillaTestingSet;
+                    numAttr = trainingSet.numAttributes();
+                    trainingSet.setClassIndex(numAttr - 1);
+                    testingSet.setClassIndex(numAttr - 1);
+                    spreadSubsample = new SpreadSubsample();
+                    spreadSubsample.setInputFormat(trainingSet);
+                    spreadSubsample.setOptions(new String[] {"-M", "1.0"});
+                    fc = new FilteredClassifier();
+                    fc.setFilter(spreadSubsample);
+                    break;
+
                 default:
                     trainingSet = vanillaTrainingSet;
                     testingSet = vanillaTestingSet;
-                    int numAttr = trainingSet.numAttributes();
+                    numAttr = trainingSet.numAttributes();
                     trainingSet.setClassIndex(numAttr - 1);
                     testingSet.setClassIndex(numAttr - 1);
                     break;

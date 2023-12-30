@@ -88,16 +88,28 @@ public class CsvHandler {
                 ret = FEATURE_SELECTION_STRING;
                 break;
             case FEATURE_SELECTION_WITH_OVER_SAMPLING:
-                ret = FEATURE_SELECTION_STRING+"Over_Sampling";
+                ret = FEATURE_SELECTION_STRING+"+Over_Sampling";
                 break;
             case FEATURE_SELECTION_WITH_UNDER_SAMPLING:
-                ret = FEATURE_SELECTION_STRING+"Under_Sampling";
+                ret = FEATURE_SELECTION_STRING+"+Under_Sampling";
                 break;
             case FEATURE_SELECTION_WITH_COST_SENSITIVE_CLASSIFIER:
-                ret = FEATURE_SELECTION_STRING+"Sensitive_Classifier_Threshold_CFP_1_CFN_10";
+                ret = FEATURE_SELECTION_STRING+"+Sensitive_Classifier_Threshold_CFP_1_CFN_10";
                 break;
             case FEATURE_SELECTION_WITH_COST_SENSITIVE_LEARNING:
-                ret = FEATURE_SELECTION_STRING+"Sensitive_Learning_CFP_1_CFN_10";
+                ret = FEATURE_SELECTION_STRING+"+Sensitive_Learning_CFP_1_CFN_10";
+                break;
+            case COST_SENSITIVE_CLASSIFIER:
+                ret = "Sensitive_Classifier_Threshold_CFP_1_CFN_10";
+                break;
+            case COST_SENSITIVE_LEARNING:
+                ret = "Sensitive_Learning_CFP_1_CFN_10";
+                break;
+            case OVER_SAMPLING:
+                ret = "Over_Sampling";
+                break;
+            case UNDER_SAMPLING:
+                ret = "Under_Sampling";
                 break;
             default:
                 break;
