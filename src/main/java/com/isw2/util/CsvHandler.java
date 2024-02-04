@@ -316,7 +316,7 @@ public class CsvHandler {
                     readPath = OUTPUT_PATH + project + "_mean_" + experimentType + ".csv";
                     writePathPart=OUTPUT_PATH + project + "_mean.csv";
                 }
-                else if((i==1)&&(Objects.equals(project, "zookeeper"))) continue; //ASSUNZIONE 22 Zookeeper jump release 2 cause of NaN values
+                else if((i==1)&&(Objects.equals(project, "zookeeper"))) continue; //ASSUNZIONE 21 Zookeeper jump release 2 cause of NaN values
                 else {
                     readPath = OUTPUT_PATH + project + "_" + i + "_" + experimentType + ".csv";
                     writePathPart=OUTPUT_PATH + project + "_" + i + ".csv";

@@ -1,14 +1,14 @@
 1-Quando ho associato le commit alle release vi erano delle commit con data precedente a quella della prima release, ho scelto
-di associarle alla prima release in quanto 1 è una cosa ragionevole 2 molte sono di configurazione e non associate a ticket e di conseguenza scartate
+di associarle alla prima release in quanto 1 è una cosa ragionevole e 2 molte sono di configurazione e non associate a ticket e di conseguenza scartate
 in fasi di filtraggio successive.
 
-2-Butto le release senza commit
+2-Scarto le release senza commit
 
-3-Nell'analisi ho considerato solo classi Java che fanno parte della logica e non i test, inoltre accade che
-se in fase di predizione mi dice che un test di una classe è buggy ma la classe testata ha passato il test che faccio?
+3-Nell'analisi ho considerato solo classi Java che fanno parte della logica e scartato i test.
+Se in fase di predizione mi dice che un test di una certa classe è buggy ma la classe testata ha passato il test che faccio?
 La considero buggy anche se non lo era? Mi darebbe concettualmente dei "falsi positivi" o se la classe passa il test ma il test è buggy mi darebbe "falsi negativi".
 
-4-Ho tolto i package-info.java perchè penso siano poco significativi ai fine della predizione
+4-Ho scartato i package-info.java perchè penso siano poco significativi ai fine della predizione
 
 5-Sia Zookeeper che Bookkeeper ad un certo punto hanno migrato su github issue, il progetto si considera terminato in corrispondenza di tale migrazione
 ad esempio Bookeeper dal 2017-06-16 passa a github issue, ho simulato che la release 4.5.0 termini in tale data
@@ -23,7 +23,7 @@ ad esempio Bookeeper dal 2017-06-16 passa a github issue, ho simulato che la rel
 tuttavia nelle dels potrebbero esserci molte blank line magari per code refactoring, ma non ho tempo per fare un'analisi più approfondita
 
 10-Ci sono molti file che vengono rinominati, però per lo più sono dei mock, quindi considero il file rinominato come nuovo file
-tuttavia per mantenere consistenti le feature devo aggiustare questi casi e forzare il fatto che se è rev 1 from start allora
+tuttavia per mantenere consistenti le feature devo aggiustare questi casi forzando il fatto che se è rev 1 from start allora
 devo avere churn=loc=locAdded
 
 11-Se il ticket viene creato o risolto nella data di inizio di una release o di fine della precedente
@@ -32,9 +32,9 @@ lo considero appartenente alla nuova release
 12-Se il ticket viene creato o risolto prima della data di inizio della prima release, lo accorpo alla prima release
 
 13-I casi in cui il calcolo di proportion è inconsistente o inutile sono stati ignorati,
-in particolare si è ignorato quando fv<=iv, fv<=ov, ed ov<iv
+in particolare sono stati ignorati i casi in cui ignorato quando fv<=iv, fv<ov, ed ov<iv
 
-14-Nel calcolo dell'IV con proportion se parto da FV=OV non lo considero pongo FV-OV=1 per non avere FV=IV
+14-Nel calcolo dell'IV con proportion se parto da FV=OV non lo considero e pongo FV-OV=1 per non avere FV=IV
 
 15-Se ci sono meno di 5 ticket validi passati uso coldStart
 
@@ -48,15 +48,11 @@ perchè preferisco prendere un falso positivo
 
 19-Utilizziamo le date di creazione e chiusura del ticket per identificare la release a cui appartengono
 
-20-Quando estraggo ticket da Jira ignoro le release senza data di rilascio e chiusura ed i ticket senza OV o FV (in termini di data)
+20-Quando estraggo ticket da Jira ignoro le release senza data di rilascio o chiusura ed i ticket senza OV o FV (in termini di data)
 
-21-Ho usato bidirectional come feature selection direction perchè prendeva poco tempo in più e dava un risultato più
-preciso fin dalla prima iterazione (con dataset più piccolo) selezionando le stesse feature che backward selezionava
-solo ad iterazioni successive (con dataset più grande)
-
-22-Il primo dataset di zookeeper relativo alla release 2 sporca la misura con dei NaN perciò l'ho rimosso dato che
+21-Il primo dataset di zookeeper relativo alla release 2 sporca la misura con dei NaN perciò l'ho rimosso dato che
 su zookeeper è fattibile dato che ha molte release
 
-23-Per calcolare i testing set uso il dataset generato usando dati fino all'ultima release disponibile su jira, dato
-che per lo studio considero la metà di tali release, in questo modo cerco di andare a ridurre lo snoring sul testing set
-dei training set che si basano su release molto piu vecchie dell'ultima disponibile.
+22-Per calcolare i testing set uso il dataset generato usando dati fino all'ultima release disponibile su jira
+
+23-Per mitigare l'effetto dello snoring sono state prese in considerazione solo metà delle release presenti su Jira

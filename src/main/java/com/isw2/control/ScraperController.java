@@ -336,7 +336,7 @@ public class ScraperController {
         List<Ticket> allTickets = getAllTickets();
         setProjectFixedBugTickets(allTickets);
         linkTicketDatesToReleases(allTickets, allReleases);
-        purgeTicketWithNoOvOrFv(allTickets); //ASSUNZIONE 22
+        purgeTicketWithNoOvOrFv(allTickets); //ASSUNZIONE 21
         Printer.printTicketsBasic(allTickets, false);
 
         //Release e ticket di interesse, in teoria forse posso anche non usarli più e prendere AllRelease/2
