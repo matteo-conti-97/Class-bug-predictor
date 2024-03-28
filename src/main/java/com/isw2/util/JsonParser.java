@@ -8,7 +8,6 @@ import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
-
 public class JsonParser {
 
     protected String readAll(Reader rd) throws IOException {
@@ -35,7 +34,6 @@ public class JsonParser {
             return new JSONObject(jsonText);
         }
     }
-
 
     public String getJSONAttribute(JSONObject object, String attr) {
         return object.get(attr).toString();

@@ -29,19 +29,19 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-
 public class WekaAnalyzer {
     private static final Logger LOGGER = LoggerFactory.getLogger(WekaAnalyzer.class);
     private static final String DATASET_SET_PATH = "src/main/java/resource/arff/dataset_";
 
     List<List<String>> generateDatasetPaths(String project, int datasetNum) {
         List<List<String>> ret = new ArrayList<>();
-        int i=2;
-        if(project.equals("zookeeper")) i=3; // ASSUNZIONE 21 Zookeeper jump release 2 cause of NaN values
+        int i = 2;
+        if (project.equals("zookeeper"))
+            i = 3; // ASSUNZIONE 21 Zookeeper jump release 2 cause of NaN values
         for (; i <= datasetNum; i++) {
             List<String> dataset = new ArrayList<>();
-            String trainingSetPath=DATASET_SET_PATH + project + "_" + i + "Train.arff";
-            String testingSetPath=DATASET_SET_PATH + project + "_" + i + "Test.arff";
+            String trainingSetPath = DATASET_SET_PATH + project + "_" + i + "Train.arff";
+            String testingSetPath = DATASET_SET_PATH + project + "_" + i + "Test.arff";
             dataset.add(trainingSetPath);
             dataset.add(testingSetPath);
             ret.add(dataset);
@@ -49,11 +49,12 @@ public class WekaAnalyzer {
         return ret;
     }
 
-    private List<Double> evualuateClassifier(Instances trainingSet, Instances testingSet, ClassifierType classifierType, FilteredClassifier fc, CostSensitiveClassifier csc, CostMatrix cm) throws Exception {
+    private List<Double> evualuateClassifier(Instances trainingSet, Instances testingSet, ClassifierType classifierType,
+            FilteredClassifier fc, CostSensitiveClassifier csc, CostMatrix cm) throws Exception {
         List<Double> ret = new ArrayList<>();
         Classifier classifier = null;
 
-        switch(classifierType) {
+        switch (classifierType) {
             case NAIVE_BAYES:
                 classifier = new NaiveBayes();
                 LOGGER.info("\nUsing Naive Bayes classifier");
@@ -72,20 +73,17 @@ public class WekaAnalyzer {
 
         assert classifier != null;
 
-
         Evaluation eval = new Evaluation(testingSet);
-        if(fc!=null) { //Uso il classificatore che fa sampling
+        if (fc != null) { // Uso il classificatore che fa sampling
             fc.setClassifier(classifier);
             fc.buildClassifier(trainingSet);
             eval.evaluateModel(fc, testingSet);
-        }
-        else if(csc!=null){
+        } else if (csc != null) {
             csc.setClassifier(classifier);
             csc.setCostMatrix(cm);
             csc.buildClassifier(trainingSet);
             eval.evaluateModel(csc, testingSet);
-        }
-        else {
+        } else {
             classifier.buildClassifier(trainingSet);
             eval.evaluateModel(classifier, testingSet);
         }
@@ -116,7 +114,9 @@ public class WekaAnalyzer {
     private List<Instances> featureSelection(Instances trainingSet, Instances testingSet) throws Exception {
         CfsSubsetEval subsetEval = new CfsSubsetEval();
         BestFirst bestFirstSrc = new BestFirst();
-        bestFirstSrc.setDirection(new SelectedTag(BestFirst.TAGS_SELECTION[2].getID(), BestFirst.TAGS_SELECTION)); //Bidirectional ASSUNZIONE 24
+        bestFirstSrc.setDirection(new SelectedTag(BestFirst.TAGS_SELECTION[2].getID(), BestFirst.TAGS_SELECTION)); // Bidirectional
+                                                                                                                   // ASSUNZIONE
+                                                                                                                   // 24
         bestFirstSrc.setSearchTermination(10);
         AttributeSelection filter = new AttributeSelection();
 
@@ -126,24 +126,24 @@ public class WekaAnalyzer {
         Instances filteredTrainingSet = Filter.useFilter(trainingSet, filter);
         Instances filteredTestingSet = Filter.useFilter(testingSet, filter);
 
-        //Set attribute of interest, the buggyness
+        // Set attribute of interest, the buggyness
         int numAttr = filteredTrainingSet.numAttributes();
         filteredTrainingSet.setClassIndex(numAttr - 1);
         filteredTestingSet.setClassIndex(numAttr - 1);
         return Arrays.asList(filteredTrainingSet, filteredTestingSet);
     }
 
-    private CostMatrix getCostMatrix(double cfp, double cfn){
+    private CostMatrix getCostMatrix(double cfp, double cfn) {
         CostMatrix costMatrix = new CostMatrix(2);
-        costMatrix.setCell(0, 0, 0.0); //Costo true positive
-        costMatrix.setCell(1, 0, cfp); //Costo false positive
-        costMatrix.setCell(0, 1, cfn); //Costo false negative
-        costMatrix.setCell(1, 1, 0.0); //Costo true negative
+        costMatrix.setCell(0, 0, 0.0); // Costo true positive
+        costMatrix.setCell(1, 0, cfp); // Costo false positive
+        costMatrix.setCell(0, 1, cfn); // Costo false negative
+        costMatrix.setCell(1, 1, 0.0); // Costo true negative
         return costMatrix;
     }
 
     public void runExperiment(String project, int datasetNum, ExperimentType type) throws Exception {
-        List<List<String>> datasetPath= generateDatasetPaths(project, datasetNum);
+        List<List<String>> datasetPath = generateDatasetPaths(project, datasetNum);
         List<Double> nvEval = new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
         List<Double> ibkEval = new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
         List<Double> rfEval = new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
@@ -151,13 +151,13 @@ public class WekaAnalyzer {
         int cntIbk = 0;
         int cntRf = 0;
         LOGGER.info("Analyzing project: {}", project);
-        for(List<String> dataset: datasetPath){
-            String trainingSetPath=dataset.get(0);
-            String testingSetPath=dataset.get(1);
+        for (List<String> dataset : datasetPath) {
+            String trainingSetPath = dataset.get(0);
+            String testingSetPath = dataset.get(1);
             LOGGER.info("Training set path: {}", trainingSetPath);
             LOGGER.info("Testing set path: {}\n", testingSetPath);
 
-            //load datasets
+            // load datasets
             DataSource trainingSetSrc = new DataSource(dataset.get(0));
             DataSource testingSetSrc = new DataSource(dataset.get(1));
             Instances vanillaTrainingSet = trainingSetSrc.getDataSet();
@@ -168,13 +168,13 @@ public class WekaAnalyzer {
             FilteredClassifier fc = null;
             String sampleSizePercentage = null;
             CostSensitiveClassifier csc = null;
-            CostMatrix cm=null;
-            int numAttr=0;
+            CostMatrix cm = null;
+            int numAttr = 0;
             SpreadSubsample spreadSubsample = null;
             Resample resample = null;
 
-            switch(type){
-                case FEATURE_SELECTION: //Feature selection bidirectional best first
+            switch (type) {
+                case FEATURE_SELECTION: // Feature selection bidirectional best first
                     filteredSets = featureSelection(vanillaTrainingSet, vanillaTestingSet);
                     trainingSet = filteredSets.get(0);
                     testingSet = filteredSets.get(1);
@@ -187,7 +187,7 @@ public class WekaAnalyzer {
 
                     spreadSubsample = new SpreadSubsample();
                     spreadSubsample.setInputFormat(trainingSet);
-                    spreadSubsample.setOptions(new String[] {"-M", "1.0"});
+                    spreadSubsample.setOptions(new String[] { "-M", "1.0" });
                     fc = new FilteredClassifier();
                     fc.setFilter(spreadSubsample);
                     break;
@@ -200,7 +200,7 @@ public class WekaAnalyzer {
                     resample = new Resample();
                     resample.setInputFormat(trainingSet);
                     sampleSizePercentage = computeSampleSizePercentage(trainingSet);
-                    resample.setOptions(new String[] {"-B", "1.0", "-S", "1", "-Z", sampleSizePercentage});
+                    resample.setOptions(new String[] { "-B", "1.0", "-S", "1", "-Z", sampleSizePercentage });
                     fc = new FilteredClassifier();
                     fc.setFilter(resample);
                     break;
@@ -254,7 +254,7 @@ public class WekaAnalyzer {
                     resample = new Resample();
                     resample.setInputFormat(trainingSet);
                     sampleSizePercentage = computeSampleSizePercentage(trainingSet);
-                    resample.setOptions(new String[] {"-B", "1.0", "-S", "1", "-Z", sampleSizePercentage});
+                    resample.setOptions(new String[] { "-B", "1.0", "-S", "1", "-Z", sampleSizePercentage });
                     fc = new FilteredClassifier();
                     fc.setFilter(resample);
                     break;
@@ -266,7 +266,7 @@ public class WekaAnalyzer {
                     testingSet.setClassIndex(numAttr - 1);
                     spreadSubsample = new SpreadSubsample();
                     spreadSubsample.setInputFormat(trainingSet);
-                    spreadSubsample.setOptions(new String[] {"-M", "1.0"});
+                    spreadSubsample.setOptions(new String[] { "-M", "1.0" });
                     fc = new FilteredClassifier();
                     fc.setFilter(spreadSubsample);
                     break;
@@ -284,78 +284,81 @@ public class WekaAnalyzer {
             List<Double> tmpIbk;
             List<Double> tmpRf;
 
-            //Evaluate classifiers
-            tmpNb=evualuateClassifier(trainingSet, testingSet, ClassifierType.NAIVE_BAYES, fc, csc, cm);
-            tmpIbk=evualuateClassifier(trainingSet, testingSet, ClassifierType.IBK, fc, csc, cm);
-            tmpRf=evualuateClassifier(trainingSet, testingSet, ClassifierType.RANDOM_FOREST, fc, csc, cm);
+            // Evaluate classifiers
+            tmpNb = evualuateClassifier(trainingSet, testingSet, ClassifierType.NAIVE_BAYES, fc, csc, cm);
+            tmpIbk = evualuateClassifier(trainingSet, testingSet, ClassifierType.IBK, fc, csc, cm);
+            tmpRf = evualuateClassifier(trainingSet, testingSet, ClassifierType.RANDOM_FOREST, fc, csc, cm);
 
             CsvHandler.writeOutData(project, trainingSetPath, type, tmpNb, tmpIbk, tmpRf);
 
-            boolean someNanNb= checkNans(tmpNb);
-            boolean someNanIbk= checkNans(tmpIbk);
-            boolean someNanRf= checkNans(tmpRf);
+            boolean someNanNb = checkNans(tmpNb);
+            boolean someNanIbk = checkNans(tmpIbk);
+            boolean someNanRf = checkNans(tmpRf);
 
-            //Sum up the evaluation results ASSUNZIONE 25/26
-            if(!someNanNb){
+            // Sum up the evaluation results ASSUNZIONE 25/26
+            if (!someNanNb) {
                 sumEvalResults(nvEval, tmpNb);
                 cntNb++;
             }
-            if(!someNanIbk){
+            if (!someNanIbk) {
                 sumEvalResults(ibkEval, tmpIbk);
                 cntIbk++;
             }
-            if(!someNanRf) {
+            if (!someNanRf) {
                 sumEvalResults(rfEval, tmpRf);
                 cntRf++;
             }
 
         }
-        //Average the evaluation results
+        // Average the evaluation results
         List<Double> nbAvg = computeMeanEval(nvEval, cntNb);
         List<Double> ibkAvg = computeMeanEval(ibkEval, cntIbk);
         List<Double> rfAvg = computeMeanEval(rfEval, cntRf);
 
         CsvHandler.writeOutData(project, "mean", type, nbAvg, ibkAvg, rfAvg);
 
-        //Print the average evaluation results
+        // Print the average evaluation results
         Printer.printMeanEval(nbAvg, ClassifierType.NAIVE_BAYES);
         Printer.printMeanEval(ibkAvg, ClassifierType.IBK);
         Printer.printMeanEval(rfAvg, ClassifierType.RANDOM_FOREST);
     }
 
-    private void sumEvalResults(List<Double> eval, List<Double> tmp){
-        for(int i=0;i<8;i++){
+    private void sumEvalResults(List<Double> eval, List<Double> tmp) {
+        for (int i = 0; i < 8; i++) {
             eval.set(i, eval.get(i) + tmp.get(i));
         }
     }
 
-    private boolean checkNans(List<Double> tmp){
-        for(Double d: tmp){
-            if(d.isNaN()) return true;
+    private boolean checkNans(List<Double> tmp) {
+        for (Double d : tmp) {
+            if (d.isNaN())
+                return true;
         }
         return false;
     }
 
     private String computeSampleSizePercentage(Instances trainingSet) {
         double ret;
-        int positive=0;
-        int negative=0;
+        int positive = 0;
+        int negative = 0;
         for (weka.core.Instance instance : trainingSet) {
-            if(Objects.equals(instance.toString(trainingSet.classIndex()), "YES")) positive++;
-            else negative++;
+            if (Objects.equals(instance.toString(trainingSet.classIndex()), "YES"))
+                positive++;
+            else
+                negative++;
         }
-        assert negative !=0;
-        assert positive !=0;
-        if(positive>negative) ret= 100*(positive - negative)/(double)negative;
-        else ret= 100*(negative - positive)/(double)positive;
+        assert negative != 0;
+        assert positive != 0;
+        if (positive > negative)
+            ret = 100 * (positive - negative) / (double) negative;
+        else
+            ret = 100 * (negative - positive) / (double) positive;
         return String.valueOf(ret);
     }
 
-    private List<Double> computeMeanEval(List<Double> eval, int numDataset){
-        return new ArrayList<>(Arrays.asList(eval.get(0)/numDataset, eval.get(1)/numDataset, eval.get(2)/numDataset, eval.get(3)/numDataset, eval.get(4)/numDataset, eval.get(5)/numDataset, eval.get(6)/numDataset, eval.get(7)/numDataset));
+    private List<Double> computeMeanEval(List<Double> eval, int numDataset) {
+        return new ArrayList<>(Arrays.asList(eval.get(0) / numDataset, eval.get(1) / numDataset,
+                eval.get(2) / numDataset, eval.get(3) / numDataset, eval.get(4) / numDataset, eval.get(5) / numDataset,
+                eval.get(6) / numDataset, eval.get(7) / numDataset));
     }
 }
-
-
-
-

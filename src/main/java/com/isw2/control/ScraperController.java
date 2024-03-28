@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-
 public class ScraperController {
     private Project project;
     private JiraDao jiraDao;
@@ -26,14 +25,12 @@ public class ScraperController {
     private static final String DATE_FORMAT = "yyyy-MM-dd";
     private static final Logger LOGGER = LoggerFactory.getLogger(ScraperController.class);
 
-
     public ScraperController(String projectName, String projectAuthor, String projectCreationDate) {
         this.project = new Project(projectName, projectAuthor, projectCreationDate);
         this.jiraDao = new JiraDao(project.getName());
         this.gitDao = new GitDao(project.getName(), project.getAuthor());
         this.commitDbDao = new CommitDbDao();
     }
-
 
     public String getProjectName() {
         return project.getName();
@@ -46,7 +43,6 @@ public class ScraperController {
     public String getProjectCreationDate() {
         return project.getCreationDate();
     }
-
 
     public void setProjectCreationDate(String creationDate) {
         this.project.setCreationDate(creationDate);
@@ -132,7 +128,8 @@ public class ScraperController {
         return jiraDao.getAllFixedBugTickets(0);
     }
 
-    //Get all releases until the specified release, lastRel must be the name of the jira format e.g 4.4.0
+    // Get all releases until the specified release, lastRel must be the name of the
+    // jira format e.g 4.4.0
     public List<Release> getReleasesOfInterest(String lastRel) {
         List<Release> ret = new ArrayList<>();
         for (Release release : project.getReleases()) {
@@ -144,7 +141,8 @@ public class ScraperController {
         return ret;
     }
 
-    //Get all tickets closed until the specified release so with the resolution date in the date range of the release
+    // Get all tickets closed until the specified release so with the resolution
+    // date in the date range of the release
     public List<Ticket> getTicketsOfInterest(String relEndDate) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
         List<Ticket> ret = new ArrayList<>();
@@ -168,71 +166,82 @@ public class ScraperController {
         int commitSize = commits.size();
         LOGGER.info("commit list size: {}", commitSize);
         for (Commit commit : commits) {
-            commitDbDao.insertCommit(commit.getSha(), commit.getId(), commit.getMessage(), commit.getAuthor(), commit.getDate(), commit.getTreeUrl(), this.project.getName());
+            commitDbDao.insertCommit(commit.getSha(), commit.getId(), commit.getMessage(), commit.getAuthor(),
+                    commit.getDate(), commit.getTreeUrl(), this.project.getName());
             saveTouchedFilesDataOnDb(commit);
         }
     }
 
     private void saveTouchedFilesDataOnDb(Commit commit) {
         for (JavaFile file : commit.getTouchedFiles()) {
-            commitDbDao.insertTouchedFile(file.getName(), commit.getSha(), commit.getId(), file.getAdd(), file.getDel(), file.getContent(), this.project.getName());
+            commitDbDao.insertTouchedFile(file.getName(), commit.getSha(), commit.getId(), file.getAdd(), file.getDel(),
+                    file.getContent(), this.project.getName());
         }
     }
 
     public void saveReleasesOfInterestOnDb() {
         for (Release release : this.project.getReleasesOfInterest()) {
-            commitDbDao.insertRelease(release.getName(), release.getNumberStr(), release.getStartDate(), release.getEndDate(), this.project.getName());
+            commitDbDao.insertRelease(release.getName(), release.getNumberStr(), release.getStartDate(),
+                    release.getEndDate(), this.project.getName());
         }
     }
 
     public void saveReleases() {
         for (Release release : this.project.getReleases()) {
-            commitDbDao.insertRelease(release.getName(), release.getNumberStr(), release.getStartDate(), release.getEndDate(), this.project.getName());
+            commitDbDao.insertRelease(release.getName(), release.getNumberStr(), release.getStartDate(),
+                    release.getEndDate(), this.project.getName());
         }
     }
 
     public void saveReleasesOnDb() {
         for (Release release : this.project.getReleasesOfInterest()) {
-            commitDbDao.insertRelease(release.getName(), release.getNumberStr(), release.getStartDate(), release.getEndDate(), this.project.getName());
+            commitDbDao.insertRelease(release.getName(), release.getNumberStr(), release.getStartDate(),
+                    release.getEndDate(), this.project.getName());
         }
     }
 
-    public void saveTicketsOnDb(List<Ticket> tickets){
-        for(Ticket ticket: tickets){
-            if(!ticket.getJiraAv().isEmpty()){
-                for(Release av: ticket.getJiraAv()){
-                    commitDbDao.insertTicket(ticket.getKey(), ticket.getResolutionDate(), ticket.getCreationDate(), this.project.getName(), av.getName());
+    public void saveTicketsOnDb(List<Ticket> tickets) {
+        for (Ticket ticket : tickets) {
+            if (!ticket.getJiraAv().isEmpty()) {
+                for (Release av : ticket.getJiraAv()) {
+                    commitDbDao.insertTicket(ticket.getKey(), ticket.getResolutionDate(), ticket.getCreationDate(),
+                            this.project.getName(), av.getName());
                 }
-            }
-            else {
-                commitDbDao.insertTicket(ticket.getKey(), ticket.getResolutionDate(), ticket.getCreationDate(), this.project.getName(), "");
+            } else {
+                commitDbDao.insertTicket(ticket.getKey(), ticket.getResolutionDate(), ticket.getCreationDate(),
+                        this.project.getName(), "");
             }
         }
     }
 
     public void saveFileTreeOnDb(List<Release> releases) {
-        int start = 0; //*****Mettere un numero più alto in caso si finiscano le chiamate all'api******
+        int start = 0; // *****Mettere un numero più alto in caso si finiscano le chiamate
+                       // all'api******
         for (int i = start; i < releases.size(); i++) {
             Release release = releases.get(i);
             List<Commit> commits = release.getCommits();
             String releaseName = release.getName();
             String releaseNumber = release.getNumberStr();
             LOGGER.info("Processing release {} - {} tree", releaseName, releaseNumber);
-            if (!commits.isEmpty()) { //Questo check è necessario per evitare eccezioni in caso la release non abbia commit
+            if (!commits.isEmpty()) { // Questo check è necessario per evitare eccezioni in caso la release non abbia
+                                      // commit
                 Commit lastCommit = commits.get(0);
                 List<JavaFile> treeFiles = null;
                 try {
                     treeFiles = gitDao.getRepoFileAtReleaseEnd(lastCommit.getTreeUrl());
                 } catch (IOException e) {
-                    int token=AuthJsonParser.getFlagToken();
-                    if(token<=5) LOGGER.info("Token {} scaduto, swappo con token {}", token, token+1);
-                    else LOGGER.info("Token finiti");
-                    AuthJsonParser.setFlagToken(token+1);
-                    //Mettere un i-- per ripetere la chiamata con il nuovo token
+                    int token = AuthJsonParser.getFlagToken();
+                    if (token <= 5)
+                        LOGGER.info("Token {} scaduto, swappo con token {}", token, token + 1);
+                    else
+                        LOGGER.info("Token finiti");
+                    AuthJsonParser.setFlagToken(token + 1);
+                    // Mettere un i-- per ripetere la chiamata con il nuovo token
                     continue;
                 }
                 for (JavaFile file : treeFiles) {
-                    commitDbDao.insertRealeaseFileTree(file.getName(), file.getContent(), this.project.getName(), release.getNumberStr());
+                    commitDbDao.insertRealeaseFileTree(file.getName(), file.getContent(), this.project.getName(),
+                            release.getNumberStr());
                 }
             }
 
@@ -249,7 +258,7 @@ public class ScraperController {
         return ret;
     }
 
-    public List<Release> getReleasesFromDb(){
+    public List<Release> getReleasesFromDb() {
         List<Release> ret = null;
         try {
             ret = commitDbDao.getReleases(this.project.getName());
@@ -266,7 +275,7 @@ public class ScraperController {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        //Get file tree for each release
+        // Get file tree for each release
         assert ret != null;
         for (Release release : ret) {
             release.setFileTreeAtReleaseEnd(getReleaseFileTreeFromDb(release));
@@ -293,10 +302,21 @@ public class ScraperController {
                 String commitDate = commit.getDate();
                 String releaseStartDate = release.getStartDate();
                 String releaseEndDate = release.getEndDate();
-                //Condizione 1 ASSUNZIONE se la commit è antecedente alla data di inizio della prima release, la inglobo nella prima release
-                //Condizione 2 Se la data della commit combacia con la fine dell'ultima commit la assegno all'ultima release perche non posso metterla come prima commit della successiva
-                //Condizione 3 Se la data della commit si trova all'interno del range di date di una release o combacia con la data di inizio della release la considero appartenente alla release
-                if (((release.getNumberStr().equals("1")) && (sdf.parse(commitDate).before(sdf.parse(releaseStartDate)))) || ((release.getNumberStr().equals(Integer.toString(releases.size()))) && (sdf.parse(commitDate).compareTo(sdf.parse(releaseEndDate)) == 0)) || ((sdf.parse(commitDate).compareTo(sdf.parse(releaseStartDate)) == 0) || ((sdf.parse(commitDate).after(sdf.parse(releaseStartDate))) && (sdf.parse(commitDate).before(sdf.parse(releaseEndDate)))))) {
+                // Condizione 1 ASSUNZIONE se la commit è antecedente alla data di inizio della
+                // prima release, la inglobo nella prima release
+                // Condizione 2 Se la data della commit combacia con la fine dell'ultima commit
+                // la assegno all'ultima release perche non posso metterla come prima commit
+                // della successiva
+                // Condizione 3 Se la data della commit si trova all'interno del range di date
+                // di una release o combacia con la data di inizio della release la considero
+                // appartenente alla release
+                if (((release.getNumberStr().equals("1"))
+                        && (sdf.parse(commitDate).before(sdf.parse(releaseStartDate))))
+                        || ((release.getNumberStr().equals(Integer.toString(releases.size())))
+                                && (sdf.parse(commitDate).compareTo(sdf.parse(releaseEndDate)) == 0))
+                        || ((sdf.parse(commitDate).compareTo(sdf.parse(releaseStartDate)) == 0)
+                                || ((sdf.parse(commitDate).after(sdf.parse(releaseStartDate)))
+                                        && (sdf.parse(commitDate).before(sdf.parse(releaseEndDate)))))) {
                     releases.get(j).addCommit(commit);
                 }
 
@@ -323,30 +343,31 @@ public class ScraperController {
     }
 
     public void getProjectDataFromDb(String lastRelease) throws ParseException {
-        List<Release> allReleases = getReleasesOfInterestFromDb(); //In realta ora le prende tutte
+        List<Release> allReleases = getReleasesOfInterestFromDb(); // In realta ora le prende tutte
         setProjectReleases(allReleases);
         List<Commit> commits = getCommitsFromDb();
         setProjectCommits(commits);
         linkCommitsToReleases(commits, allReleases);
         Printer.printProjectInfo(this.project);
-        Printer.printReleasesDetailed(allReleases,false);
-        removeEmptyReleases(allReleases); //ASSUNZIONE 2
-        adjustReleaseIndexes(allReleases); //Se alcune release le ho tolte rimuovo il "buco" lasciato negli indici
+        Printer.printReleasesDetailed(allReleases, false);
+        removeEmptyReleases(allReleases); // ASSUNZIONE 2
+        adjustReleaseIndexes(allReleases); // Se alcune release le ho tolte rimuovo il "buco" lasciato negli indici
 
         List<Ticket> allTickets = getAllTickets();
         setProjectFixedBugTickets(allTickets);
         linkTicketDatesToReleases(allTickets, allReleases);
-        purgeTicketWithNoOvOrFv(allTickets); //ASSUNZIONE 21
+        purgeTicketWithNoOvOrFv(allTickets); // ASSUNZIONE 21
         Printer.printTicketsBasic(allTickets, false);
 
-        //Release e ticket di interesse, in teoria forse posso anche non usarli più e prendere AllRelease/2
+        // Release e ticket di interesse, in teoria forse posso anche non usarli più e
+        // prendere AllRelease/2
         List<Release> releasesOfInterest = getReleasesOfInterest(lastRelease);
         setProjectReleasesOfInterest(releasesOfInterest);
         String lastInterestReleaseEndDate = getLastReleaseEndDateOfInterest();
-        List<Ticket> ticketOfInterest =getTicketsOfInterest(lastInterestReleaseEndDate);
+        List<Ticket> ticketOfInterest = getTicketsOfInterest(lastInterestReleaseEndDate);
         setProjectFixedBugTicketsOfInterest(ticketOfInterest);
 
-        Printer.printReleasesDetailed(releasesOfInterest,true);
+        Printer.printReleasesDetailed(releasesOfInterest, true);
         Printer.printTicketsBasic(ticketOfInterest, true);
     }
 
@@ -356,7 +377,7 @@ public class ScraperController {
         Printer.printProjectInfo(this.project);
 
         saveProjectOnDb();
-        String lastReleaseDate=allReleases.get(allReleases.size()-1).getEndDate();
+        String lastReleaseDate = allReleases.get(allReleases.size() - 1).getEndDate();
         saveCommitDataOnDb(lastReleaseDate);
         saveReleases();
         LOGGER.info("Saved releases on db");
@@ -380,18 +401,26 @@ public class ScraperController {
 
     public void linkTicketDatesToReleases(List<Ticket> tickets, List<Release> releases) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
-        for(Ticket ticket:tickets){
-            String ticketCreationDate=ticket.getCreationDate();
-            String ticketResDate=ticket.getResolutionDate();
-            for(Release release:releases){
-                String releaseNumber=release.getNumberStr();
-                String relCreationDate=release.getStartDate();
-                String relEndDate=release.getEndDate();
-                //ASSUNZIONE 12 condizione 2, ASSUNZIONE 13 condizione 1
-                if(((Objects.equals(releaseNumber, "1"))&&(sdf.parse(ticketResDate).before(sdf.parse(relCreationDate))))||(sdf.parse(ticketResDate).compareTo(sdf.parse(relCreationDate))==0)||((sdf.parse(ticketResDate).after(sdf.parse(relCreationDate)))&&(sdf.parse(ticketResDate).before(sdf.parse(relEndDate))))){
+        for (Ticket ticket : tickets) {
+            String ticketCreationDate = ticket.getCreationDate();
+            String ticketResDate = ticket.getResolutionDate();
+            for (Release release : releases) {
+                String releaseNumber = release.getNumberStr();
+                String relCreationDate = release.getStartDate();
+                String relEndDate = release.getEndDate();
+                // ASSUNZIONE 12 condizione 2, ASSUNZIONE 13 condizione 1
+                if (((Objects.equals(releaseNumber, "1"))
+                        && (sdf.parse(ticketResDate).before(sdf.parse(relCreationDate))))
+                        || (sdf.parse(ticketResDate).compareTo(sdf.parse(relCreationDate)) == 0)
+                        || ((sdf.parse(ticketResDate).after(sdf.parse(relCreationDate)))
+                                && (sdf.parse(ticketResDate).before(sdf.parse(relEndDate))))) {
                     ticket.setFv(release);
                 }
-                if(((Objects.equals(release.getNumberStr(), "1"))&&(sdf.parse(ticketCreationDate).before(sdf.parse(relCreationDate))))||(sdf.parse(ticketCreationDate).compareTo(sdf.parse(relCreationDate))==0)||((sdf.parse(ticketCreationDate).after(sdf.parse(relCreationDate)))&&(sdf.parse(ticketCreationDate).before(sdf.parse(relEndDate))))){
+                if (((Objects.equals(release.getNumberStr(), "1"))
+                        && (sdf.parse(ticketCreationDate).before(sdf.parse(relCreationDate))))
+                        || (sdf.parse(ticketCreationDate).compareTo(sdf.parse(relCreationDate)) == 0)
+                        || ((sdf.parse(ticketCreationDate).after(sdf.parse(relCreationDate)))
+                                && (sdf.parse(ticketCreationDate).before(sdf.parse(relEndDate))))) {
                     ticket.setOv(release);
                 }
             }
@@ -422,14 +451,14 @@ public class ScraperController {
 
     }
 
-    public void purgeTicketWithNoOvOrFv(List<Ticket> tickets){
-        List<Ticket> ticketToPurge=new ArrayList<>();
-        for(Ticket ticket:tickets){
-            if((ticket.getOv()==null)||(ticket.getFv()==null)){
+    public void purgeTicketWithNoOvOrFv(List<Ticket> tickets) {
+        List<Ticket> ticketToPurge = new ArrayList<>();
+        for (Ticket ticket : tickets) {
+            if ((ticket.getOv() == null) || (ticket.getFv() == null)) {
                 ticketToPurge.add(ticket);
             }
         }
-        for(Ticket ticket:ticketToPurge){
+        for (Ticket ticket : ticketToPurge) {
             tickets.remove(ticket);
         }
     }
@@ -449,6 +478,5 @@ public class ScraperController {
 
         Printer.printTicketsDetailed(allTickets);
     }
-
 
 }

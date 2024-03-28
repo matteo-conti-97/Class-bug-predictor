@@ -14,9 +14,9 @@ public class Commit {
     private String author;
     private List<JavaFile> touchedFiles;
 
-
-    //Used for db creation
-    public Commit(String id, String sha, String message, String date, String author, String treeUrl, List<JavaFile> touchedFiles) {
+    // Used for db creation
+    public Commit(String id, String sha, String message, String date, String author, String treeUrl,
+            List<JavaFile> touchedFiles) {
         this.id = id;
         this.sha = sha;
         this.message = message;

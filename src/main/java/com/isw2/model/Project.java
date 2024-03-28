@@ -12,8 +12,7 @@ public class Project {
     private List<Release> releasesOfInterest;
     private List<Ticket> fixedBugTicketsOfInterest;
 
-
-    public Project(String name, String author, String creationDate){
+    public Project(String name, String author, String creationDate) {
         this.name = name;
         this.author = author;
         this.creationDate = creationDate;

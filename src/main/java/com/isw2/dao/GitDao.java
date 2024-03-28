@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class GitDao {
     private String projectName;
     private String author;
@@ -79,11 +78,13 @@ public class GitDao {
         return ret;
     }
 
-    //Get all commits until a given date, in the format YYYY-MM-DD for our purpose the date is the end date of the interest release
+    // Get all commits until a given date, in the format YYYY-MM-DD for our purpose
+    // the date is the end date of the interest release
     public List<Commit> getAllCommitsUntil(String relEndDate) {
         JsonParser jsonParser = new AuthJsonParser();
         List<Commit> ret = new ArrayList<>();
-        int page = 0; //*****Mettere un numero di pagina più alto se si finiscono gli accessi dell'api*****
+        int page = 0; // *****Mettere un numero di pagina più alto se si finiscono gli accessi
+                      // dell'api*****
         long commitId = 0;
         while (true) {
             JSONArray tmp;
@@ -91,7 +92,8 @@ public class GitDao {
             LOGGER.info(query);
             try {
                 tmp = jsonParser.readJsonArrayFromUrl(query);
-                if (tmp.length() == 0) break;
+                if (tmp.length() == 0)
+                    break;
                 for (int i = 0; i < tmp.length(); i++) {
                     String commitUrl = tmp.getJSONObject(i).getString("url");
                     ret.add(getCommit(commitUrl, commitId));
@@ -107,7 +109,7 @@ public class GitDao {
         return ret;
     }
 
-    //Prende una copia di tutti i file al termine della release
+    // Prende una copia di tutti i file al termine della release
     public List<JavaFile> getRepoFileAtReleaseEnd(String treeUrl) throws IOException {
         List<JavaFile> ret = new ArrayList<>();
         AuthJsonParser jsonParser = new AuthJsonParser();
@@ -119,7 +121,8 @@ public class GitDao {
             JSONObject treeElem = tree.getJSONObject(i);
             String filename = treeElem.getString("path");
 
-            if ((filename.endsWith(".java")) && (!filename.contains("package-info")) && (!filename.contains("test")) && (!filename.contains("Test"))) {
+            if ((filename.endsWith(".java")) && (!filename.contains("package-info")) && (!filename.contains("test"))
+                    && (!filename.contains("Test"))) {
                 String className = filename.substring(filename.lastIndexOf("/") + 1);
                 String fileUrl = treeElem.getString("url");
                 JSONObject fileJson = null;

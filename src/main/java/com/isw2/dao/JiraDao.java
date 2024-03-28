@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class JiraDao {
 
     private final String projectName;
@@ -21,17 +20,18 @@ public class JiraDao {
         this.projectName = projectName.toUpperCase();
     }
 
-
     /*
-    Get all releases until the specified release, the releaseName must follow the name convention of jira (e.g. 1.0.0)
-    if an empty or non-existent name is specified, the method will return all releases
-    */
+     * Get all releases until the specified release, the releaseName must follow the
+     * name convention of jira (e.g. 1.0.0)
+     * if an empty or non-existent name is specified, the method will return all
+     * releases
+     */
     public List<Release> getAllReleases(String creationDate) {
         List<Release> ret = new ArrayList<>();
         JsonParser jsonParser = new JsonParser();
         JSONObject jsonReleases = null;
         String query = String.format(ALL_RELEASE_QUERY, this.projectName);
-        String lastReleaseEndDate=creationDate;
+        String lastReleaseEndDate = creationDate;
         try {
             jsonReleases = jsonParser.readJsonFromUrl(query);
         } catch (IOException e) {
@@ -41,11 +41,15 @@ public class JiraDao {
         JSONArray releases = jsonReleases.getJSONArray("values");
         for (int i = 0; i < releases.length(); i++) {
             JSONObject releaseJson = releases.getJSONObject(i);
-            if((!releaseJson.getBoolean("released"))||(!releaseJson.has("releaseDate"))) continue; //skip unreleased versions
+            if ((!releaseJson.getBoolean("released")) || (!releaseJson.has("releaseDate")))
+                continue; // skip unreleased versions
             String name = releaseJson.getString("name");
             String endDate = releaseJson.getString("releaseDate");
             Release release;
-            release = new Release(name, i + 1, lastReleaseEndDate, endDate); //+1 cause it start at 0, use the next release start date as end date of the current release, except for the last release which have missing
+            release = new Release(name, i + 1, lastReleaseEndDate, endDate); // +1 cause it start at 0, use the next
+                                                                             // release start date as end date of the
+                                                                             // current release, except for the last
+                                                                             // release which have missing
             lastReleaseEndDate = endDate;
 
             ret.add(release);
@@ -53,8 +57,7 @@ public class JiraDao {
         return ret;
     }
 
-
-    //Retrieve specified ticket data from jira
+    // Retrieve specified ticket data from jira
     public Ticket getTicket(String key, String ticketId, String ticketUrl) {
         Ticket ret = new Ticket(key, ticketId, ticketUrl);
         JsonParser jsonParser = new JsonParser();
@@ -69,7 +72,7 @@ public class JiraDao {
         JSONObject ticketFields = jsonTicket.getJSONObject("fields");
         String creationDate = ticketFields.getString("created").substring(0, 10);
         String resolutionDate = ticketFields.getString("resolutiondate").substring(0, 10);
-        if(ticketFields.has("versions")) {
+        if (ticketFields.has("versions")) {
             JSONArray affectedVersionsJson = ticketFields.getJSONArray("versions");
 
             for (int i = 0; i < affectedVersionsJson.length(); i++) {
@@ -83,7 +86,7 @@ public class JiraDao {
         return ret;
     }
 
-    //In jira the affected version is the field "name" of the version
+    // In jira the affected version is the field "name" of the version
     public List<Ticket> getAllFixedBugTickets(int start) {
         JsonParser jsonParser = new JsonParser();
         ArrayList<Ticket> ret = new ArrayList<>();
@@ -91,7 +94,8 @@ public class JiraDao {
         int total = 1;
         int max = 1000;
         do {
-            //Only gets a max of 1000 at a time, so must do this multiple times if bugs >1000
+            // Only gets a max of 1000 at a time, so must do this multiple times if bugs
+            // >1000
             end = start + max;
             String query = String.format(FIXED_BUG_QUERY, this.projectName, start, end);
             JSONObject jsonTickets = null;
@@ -103,7 +107,7 @@ public class JiraDao {
             assert jsonTickets != null;
             total = jsonTickets.getInt("total");
             JSONArray issues = jsonTickets.getJSONArray("issues");
-            for (; start < total && start < end; start++) {  //Iterate through each bug
+            for (; start < total && start < end; start++) { // Iterate through each bug
                 JSONObject ticketMetadata = issues.getJSONObject(start % 1000);
                 String ticketId = ticketMetadata.get("id").toString();
                 String key = ticketMetadata.get("key").toString();

@@ -11,7 +11,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class CommitDbDao {
     private Connection conn;
     private static final String DB_URL = "jdbc:mysql://localhost:3306/isw2_scraping_db?allowPublicKeyRetrieval=true&useSSL=false";
@@ -41,7 +40,6 @@ public class CommitDbDao {
         }
     }
 
-
     public void insertProject(String name, String author) {
         try (PreparedStatement ps = conn.prepareStatement(
                 "INSERT INTO project(name, author) VALUES(?,?) ON DUPLICATE KEY UPDATE author = ?")) {
@@ -57,14 +55,15 @@ public class CommitDbDao {
         }
     }
 
-    public void insertCommit(String sha, String id, String message, String author, String date, String treeUrl, String project) {
+    public void insertCommit(String sha, String id, String message, String author, String date, String treeUrl,
+            String project) {
         try (PreparedStatement ps = conn.prepareStatement(
                 "INSERT INTO commit(sha, id, message, author, cdate, treeUrl, project_name) VALUES(?,?,?,?,?,?,?)" +
                         "ON DUPLICATE KEY UPDATE author = ?")) {
 
             ps.setString(1, sha);
             ps.setString(2, id);
-            ps.setString(3, message.substring(0,25));
+            ps.setString(3, message.substring(0, 25));
             ps.setString(4, author);
             ps.setString(5, date);
             ps.setString(6, treeUrl);
@@ -96,9 +95,11 @@ public class CommitDbDao {
         }
     }
 
-    public void insertTouchedFile(String filename, String commitSha, String commitId, String add, String del, String content, String project) {
+    public void insertTouchedFile(String filename, String commitSha, String commitId, String add, String del,
+            String content, String project) {
         try (PreparedStatement ps = conn.prepareStatement(
-                "INSERT INTO touchedfiles(commit_sha, commit_id, commit_project_name, filename, adds, dels, content) VALUES(?,?,?,?,?,?,?)" +
+                "INSERT INTO touchedfiles(commit_sha, commit_id, commit_project_name, filename, adds, dels, content) VALUES(?,?,?,?,?,?,?)"
+                        +
                         "ON DUPLICATE KEY UPDATE adds = ?")) {
 
             ps.setString(1, commitSha);
@@ -117,7 +118,7 @@ public class CommitDbDao {
         }
     }
 
-    public void insertTicket(String key, String resDate, String creationDate, String projectName, String av){
+    public void insertTicket(String key, String resDate, String creationDate, String projectName, String av) {
         try (PreparedStatement ps = conn.prepareStatement(
                 "INSERT INTO ticket(project, tkey, resDate, creationDate, av) VALUES(?,?,?,?,?)" +
                         "ON DUPLICATE KEY UPDATE resDate = ?")) {
@@ -200,7 +201,8 @@ public class CommitDbDao {
             ps.setString(3, commitId);
             rs = ps.executeQuery();
             while (rs.next()) {
-                ret.add(new JavaFile(rs.getString("filename"), rs.getString("adds"), rs.getString("dels"), rs.getString("content"), rs.getString("status"), rs.getString("pname")));
+                ret.add(new JavaFile(rs.getString("filename"), rs.getString("adds"), rs.getString("dels"),
+                        rs.getString("content"), rs.getString("status"), rs.getString("pname")));
             }
             rs.close();
             return ret;
@@ -236,7 +238,8 @@ public class CommitDbDao {
                 String commitAuthor = rs.getString("author");
                 String commitTreeUrl = rs.getString("treeUrl");
                 List<JavaFile> touchedFile = getTouchedFiles(commitSha, project, commitId);
-                ret.add(new Commit(commitId, commitSha, commitMessage, commitDate, commitAuthor, commitTreeUrl, touchedFile));
+                ret.add(new Commit(commitId, commitSha, commitMessage, commitDate, commitAuthor, commitTreeUrl,
+                        touchedFile));
             }
             rs.close();
         } catch (SQLException e) {
@@ -315,9 +318,9 @@ public class CommitDbDao {
     public List<Ticket> getTickets(String project) throws SQLException {
         ResultSet rs = null;
         PreparedStatement ps = null;
-        List<Ticket> ticketSet= getTicketSet(project);
+        List<Ticket> ticketSet = getTicketSet(project);
 
-        for(Ticket ticket: ticketSet) {
+        for (Ticket ticket : ticketSet) {
             List<Release> av = new ArrayList<>();
             try {
                 ps = conn.prepareStatement(

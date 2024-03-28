@@ -26,7 +26,7 @@ public class AuthJsonParser extends JsonParser {
         AuthJsonParser.flagToken = flagToken;
     }
 
-    public static int getFlagToken(){
+    public static int getFlagToken() {
         return flagToken;
     }
 
@@ -35,34 +35,40 @@ public class AuthJsonParser extends JsonParser {
         uc.setRequestProperty("X-Requested-With", "Curl");
         String token;
         String user;
-        if (flagToken ==1) {
+        if (flagToken == 1) {
             user = USERNAME2;
-            try (BufferedReader oauthReader = new BufferedReader(new FileReader("src/main/java/resource/token/git_token_onibaku"))) {
+            try (BufferedReader oauthReader = new BufferedReader(
+                    new FileReader("src/main/java/resource/token/git_token_onibaku"))) {
                 token = oauthReader.readLine();
             }
-        }else if(flagToken ==2){
+        } else if (flagToken == 2) {
             user = USERNAME3;
-            try (BufferedReader oauthReader = new BufferedReader(new FileReader("src/main/java/resource/token/git_token_mcuni"))) {
+            try (BufferedReader oauthReader = new BufferedReader(
+                    new FileReader("src/main/java/resource/token/git_token_mcuni"))) {
                 token = oauthReader.readLine();
             }
-        }else if(flagToken ==3){
+        } else if (flagToken == 3) {
             user = USERNAME4;
-            try (BufferedReader oauthReader = new BufferedReader(new FileReader("src/main/java/resource/token/git_token_sdgasg82"))) {
+            try (BufferedReader oauthReader = new BufferedReader(
+                    new FileReader("src/main/java/resource/token/git_token_sdgasg82"))) {
                 token = oauthReader.readLine();
             }
-        }else if(flagToken ==4) {
+        } else if (flagToken == 4) {
             user = USERNAME5;
-            try (BufferedReader oauthReader = new BufferedReader(new FileReader("src/main/java/resource/token/git_token_sdfas6695"))) {
+            try (BufferedReader oauthReader = new BufferedReader(
+                    new FileReader("src/main/java/resource/token/git_token_sdfas6695"))) {
                 token = oauthReader.readLine();
             }
-        }else if(flagToken ==5) {
+        } else if (flagToken == 5) {
             user = USERNAME6;
-            try (BufferedReader oauthReader = new BufferedReader(new FileReader("src/main/java/resource/token/git_token_rioeuto"))) {
+            try (BufferedReader oauthReader = new BufferedReader(
+                    new FileReader("src/main/java/resource/token/git_token_rioeuto"))) {
                 token = oauthReader.readLine();
             }
         } else {
             user = USERNAME;
-            try (BufferedReader oauthReader = new BufferedReader(new FileReader("src/main/java/resource/token/git_token_matteo"))) {
+            try (BufferedReader oauthReader = new BufferedReader(
+                    new FileReader("src/main/java/resource/token/git_token_matteo"))) {
                 token = oauthReader.readLine();
             }
         }

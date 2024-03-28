@@ -21,7 +21,7 @@ public class CodeParser {
         writeOnFile(decFileContent);
         Runtime.getRuntime().exec(CMD);
         List<String[]> csvRead = CsvHandler.readCsv(OUT_CSV_PATH);
-        return csvRead.get(0)[4]; //Code line count
+        return csvRead.get(0)[4]; // Code line count
     }
 
     public static String getBlankLineCount(String fileContent) throws IOException {
@@ -29,7 +29,7 @@ public class CodeParser {
         writeOnFile(decFileContent);
         Runtime.getRuntime().exec(CMD);
         List<String[]> csvRead = CsvHandler.readCsv(OUT_CSV_PATH);
-        return csvRead.get(0)[2]; //Code line count
+        return csvRead.get(0)[2]; // Code line count
     }
 
     public static String getCommentLineCount(String fileContent) throws IOException {
@@ -37,7 +37,7 @@ public class CodeParser {
         writeOnFile(decFileContent);
         Runtime.getRuntime().exec(CMD);
         List<String[]> csvRead = CsvHandler.readCsv(OUT_CSV_PATH);
-        return csvRead.get(0)[3]; //Code line count
+        return csvRead.get(0)[3]; // Code line count
     }
 
     public static String base64Decode(String encodedString) {

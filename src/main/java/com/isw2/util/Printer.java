@@ -10,7 +10,9 @@ import java.util.List;
 
 public class Printer {
     private static final Logger LOGGER = LoggerFactory.getLogger(Printer.class);
-    private Printer(){}
+
+    private Printer() {
+    }
 
     public static void printTicketsDetailed(List<Ticket> tickets) {
         int ticketSize = tickets.size();
@@ -23,7 +25,10 @@ public class Printer {
             String fvNumber = ticket.getFv().getNumberStr();
             String ovName = ticket.getOv().getName();
             String ovNumber = ticket.getOv().getNumberStr();
-            LOGGER.info("{} Creation Date: {} Resolution Date: {} Fix Version: {} Num: {} Creation Date: {} Opening Version: {} Num: {}", ticketKey, ticketCreationDate, ticketResolutionDate, fvName, fvNumber, ticket.getCreationDate(), ovName, ovNumber);
+            LOGGER.info(
+                    "{} Creation Date: {} Resolution Date: {} Fix Version: {} Num: {} Creation Date: {} Opening Version: {} Num: {}",
+                    ticketKey, ticketCreationDate, ticketResolutionDate, fvName, fvNumber, ticket.getCreationDate(),
+                    ovName, ovNumber);
             LOGGER.info("\tAffected Versions: ");
             for (Release av : ticket.getJiraAv()) {
                 String avName = av.getName();
@@ -32,15 +37,18 @@ public class Printer {
         }
     }
 
-    public static void printTicketsBasic(List<Ticket> tickets, boolean interest){
+    public static void printTicketsBasic(List<Ticket> tickets, boolean interest) {
         int ticketSize = tickets.size();
-        if(interest) LOGGER.info("\n{} tickets of interest", ticketSize);
-        else LOGGER.info("\n{} tickets", ticketSize);
+        if (interest)
+            LOGGER.info("\n{} tickets of interest", ticketSize);
+        else
+            LOGGER.info("\n{} tickets", ticketSize);
         for (Ticket ticket : tickets) {
             String ticketKey = ticket.getKey();
             String ticketCreationDate = ticket.getCreationDate();
             String ticketResolutionDate = ticket.getResolutionDate();
-            LOGGER.info("{} Creation Date: {} Resolution Date: {}", ticketKey, ticketCreationDate, ticketResolutionDate);
+            LOGGER.info("{} Creation Date: {} Resolution Date: {}", ticketKey, ticketCreationDate,
+                    ticketResolutionDate);
         }
     }
 
@@ -51,9 +59,11 @@ public class Printer {
         LOGGER.info("Creation date: {}", projectCreationDate);
     }
 
-    public static void printReleasesDetailed(List<Release> releases, boolean interest){
-        if(interest) LOGGER.info("Releases of interest: ");
-        else LOGGER.info("All releases: ");
+    public static void printReleasesDetailed(List<Release> releases, boolean interest) {
+        if (interest)
+            LOGGER.info("Releases of interest: ");
+        else
+            LOGGER.info("All releases: ");
         for (Release release : releases) {
             String releaseName = release.getName();
             String releaseNumber = release.getNumberStr();
@@ -61,23 +71,25 @@ public class Printer {
             String releaseEndDate = release.getEndDate();
             int releaseNumCommits = release.getCommits().size();
             int releaseNumFiles = release.getFileTreeAtReleaseEnd().size();
-            LOGGER.info("Release: {} number {} has {} commits and {} non test java files, starts at {} and ends at {}", releaseName, releaseNumber, releaseNumCommits, releaseNumFiles, releaseStartDate, releaseEndDate);
+            LOGGER.info("Release: {} number {} has {} commits and {} non test java files, starts at {} and ends at {}",
+                    releaseName, releaseNumber, releaseNumCommits, releaseNumFiles, releaseStartDate, releaseEndDate);
         }
     }
 
-    public static void printReleasesBasic(List<Release> releases){
+    public static void printReleasesBasic(List<Release> releases) {
         LOGGER.info("Releases of interest: ");
         for (Release release : releases) {
             String releaseName = release.getName();
             String releaseNumber = release.getNumberStr();
             String releaseStartDate = release.getStartDate();
             String releaseEndDate = release.getEndDate();
-            LOGGER.info("Release: {} number {} starts at {} and ends at {}", releaseName, releaseNumber, releaseStartDate, releaseEndDate);
+            LOGGER.info("Release: {} number {} starts at {} and ends at {}", releaseName, releaseNumber,
+                    releaseStartDate, releaseEndDate);
         }
     }
 
-    public static void printMeanEval(List<Double> meanEval, ClassifierType classifierType){
-        switch(classifierType){
+    public static void printMeanEval(List<Double> meanEval, ClassifierType classifierType) {
+        switch (classifierType) {
             case RANDOM_FOREST:
                 LOGGER.info("\n\nMean evaluation with Random Forest: ");
                 break;

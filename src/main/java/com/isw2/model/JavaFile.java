@@ -22,15 +22,14 @@ public class JavaFile {
     String status;
     String prevName;
 
-
-    //Usato per riempire la tabella del file tree nel db
+    // Usato per riempire la tabella del file tree nel db
     public JavaFile(String name, String content) {
         this.name = name;
         this.content = content;
-        this.buggy="NO";
+        this.buggy = "NO";
     }
 
-    //Usato per riempire la tabella delle commit nel db
+    // Usato per riempire la tabella delle commit nel db
     public JavaFile(String name, String add, String del, String content, String status, String prevName) {
         this.name = name;
         this.add = add;
@@ -38,7 +37,7 @@ public class JavaFile {
         this.content = content;
         this.status = status;
         this.prevName = prevName;
-        this.buggy="NO";
+        this.buggy = "NO";
     }
 
     public String getName() {
@@ -80,7 +79,6 @@ public class JavaFile {
     public void setRawUrl(String rawUrl) {
         this.rawUrl = rawUrl;
     }
-
 
     public String getnAuthorInRelease() {
         return nAuthorInRelease;

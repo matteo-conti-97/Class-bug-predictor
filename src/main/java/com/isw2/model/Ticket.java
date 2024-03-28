@@ -10,26 +10,29 @@ public class Ticket {
     private String resolutionDate;
     private int iv;
     private Release ov;
-    private Release fv; //Not the jira fix version, but the git fix commit using SZZ approach
+    private Release fv; // Not the jira fix version, but the git fix commit using SZZ approach
     private List<Release> jiraAv;
-    private List<Release> proportionAv; //Not always jira is trustable
+    private List<Release> proportionAv; // Not always jira is trustable
     private List<Commit> gitCommits;
 
     public Ticket(String key, String ticketId, String ticketUrl) {
         this.key = key;
         this.ticketId = ticketId;
         this.ticketUrl = ticketUrl;
-        this.iv=-1;
+        this.iv = -1;
     }
-
 
     public Ticket(String key) {
         this.key = key;
     }
 
-    public int getIv(){return iv;}
+    public int getIv() {
+        return iv;
+    }
 
-    public void setIv(int iv){this.iv = iv;}
+    public void setIv(int iv) {
+        this.iv = iv;
+    }
 
     public String getTicketId() {
         return ticketId;
@@ -54,7 +57,6 @@ public class Ticket {
     public void setTicketUrl(String ticketUrl) {
         this.ticketUrl = ticketUrl;
     }
-
 
     public String getCreationDate() {
         return creationDate;
@@ -112,4 +114,3 @@ public class Ticket {
         this.gitCommits = gitCommits;
     }
 }
-

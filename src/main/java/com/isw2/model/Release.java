@@ -8,7 +8,7 @@ public class Release {
     private int number;
     private String startDate;
     private String endDate;
-    private List<Commit> commits; //The first element is the last commit of the release and the last element is the first commit of the release
+    private List<Commit> commits; // The first element is the last commit of the release and the last element is the first commit of the release
     private List<Ticket> tickets;
     private List<JavaFile> fileTreeAtReleaseEnd;
 
